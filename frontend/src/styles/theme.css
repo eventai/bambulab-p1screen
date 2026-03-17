@@ -1,0 +1,53 @@
+:root {
+  --bg-0: #0b1117;
+  --bg-1: #0f1720;
+  --bg-2: #161f2b;
+  --bg-3: #232f41;
+  --accent: #B8F776;
+  --accent-2: #f2c14f;
+  --text-0: #f1f5fb;
+  --text-1: #c2cbd8;
+  --text-2: #8f9bb0;
+  --stroke: #2a3545;
+}
+
+:root:root {
+  --van-primary-color: #4FA34F;
+  --van-background: #141414;
+  --van-background-2: #242424;
+  --van-background-3: #333333;
+  --van-background-4: #3C3C3C;
+  --van-text-color: #F0F0F0;
+  --van-text-color-2: #C4C4C4;
+
+  --van-button-default-color: var(--van-black);
+  --van-button-default-background: var(--van-white);
+  --van-button-primary-color: var(--van-white);
+  --van-button-primary-background: var(--van-primary-color);
+
+  --van-cell-group-inset-title-padding: 8px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--van-background);
+  color: var(--text-0);
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior: none;
+  overflow: hidden;
+}
+
+#app {
+  width: 100vw;
+  height: 100vh;
+}
