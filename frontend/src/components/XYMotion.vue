@@ -53,6 +53,7 @@ const emitMove = (axis: 'home' | 'x' | 'y', step: -10 | -1 | 0 | 1 | 10) => {
 
 .axis-dial {
   width: 82%;
+  margin: 8px;
   aspect-ratio: 1 / 1;
   position: relative;
   border-radius: 50%;

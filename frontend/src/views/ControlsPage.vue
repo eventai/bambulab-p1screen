@@ -38,7 +38,7 @@
             </div>
           </div>
           <div class="control-split">
-            <div class="control-row">
+            <div class="control-row" @click="showPrintSpeedPopup = true">
               <div class="control-left">
                 <img class="control-icon-img" :src="speedIcon" />
               </div>
@@ -46,11 +46,11 @@
                 <span>{{ getPrintSpeed }}%</span>
               </div>
             </div>
-            <div class="control-row">
+            <div class="control-row" @click="toggleLight">
               <div class="control-left">
                 <img class="control-icon-img" :src="lightState ? lightOnIcon : lightOffIcon" />
               </div>
-              <div class="control-value" @click="toggleLight">
+              <div class="control-value">
                 <span>照明</span>
               </div>
             </div>
@@ -70,6 +70,13 @@
       :type="tempPopupType"
       @confirm="handleTempConfirm"
     />
+
+    <PrintSpeedPopup
+      v-model:show="showPrintSpeedPopup"
+      :value="getPrintSpeedLevel"
+      @confirm="handlePrintSpeedConfirm"
+    />
+
   </div>
 </template>
 
@@ -79,6 +86,7 @@ import XYMotion from '../components/XYMotion.vue'
 import ZMotion from '../components/ZMotion.vue'
 import EMotion from '../components/EMotion.vue'
 import TempKeypadPopup from '../components/TempKeypadPopup.vue'
+import PrintSpeedPopup from '../components/PrintSpeedPopup.vue'
 import { device } from '../store/device'
 import { WSService } from '../store/ws'
 
@@ -138,9 +146,16 @@ const toggleFan = (type: 'part' | 'aux' | 'chamber') => {
 // ------------------------------
 // Speed
 
-const getPrintSpeed = computed(() => {
-  return device.print.spd_mag ?? 0
-})
+const showPrintSpeedPopup = ref(false)
+
+const getPrintSpeed = computed(() => device.print.spd_mag ?? 0)
+const getPrintSpeedLevel = computed(() => device.print.spd_lvl ?? 0)
+
+const handlePrintSpeedConfirm = (speedLevel: number) => {
+  console.log('[Controls] set print speed', speedLevel)
+  // TODO 提示：空闲状态下调整打印速度不生效。
+  WSService.getInstance().setPrintSpeedLevel(speedLevel)
+}
 
 // ------------------------------
 // Light

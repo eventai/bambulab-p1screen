@@ -30,7 +30,9 @@ wss.on('connection', (socket, req) => {
   const reportTopic = `device/${serial}/report`
   const commandTopic = `device/${serial}/request`
 
-  let mqttClient = mqtt.connect(`mqtts://${ip}:8883`, {
+  const brokerUrl = `mqtts://${ip}:8883`
+  console.info(`[mqtt][${remote}] connecting to ${brokerUrl}`)
+  let mqttClient = mqtt.connect(brokerUrl, {
     clientId: `p1screen_${remote}`,
     username: 'bblp',
     password: code,
@@ -42,9 +44,7 @@ wss.on('connection', (socket, req) => {
   mqttClient.on('connect', () => {
     console.info(`[mqtt][${remote}] connected`)
     mqttClient.subscribe(reportTopic, (err) => {
-      if (err) {
-        console.error(`[mqtt][${remote}] subscribe error, topic = ${reportTopic}, err = ${err.message}`)
-      }
+      console.info(`[mqtt][${remote}] subscribe topic: ${reportTopic}, err = ${err?.message}`)
     })
   })
 

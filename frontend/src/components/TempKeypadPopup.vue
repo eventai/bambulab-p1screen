@@ -1,12 +1,12 @@
 <template>
   <van-popup :show="show" position="right" @click-overlay="handleClose">
-    <div class="temp-popup">
-      <div class="temp-header">
-        <button class="temp-back" type="button" @click="handleClose">
+    <div class="popup">
+      <div class="popup-header">
+        <button class="popup-header-back" type="button" @click="handleClose">
           <span class="material-symbols-rounded">arrow_back_ios</span>
         </button>
-        <div class="temp-title">{{ title }}</div>
-        <van-button class="temp-confirm" type="primary" size="normal" :disabled="inputValue.length === 0" @click="handleConfirm">确定</van-button>
+        <div class="popup-header-title">{{ title }}</div>
+        <van-button class="popup-header-confirm" type="primary" size="normal" :disabled="inputValue.length === 0" @click="handleConfirm">确定</van-button>
       </div>
 
       <div class="temp-display">
@@ -23,6 +23,7 @@
           <span class="material-symbols-rounded">backspace</span>
         </button>
       </div>
+
     </div>
   </van-popup>
 </template>
@@ -100,51 +101,15 @@ const handleConfirm = () => {
 </script>
 
 <style scoped>
-.temp-popup {
-  background: #3b3b3b;
-  color: #f2f2f2;
-  padding: 14px 14px 18px;
-  display: grid;
-  gap: 12px;
-}
-
-.temp-header {
-  display: grid;
-  grid-template-columns: 32px 1fr auto;
-  align-items: center;
-  gap: 12px;
-}
-
-.temp-back {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  border: 0;
-  background: transparent;
-  color: #e8e8e8;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-}
-
-.temp-title {
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.temp-confirm {
-  width: 80px;
-  height: 40px;
-}
-
 .temp-display {
-  background: #2f2f2f;
+  background: var(--van-background-2);
   border-radius: 10px;
   padding: 14px;
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
   font-size: 20px;
+  height: 58px;
 }
 
 .temp-value {
@@ -161,11 +126,11 @@ const handleConfirm = () => {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
+  align-self: start;
 }
 
 .temp-key {
-  background: #4a4a4a;
-  color: #f5f5f5;
+  background: var(--van-background-5);
   border: 0;
   border-radius: 8px;
   width: 100px;

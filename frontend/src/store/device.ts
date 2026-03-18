@@ -24,6 +24,7 @@ export type DevicePrint = {
   nozzle_type?: string
 
   spd_mag?: number
+  spd_lvl?: number
   fan_gear?: number
 
   ams?: DeviceAMSInfo

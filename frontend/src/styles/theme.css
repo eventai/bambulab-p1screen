@@ -17,6 +17,8 @@
   --van-background-2: #242424;
   --van-background-3: #333333;
   --van-background-4: #3C3C3C;
+  --van-background-5: #4A4A4A;
+  
   --van-text-color: #F0F0F0;
   --van-text-color-2: #C4C4C4;
 
@@ -50,4 +52,43 @@ body {
 #app {
   width: 100vw;
   height: 100vh;
+}
+
+.popup {
+  background: #3b3b3b;
+  color: #f2f2f2;
+  padding: 14px 14px 18px;
+  display: grid;
+  gap: 12px;
+  height: 100vh;
+}
+
+.popup-header {
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  height: 40px;
+}
+
+.popup-header-back {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 0;
+  background: transparent;
+  color: #e8e8e8;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.popup-header-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.popup-header-confirm {
+  width: 80px;
+  height: 40px;
 }

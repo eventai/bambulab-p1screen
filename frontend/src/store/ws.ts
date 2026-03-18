@@ -90,6 +90,10 @@ export class WSService {
         (device.print as any)[key] = data.print[key]
         console.debug(`[WebSocket] update print.${key} = ${JSON.stringify(data.print[key])}`)
       }
+    } else if (data?.print?.command === 'print_speed') {
+      console.debug(`[WebSocket] update print.print_speed_level = ${JSON.stringify(data.print?.param)}`)
+      device.print.spd_lvl = Number(data.print?.param)
+      device.print.spd_mag = [50, 100, 124, 166][device.print.spd_lvl - 1]
     } else if (data?.info?.command === 'get_version') {
       device.module = data.info.module
       console.debug(`[WebSocket] update module = ${JSON.stringify(data.info.module)}`)
