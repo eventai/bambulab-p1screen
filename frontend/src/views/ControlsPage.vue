@@ -2,41 +2,22 @@
   <div class="controls-page">
     <div class="control-panel">
         <div class="control-list">
-          <div class="control-row" @click="openTempPopup('nozzle')">
+
+          <div class="control-row" v-for="item in temps" :key="item.type" @click="openTempPopup(item.type)">
             <div class="control-left">
-              <img class="control-icon-img" :src="nozzleTempIcon" />
+              <img class="control-icon-img" :src="item.icon" />
             </div>
-            <div class="control-value">{{ Math.floor(Number(device.print.nozzle_temper ?? '0')) }} / {{ Math.floor(Number(device.print.nozzle_target_temper ?? '0')) }} ℃</div>
+            <div class="control-value">{{ item.current }} / {{ item.target }} ℃</div>
           </div>
-          <div class="control-row" @click="openTempPopup('bed')">
-            <div class="control-left">
-              <img class="control-icon-img" :src="bedTempIcon" />
-            </div>
-            <div class="control-value">{{ Math.floor(Number(device.print.bed_temper ?? '0')) }} / {{ Math.floor(Number(device.print.bed_target_temper ?? '0')) }} ℃</div>
-          </div>
-          <div class="fan-row">
-            <div class="fan-card">
-              <div class="fan-name">部件</div>
-              <div class="fan-toggle" role="button" @click="toggleFan('part')">
-                <img :src="getFanSpeed('part') !== 0 ? fanOnIcon : fanOffIcon" />
-              </div>
-              <div class="fan-percent">{{ (getFanSpeed('part') / 255 * 100).toFixed(0) }}%</div>
-            </div>
-            <div class="fan-card">
-              <div class="fan-name">辅助</div>
-              <div class="fan-toggle" role="button" @click="toggleFan('aux')">
-                <img :src="getFanSpeed('aux') !== 0 ? fanOnIcon : fanOffIcon" />
-              </div>
-              <div class="fan-percent">{{ (getFanSpeed('aux') / 255 * 100).toFixed(0) }}%</div>
-            </div>
-            <div class="fan-card">
-              <div class="fan-name">机箱</div>
-              <div class="fan-toggle" role="button" @click="toggleFan('chamber')">
-                <img :src="getFanSpeed('chamber') !== 0 ? fanOnIcon : fanOffIcon" />
-              </div>
-              <div class="fan-percent">{{ (getFanSpeed('chamber') / 255 * 100).toFixed(0) }}%</div>
+
+          <div class="fan-row" @click="showFanSpeedPopup = true">
+            <div class="fan-card" v-for="item in fans" :key="item.type">
+              <div class="fan-name">{{ item.name }}</div>
+              <img class="fan-icon" :src="WSService.getInstance().getFanSpeed(item.type) !== 0 ? fanOnIcon : fanOffIcon" />
+              <div class="fan-percent">{{ (WSService.getInstance().getFanSpeed(item.type) / 255 * 100).toFixed(0) }}%</div>
             </div>
           </div>
+
           <div class="control-split">
             <div class="control-row" @click="showPrintSpeedPopup = true">
               <div class="control-left">
@@ -55,12 +36,13 @@
               </div>
             </div>
           </div>
+
         </div>
     </div>
 
     <div class="xyz-motion">
-        <XYMotion @move="handleMove" />
-        <ZMotion @move="handleMove" />
+      <XYMotion @move="handleMove" />
+      <ZMotion @move="handleMove" />
     </div>
 
     <EMotion @move="handleMove" />
@@ -69,6 +51,10 @@
       v-model:show="showTempPopup"
       :type="tempPopupType"
       @confirm="handleTempConfirm"
+    />
+
+    <FanSpeedPopup
+      v-model:show="showFanSpeedPopup"
     />
 
     <PrintSpeedPopup
@@ -86,8 +72,9 @@ import XYMotion from '../components/XYMotion.vue'
 import ZMotion from '../components/ZMotion.vue'
 import EMotion from '../components/EMotion.vue'
 import TempKeypadPopup from '../components/TempKeypadPopup.vue'
+import FanSpeedPopup from '../components/FanSpeedPopup.vue'
 import PrintSpeedPopup from '../components/PrintSpeedPopup.vue'
-import { device } from '../store/device'
+import { device, fans } from '../store/device'
 import { WSService } from '../store/ws'
 
 import nozzleTempIcon from '../assets/images/monitor_nozzle_temp.svg'
@@ -104,8 +91,21 @@ import lightOffIcon from '../assets/images/monitor_lamp_off.svg'
 
 // ------------------------------
 // Temperature
-const tempPopupType = ref<'bed' | 'nozzle' | 'chamber' | undefined>(undefined)
 const showTempPopup = ref(false)
+const tempPopupType = ref<'bed' | 'nozzle' | 'chamber' | undefined>(undefined)
+const temps: { type: 'bed' | 'nozzle' | 'chamber', icon: string, activeIcon: string, current: any, target: any }[] = [{
+  type: 'nozzle',
+  icon: nozzleTempIcon,
+  activeIcon: nozzleTempActiveIcon,
+  current: computed(() => Math.floor(Number(device.print.nozzle_temper ?? '0'))),
+  target: computed(() => Math.floor(Number(device.print.nozzle_target_temper ?? '0'))),
+}, {
+  type: 'bed',
+  icon: bedTempIcon,
+  activeIcon: bedTempActiveIcon,
+  current: computed(() => Math.floor(Number(device.print.bed_temper ?? '0'))),
+  target: computed(() => Math.floor(Number(device.print.bed_target_temper ?? '0'))),
+}]
 
 const openTempPopup = (type: 'bed' | 'nozzle' | 'chamber') => {
   tempPopupType.value = type
@@ -120,28 +120,7 @@ const handleTempConfirm = (type: 'bed' | 'nozzle' | 'chamber' | undefined, value
 // ------------------------------
 // Fan
 
-const getFanSpeed = (type: 'part' | 'aux' | 'chamber') => {
-  const fanGear = device.print.fan_gear ?? 0
-  if (type === 'part') {
-    return fanGear % 256
-  } else if (type === 'aux') {
-    return (fanGear >> 8) % 256
-  } else if (type === 'chamber') {
-    return (fanGear >> 16) % 256
-  }
-  return 0
-}
-
-const toggleFan = (type: 'part' | 'aux' | 'chamber') => {
-  let speed = getFanSpeed(type)
-  if (speed === 0) {
-    speed = 255
-  } else {
-    speed = 0
-  }
-  console.log(`[Controls] setFanSpeed: type=${type}, speed=${speed}`)
-  WSService.getInstance().setFanSpeed(type, speed)
-}
+const showFanSpeedPopup = ref(false)
 
 // ------------------------------
 // Speed
@@ -298,20 +277,6 @@ const handleMove = (axis: 'home' | 'x' | 'y' | 'z' | 'e', step: -10 | -1 | 0| 1 
 
 .fan-percent {
   font-weight: 600;
-}
-
-.fan-toggle {
-  width: 24px;
-  height: 24px;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-}
-
-.fan-toggle img {
-  width: 20px;
-  height: 20px;
-  object-fit: contain;
 }
 
 .xyz-motion {

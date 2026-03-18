@@ -9,7 +9,7 @@
       </div>
 
       <div class="print-speed-buttons">
-        <van-button v-for="item in buttons" :class="`print-speed-button ${item.value === value ? 'print-speed-button-active' : ''}`" type="primary" size="large" @click="handleConfirm(item.value)">{{ item.label }}</van-button>
+        <van-button v-for="item in buttons" :key="item.value" :class="`print-speed-button ${item.value === value ? 'print-speed-button-active' : ''}`" type="primary" size="large" @click="handleConfirm(item.value)">{{ item.label }}</van-button>
       </div>
 
     </div>

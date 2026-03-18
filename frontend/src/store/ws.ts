@@ -94,6 +94,10 @@ export class WSService {
       console.debug(`[WebSocket] update print.print_speed_level = ${JSON.stringify(data.print?.param)}`)
       device.print.spd_lvl = Number(data.print?.param)
       device.print.spd_mag = [50, 100, 124, 166][device.print.spd_lvl - 1]
+    } else if (data?.print?.command === 'gcode_line') {
+      if (data?.print?.param.startsWith('M106')) { // fan speed
+        // TODO update device.print.fan_gear
+      }
     } else if (data?.info?.command === 'get_version') {
       device.module = data.info.module
       console.debug(`[WebSocket] update module = ${JSON.stringify(data.info.module)}`)
@@ -126,6 +130,20 @@ export class WSService {
     return true
   }
 
+  // speed: 0~255
+  getFanSpeed(type: 'part' | 'aux' | 'chamber') {
+    const fanGear = device.print.fan_gear ?? 0
+    if (type === 'part') {
+      return fanGear % 256
+    } else if (type === 'aux') {
+      return (fanGear >> 8) % 256
+    } else if (type === 'chamber') {
+      return (fanGear >> 16) % 256
+    }
+    return 0
+  }
+
+  // speed: 0~255
   setFanSpeed(type: 'part' | 'aux' | 'chamber', speed: number) {
     const fanNum = {
       part: 1,
@@ -142,6 +160,7 @@ export class WSService {
     })
   }
 
+  // level: 1~4
   setPrintSpeedLevel(level: number) {
     // TODO level enum
     this.publishCommand({

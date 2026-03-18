@@ -67,3 +67,14 @@ export const device = reactive<{
   module: [],
   print: {},
 })
+
+export const fans: { type: 'part' | 'aux' | 'chamber', name: string }[] = [{
+  type: 'part',
+  name: '部件'
+}, {
+  type: 'aux',
+  name: '辅助'
+}, {
+  type: 'chamber',
+  name: '机箱'
+}]
