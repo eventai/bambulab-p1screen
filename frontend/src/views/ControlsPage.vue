@@ -4,33 +4,16 @@
         <div class="control-list">
           <div class="control-row" @click="openTempPopup('nozzle')">
             <div class="control-left">
-              <img
-                class="control-icon-img"
-                src="../assets/images/monitor_nozzle_temp.svg"
-              />
+              <img class="control-icon-img" :src="nozzleTempIcon" />
             </div>
             <div class="control-value">{{ Math.floor(Number(device.print.nozzle_temper ?? '0')) }} / {{ Math.floor(Number(device.print.nozzle_target_temper ?? '0')) }} ℃</div>
           </div>
           <div class="control-row" @click="openTempPopup('bed')">
             <div class="control-left">
-              <img
-                class="control-icon-img"
-                src="../assets/images/monitor_bed_temp.svg"
-              />
+              <img class="control-icon-img" :src="bedTempIcon" />
             </div>
             <div class="control-value">{{ Math.floor(Number(device.print.bed_temper ?? '0')) }} / {{ Math.floor(Number(device.print.bed_target_temper ?? '0')) }} ℃</div>
           </div>
-          <!-- 
-          <div class="control-row" @click="openTempPopup('chamber', '机箱温度')">
-            <div class="control-left">
-              <img
-                class="control-icon-img"
-                src="../assets/images/monitor_frame_temp.svg"
-              />
-            </div>
-            <div class="control-value">_ / _ ℃</div>
-          </div>
-          -->
           <div class="fan-row">
             <div class="fan-card">
               <div class="fan-name">部件</div>
@@ -57,10 +40,7 @@
           <div class="control-split">
             <div class="control-row">
               <div class="control-left">
-                <img
-                  class="control-icon-img"
-                  src="../assets/images/monitor_speed.svg"
-                />
+                <img class="control-icon-img" :src="speedIcon" />
               </div>
               <div class="control-value">
                 <span>100%</span>
@@ -68,10 +48,7 @@
             </div>
             <div class="control-row">
               <div class="control-left">
-                <img
-                  class="control-icon-img"
-                  :src="lightState ? lightOnIcon : lightOffIcon"
-                  />
+                <img class="control-icon-img" :src="lightState ? lightOnIcon : lightOffIcon" />
               </div>
               <div class="control-value" @click="toggleLight">
                 <span>LED</span>
@@ -97,18 +74,25 @@
 </template>
 
 <script setup lang="ts">
+import { computed, ref } from 'vue'
 import XYMotion from '../components/XYMotion.vue'
 import ZMotion from '../components/ZMotion.vue'
 import EMotion from '../components/EMotion.vue'
 import TempKeypadPopup from '../components/TempKeypadPopup.vue'
 import { device } from '../store/device'
-import { computed, ref } from 'vue'
+import { WSService } from '../store/ws'
 
+import nozzleTempIcon from '../assets/images/monitor_nozzle_temp.svg'
+import nozzleTempActiveIcon from '../assets/images/monitor_nozzle_temp_active.svg'
+import bedTempIcon from '../assets/images/monitor_bed_temp.svg'
+import bedTempActiveIcon from '../assets/images/monitor_bed_temp_active.svg'
+// import frameTempIcon from '../assets/images/monitor_frame_temp.svg'
+// import frameTempActiveIcon from '../assets/images/monitor_frame_temp_active.svg'
+import speedIcon from '../assets/images/monitor_speed.svg'
 import fanOnIcon from '../assets/images/monitor_fan_on.svg'
 import fanOffIcon from '../assets/images/monitor_fan_off.svg'
 import lightOnIcon from '../assets/images/monitor_lamp_on.svg'
 import lightOffIcon from '../assets/images/monitor_lamp_off.svg'
-import { WSService } from '../store/ws'
 
 const handleMove = (axis: 'home' | 'x' | 'y' | 'z' | 'e', step: -10 | -1 | 0| 1 | 10) => {
   console.log('[XYMotion] move', axis, step)
