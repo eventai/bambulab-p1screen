@@ -138,6 +138,16 @@ export class WSService {
     })
   }
 
+  setPrintSpeedLevel(level: number) {
+    // TODO level enum
+    this.publishCommand({
+      "print": {
+        "command": "print_speed",
+        "param": `${level}`
+      }
+    })
+  }
+
   setLight(on: boolean) {
     this.publishCommand({
       "system": {

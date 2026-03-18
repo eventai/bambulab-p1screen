@@ -43,7 +43,7 @@
                 <img class="control-icon-img" :src="speedIcon" />
               </div>
               <div class="control-value">
-                <span>100%</span>
+                <span>{{ getPrintSpeed }}%</span>
               </div>
             </div>
             <div class="control-row">
@@ -51,7 +51,7 @@
                 <img class="control-icon-img" :src="lightState ? lightOnIcon : lightOffIcon" />
               </div>
               <div class="control-value" @click="toggleLight">
-                <span>LED</span>
+                <span>照明</span>
               </div>
             </div>
           </div>
@@ -94,10 +94,23 @@ import fanOffIcon from '../assets/images/monitor_fan_off.svg'
 import lightOnIcon from '../assets/images/monitor_lamp_on.svg'
 import lightOffIcon from '../assets/images/monitor_lamp_off.svg'
 
-const handleMove = (axis: 'home' | 'x' | 'y' | 'z' | 'e', step: -10 | -1 | 0| 1 | 10) => {
-  console.log('[XYMotion] move', axis, step)
+// ------------------------------
+// Temperature
+const tempPopupType = ref<'bed' | 'nozzle' | 'chamber' | undefined>(undefined)
+const showTempPopup = ref(false)
+
+const openTempPopup = (type: 'bed' | 'nozzle' | 'chamber') => {
+  tempPopupType.value = type
+  showTempPopup.value = true
+}
+
+const handleTempConfirm = (type: 'bed' | 'nozzle' | 'chamber' | undefined, value: number) => {
+  console.log('[Controls] temp confirm', type, value)
   // TODO
 }
+
+// ------------------------------
+// Fan
 
 const getFanSpeed = (type: 'part' | 'aux' | 'chamber') => {
   const fanGear = device.print.fan_gear ?? 0
@@ -122,6 +135,16 @@ const toggleFan = (type: 'part' | 'aux' | 'chamber') => {
   WSService.getInstance().setFanSpeed(type, speed)
 }
 
+// ------------------------------
+// Speed
+
+const getPrintSpeed = computed(() => {
+  return device.print.spd_mag ?? 0
+})
+
+// ------------------------------
+// Light
+
 const lightState = computed(() => {
   if (!device.print) return false
   return device.print.lights_report?.find(item => item.node === 'chamber_light')?.mode === 'on'
@@ -132,16 +155,11 @@ const toggleLight = () => {
   WSService.getInstance().setLight(!lightState.value)
 }
 
-const tempPopupType = ref<'bed' | 'nozzle' | 'chamber' | undefined>(undefined)
-const showTempPopup = ref(false)
+// ------------------------------
+// Motion
 
-const openTempPopup = (type: 'bed' | 'nozzle' | 'chamber') => {
-  tempPopupType.value = type
-  showTempPopup.value = true
-}
-
-const handleTempConfirm = (type: 'bed' | 'nozzle' | 'chamber' | undefined, value: number) => {
-  console.log('[Controls] temp confirm', type, value)
+const handleMove = (axis: 'home' | 'x' | 'y' | 'z' | 'e', step: -10 | -1 | 0| 1 | 10) => {
+  console.log('[XYMotion] move', axis, step)
   // TODO
 }
 
@@ -214,6 +232,7 @@ const handleTempConfirm = (type: 'bed' | 'nozzle' | 'chamber' | undefined, value
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -234,7 +253,6 @@ const handleTempConfirm = (type: 'bed' | 'nozzle' | 'chamber' | undefined, value
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  line-height: 1.1;
 }
 
 .control-split {

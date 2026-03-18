@@ -54,7 +54,7 @@ const emitMove = (axis: 'e', step: -1 | 1) => {
 }
 
 .extruder-btn {
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--van-background-4);
   border-radius: 12px;
   padding: 8px;
   display: flex;

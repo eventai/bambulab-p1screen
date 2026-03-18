@@ -10,7 +10,7 @@
       10
     </van-button>
     <van-button
-      class="heatbed-btn"
+      class="heatbed-btn inner"
       type="default"
       size="small"
       :icon="bedUpIcon"
@@ -20,7 +20,7 @@
     </van-button>
     <div class="heatbed-label">热床</div>
     <van-button
-      class="heatbed-btn"
+      class="heatbed-btn inner"
       type="default"
       size="small"
       :icon="bedDownIcon"
@@ -69,6 +69,10 @@ const emitMove = (axis: 'z', step: -10 | -1 | 1 | 10) => {
   width: 55px;
   font-size: 13px;
   color: var(--van-text-color);
+  background: var(--van-background-4);
+}
+
+.heatbed-btn.inner {
   background: var(--van-background-3);
 }
 

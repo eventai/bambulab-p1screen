@@ -8,7 +8,7 @@
           <span class="material-symbols-rounded">tune</span>
         </RouterLink>
         <RouterLink class="nav-item" to="/filament">
-          <span class="material-symbols-rounded">local_offer</span>
+          <span class="material-symbols-rounded">database</span>
         </RouterLink>
         <RouterLink class="nav-item" to="/settings">
           <span class="material-symbols-rounded">settings</span>
