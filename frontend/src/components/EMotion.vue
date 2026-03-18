@@ -3,7 +3,10 @@
     <button class="extruder-btn" type="button" @click="emitMove('e', -1)">
       <span class="material-symbols-rounded">arrow_drop_up</span>
     </button>
-    <img src="../assets/images/monitor_extruder_empty_load.png" />
+    <div class="extruder-imgs">
+      <img src="../assets/images/pipe_of_empty.svg" />
+      <img src="../assets/images/single_nozzle_xp.svg" />
+    </div>
     <button class="extruder-btn" type="button" @click="emitMove('e', 1)">
       <span class="material-symbols-rounded">arrow_drop_down</span>
     </button>
@@ -33,8 +36,15 @@ const emitMove = (axis: 'e', step: -1 | 1) => {
   text-align: center;
 }
 
-.extruder-card img {
-  width: 75%;
+.extruder-imgs {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.extruder-imgs img:first-child {
+  width: 8px;
+  margin-bottom: -2px;
 }
 
 .extruder-label {

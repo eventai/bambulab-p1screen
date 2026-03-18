@@ -2,7 +2,7 @@
   <div class="controls-page">
     <div class="control-panel">
         <div class="control-list">
-          <div class="control-row">
+          <div class="control-row" @click="openTempPopup('nozzle')">
             <div class="control-left">
               <img
                 class="control-icon-img"
@@ -11,7 +11,7 @@
             </div>
             <div class="control-value">{{ Math.floor(Number(device.print.nozzle_temper ?? '0')) }} / {{ Math.floor(Number(device.print.nozzle_target_temper ?? '0')) }} ℃</div>
           </div>
-          <div class="control-row">
+          <div class="control-row" @click="openTempPopup('bed')">
             <div class="control-left">
               <img
                 class="control-icon-img"
@@ -20,7 +20,8 @@
             </div>
             <div class="control-value">{{ Math.floor(Number(device.print.bed_temper ?? '0')) }} / {{ Math.floor(Number(device.print.bed_target_temper ?? '0')) }} ℃</div>
           </div>
-          <div class="control-row">
+          <!-- 
+          <div class="control-row" @click="openTempPopup('chamber', '机箱温度')">
             <div class="control-left">
               <img
                 class="control-icon-img"
@@ -29,6 +30,7 @@
             </div>
             <div class="control-value">_ / _ ℃</div>
           </div>
+          -->
           <div class="fan-row">
             <div class="fan-card">
               <div class="fan-name">部件</div>
@@ -85,6 +87,12 @@
     </div>
 
     <EMotion @move="handleMove" />
+
+    <TempKeypadPopup
+      v-model:show="showTempPopup"
+      :type="tempPopupType"
+      @confirm="handleTempConfirm"
+    />
   </div>
 </template>
 
@@ -92,6 +100,7 @@
 import XYMotion from '../components/XYMotion.vue'
 import ZMotion from '../components/ZMotion.vue'
 import EMotion from '../components/EMotion.vue'
+import TempKeypadPopup from '../components/TempKeypadPopup.vue'
 import { device } from '../store/device'
 import { computed, ref } from 'vue'
 
@@ -137,6 +146,19 @@ const lightState = computed(() => {
 const toggleLight = () => {
   console.log(`[Controls] setLight: on=${!lightState.value}`)
   WSService.getInstance().setLight(!lightState.value)
+}
+
+const tempPopupType = ref<'bed' | 'nozzle' | 'chamber' | undefined>(undefined)
+const showTempPopup = ref(false)
+
+const openTempPopup = (type: 'bed' | 'nozzle' | 'chamber') => {
+  tempPopupType.value = type
+  showTempPopup.value = true
+}
+
+const handleTempConfirm = (type: 'bed' | 'nozzle' | 'chamber' | undefined, value: number) => {
+  console.log('[Controls] temp confirm', type, value)
+  // TODO
 }
 
 </script>

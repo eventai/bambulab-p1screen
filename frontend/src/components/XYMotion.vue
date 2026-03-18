@@ -164,7 +164,7 @@ const emitMove = (axis: 'home' | 'x' | 'y', step: -10 | -1 | 0 | 1 | 10) => {
 }
 
 .axis-label-inner.plus10 {
-  --x: 32%;
+  --x: 34%;
   --y: -26%;
 }
 
@@ -176,11 +176,13 @@ const emitMove = (axis: 'home' | 'x' | 'y', step: -10 | -1 | 0 | 1 | 10) => {
 .axis-label-inner.minus1 {
   --x: -16%;
   --y: 10%;
+  padding-left: 16%;
 }
 
 .axis-label-inner.minus10 {
-  --x: -32%;
+  --x: -34%;
   --y: 26%;
+  padding-left: 23%;
 }
 
 .axis-home {
