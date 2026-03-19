@@ -28,7 +28,9 @@
   --van-button-primary-background: var(--van-primary-color);
 
   --van-cell-group-inset-title-padding: 8px;
-
+  --van-cell-border-color: var(--van-background-4);
+  --van-cell-active-color: var(--van-background-4);
+  
   --van-progress-background: var(--van-background-4);
 }
 
