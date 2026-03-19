@@ -48,6 +48,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { showDialog } from 'vant'
 import XYMotion from '../components/XYMotion.vue'
 import ZMotion from '../components/ZMotion.vue'
 import EMotion from '../components/EMotion.vue'
@@ -113,7 +114,9 @@ const getPrintSpeedLevel = computed(() => device.print.spd_lvl ?? 0)
 
 const handlePrintSpeedConfirm = (speedLevel: number) => {
   console.log('[Controls] set print speed', speedLevel)
-  // TODO 提示：空闲状态下调整打印速度不生效。
+  if (device.print?.gcode_state === 'IDLE') {
+    showDialog({ message: '空闲状态下调整打印速度不生效。' })
+  }
   WSService.getInstance().setPrintSpeedLevel(speedLevel)
 }
 

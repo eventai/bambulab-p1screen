@@ -83,20 +83,29 @@ export class WSService {
 
   onMessage(event: MessageEvent<any>) {
     let data = JSON.parse(event.data) ?? {}
-    if (data?.print?.command === 'push_status') {
+    if (data.print?.command === 'push_status') {
       for (const key in data.print) {
         if (['command', 'msg', 'sequence_id'].includes(key))
           continue
         (device.print as any)[key] = data.print[key]
         console.debug(`[WebSocket] update print.${key} = ${JSON.stringify(data.print[key])}`)
       }
-    } else if (data?.print?.command === 'print_speed') {
-      console.debug(`[WebSocket] update print.print_speed_level = ${JSON.stringify(data.print?.param)}`)
+    } else if (data.print?.command === 'print_speed') {
+      console.debug(`[WebSocket] update print_speed_level = ${JSON.stringify(data.print?.param)}`)
       device.print.spd_lvl = Number(data.print?.param)
       device.print.spd_mag = [50, 100, 124, 166][device.print.spd_lvl - 1]
-    } else if (data?.print?.command === 'gcode_line') {
-      if (data?.print?.param.startsWith('M106')) { // fan speed
-        // TODO update device.print.fan_gear
+    } else if (data.print?.command === 'gcode_line') {
+      if ((data.print?.param as string).startsWith('M106')) { // fan speed
+        const items = (data.print?.param as string).trim().split(' ')
+        if (items.length !== 3) {
+          return
+        }
+        const fanNum = Number(items[1].replace('P', ''))
+        const fanBit = (8 * (fanNum - 1))
+        const speed = Number(items[2].replace('S', ''))
+        let fanGear = device.print.fan_gear ?? 0
+        device.print.fan_gear = (fanGear & ~(0xFF << fanBit)) | (speed << fanBit);
+        console.debug(`[WebSocket] update fanNum = ${fanNum}, fanSpeed = ${speed}`)
       }
     } else if (data?.info?.command === 'get_version') {
       device.module = data.info.module
@@ -106,7 +115,7 @@ export class WSService {
       if (chamber_light) {
         chamber_light.mode = data.system.led_mode
       }
-      console.debug(`[WebSocket] update system.led_mode = ${JSON.stringify(data.system.led_mode)}`)
+      console.debug(`[WebSocket] update led_mode = ${JSON.stringify(data.system.led_mode)}`)
     } else {
       console.warn('[WebSocket] unhandled message:', data)
     }
@@ -162,7 +171,6 @@ export class WSService {
 
   // level: 1~4
   setPrintSpeedLevel(level: number) {
-    // TODO level enum
     this.publishCommand({
       "print": {
         "command": "print_speed",

@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
-import { Button, Slider, Progress, Popup, Divider, Cell, CellGroup } from 'vant'
+import { Button, Slider, Progress, Popup, Dialog, Cell, CellGroup } from 'vant'
 import App from './App.vue'
 import { WSService } from './store/ws'
 import HomePage from './views/HomePage.vue'
@@ -32,7 +32,7 @@ createApp(App)
   .use(Slider)
   .use(Progress)
   .use(Popup)
-  .use(Divider)
+  .use(Dialog)
   .use(Cell)
   .use(CellGroup)
   .mount('#app')
