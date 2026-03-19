@@ -2,10 +2,12 @@
   <div class="homepage">
     <div class="row-1">
       <div>
-        <!-- <img class="task-thumbnail" src="../assets/images/monitor_sdcard_thumbnail.png"/> -->
+        <img class="task-thumbnail" src="../assets/images/monitor_sdcard_thumbnail.png"/>
+        <span class="task-name">{{ computed(() => device.print?.subtask_name || '') }}</span>
       </div>
-      <div>
-        <img class="printer-thumbnail" src="../assets/images/printer_thumbnail_p1s_png.png"/>
+      <div class="printer-thumbnail" :style="{ backgroundImage: `url(${p1sThumbnail})`}">
+        <span class="nozzle-temp">{{ computed(() => Math.floor(Number(device.print.nozzle_temper ?? '0'))) }} ℃</span>
+        <span class="heatbed-temp">{{ computed(() => Math.floor(Number(device.print.bed_temper ?? '0'))) }} ℃</span>
       </div>
     </div>
     <div class="row-2">
@@ -13,12 +15,13 @@
         <div class="progress-card-left">
           <div class="progress-labels">
             <span>{{ getPrintPercent }} %</span>
-            <span>{{ getCurrentLayerNum }} / {{ getTotalLayerNum }} | {{ getRemainingTimeLabel }}</span>
+            <span>{{ getPrintInfo }}</span>
           </div>
           <van-progress :percentage="getPrintPercent" :show-pivot="false" />
           <span class="progress-status">{{ getPrintStateLabel }}</span>
         </div>
-        <ControlButton :icon="isPaused ? resumeIcon : pauseIcon" :label=" isPaused ? '继续' : '暂停'" @click="togglePause" />
+        <ControlButton v-if="!isPaused" :icon="pauseIcon" label="暂停" @click="togglePause" />
+        <ControlButton v-if="isPaused" :icon="resumeIcon" label="继续" @click="togglePause" />
         <ControlButton :icon="stopIcon" label="停止" @click="handleStop" />
       </div>
       <ControlButton class="light-button" :icon="lightState ? lightOnIcon : lightOffIcon" label="照明" @click="toggleLight" />
@@ -28,6 +31,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import humanizeDuration from 'humanize-duration'
 import { device } from '../store/device'
 import { WSService } from '../store/ws'
 import ControlButton from '../components/ControlButton.vue'
@@ -37,10 +41,10 @@ import lightOffIcon from '../assets/images/monitor_lamp_off.svg'
 import pauseIcon from '../assets/images/print_control_pause.svg'
 import resumeIcon from '../assets/images/print_control_resume.svg'
 import stopIcon from '../assets/images/print_control_stop.svg'
+import p1sThumbnail from '../assets/images/printer_thumbnail_p1s_png.png'
 
-const getPrintPercent = computed(() => {
-  return device.print?.mc_percent || 0
-})
+
+const getPrintPercent = computed(() => device.print?.mc_percent || 0)
 
 const getPrintStateLabel = computed(() => {
   return {
@@ -51,35 +55,30 @@ const getPrintStateLabel = computed(() => {
   }[device.print?.gcode_state ?? '']
 })
 
-const getCurrentLayerNum = computed(() => {
-  return device.print?.layer_num || 0
+const getPrintInfo = computed(() => {
+  const remainingTime = humanizeDuration(device.print?.mc_remaining_time || 0, {
+    units: ['h', 'm'],
+    round: true,
+    language: 'zh_CN'
+  })
+  return `${device.print?.layer_num || 0} / ${device.print?.total_layer_num || 0} | ${remainingTime}`
 })
 
-const getTotalLayerNum = computed(() => {
-  return device.print?.total_layer_num || 0
-})
-
-const getRemainingTimeLabel = computed(() => {
-  // TODO format time
-  return device.print?.mc_remaining_time || 0
-})
-
-const isPaused = computed(() => {
-  return device.print?.gcode_state === 'PAUSED'
-})
+const isPaused = computed(() => device.print?.gcode_state === 'PAUSED')
 
 const togglePause = () => {
-
+  if (isPaused.value) {
+    console.log('[Controls] pause')
+  } else {
+    console.log('[Controls] resume')
+  }
 }
 
 const handleStop = () => {
-
+  console.log('[Controls] stop')
 }
 
-const lightState = computed(() => {
-  if (!device.print) return false
-  return device.print.lights_report?.find(item => item.node === 'chamber_light')?.mode === 'on'
-})
+const lightState = computed(() => device.print.lights_report?.find(item => item.node === 'chamber_light')?.mode === 'on')
 
 const toggleLight = () => {
   console.log(`[Controls] setLight: on=${!lightState.value}`)
@@ -109,20 +108,49 @@ const toggleLight = () => {
 }
 
 .row-1 > div:first-child {
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
 }
 
-.row-1 > div:last-child {
+.row-1 > :last-child {
   width: 200px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .task-thumbnail {
-  height: 80%;
+  width: 50%;
+  height: auto;
 }
 
-.printer-thumbnail {
-  width: 100%;
-  height: auto;
+.task-name {
+  width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.printer-thumbnail > span {
+  font-size: 14px;
+  font-weight: 500;
+  position: relative;
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 8px;
+  padding: 4px 8px;
+}
+
+.nozzle-temp {
+  left: 60%;
+  top: calc(50% - 100px + 45px);
+}
+
+.heatbed-temp {
+  left: 8%;
+  top: calc(50% - 100px + 130px);;
 }
 
 .progress-card {
@@ -130,11 +158,12 @@ const toggleLight = () => {
   grid-template-columns: 1fr auto auto;
   font-size: 12px;
   gap: 8px;
-  padding: 8px 12px;
+  padding: 8px;
 }
 
 .progress-card-left {
   display: grid;
+  padding: 4px;
 }
 
 .progress-labels {

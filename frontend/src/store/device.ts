@@ -32,6 +32,7 @@ export type DevicePrint = {
   gcode_state?: string
   layer_num?: number
   total_layer_num?: number
+  subtask_name?: string
 
   ams?: DeviceAMSInfo
   vt_tray?: DeviceTray
