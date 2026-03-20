@@ -25,9 +25,7 @@
       <div class="axis-label-inner plus1">+1</div>
       <div class="axis-label-inner minus1">-1</div>
       <div class="axis-label-inner minus10">-10</div>
-      <button class="axis-home" type="button" aria-label="Home" @click="emitMove('home', 0)">
-        <img src="../assets/images/monitor_axis_home.svg" />
-      </button>
+      <button class="axis-home" @click="emitMove('home', 0)"></button>
     </div>
   </div>
 </template>
@@ -189,12 +187,10 @@ const emitMove = (axis: 'home' | 'x' | 'y', step: -10 | -1 | 0 | 1 | 10) => {
 .axis-home {
   width: 22%;
   aspect-ratio: 1 / 1;
-  background: var(--van-background-4);
   border-radius: 40%;
   border-width: 0;
   display: grid;
   place-items: center;
-  color: var(--van-primary-color);
   z-index: 3;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   cursor: pointer;
@@ -203,6 +199,11 @@ const emitMove = (axis: 'home' | 'x' | 'y', step: -10 | -1 | 0 | 1 | 10) => {
   overflow: hidden;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  color: var(--van-primary-color);
+  background: var(--van-background-4);
+  background-image: url(../assets/images/monitor_axis_home.svg);
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .axis-home:active {

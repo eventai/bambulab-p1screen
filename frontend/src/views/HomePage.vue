@@ -20,7 +20,7 @@
           <van-progress :percentage="getPrintPercent" :show-pivot="false" />
           <span class="progress-status">{{ getPrintStateLabel }}</span>
         </div>
-        <ControlButton :icon="skipIcon" label="跳过" @click="handleSkip" />
+        <!-- <ControlButton :icon="skipIcon" label="跳过" @click="handleSkip" /> -->
         <ControlButton v-if="!isPaused" :icon="pauseIcon" label="暂停" @click="togglePause" />
         <ControlButton v-if="isPaused" :icon="resumeIcon" label="继续" @click="togglePause" />
         <ControlButton :icon="stopIcon" label="停止" @click="handleStop" />
@@ -46,27 +46,41 @@ import stopIcon from '../assets/images/print_control_stop.svg'
 import p1sThumbnail from '../assets/images/printer_thumbnail_p1s_png.png'
 
 
-const getPrintPercent = computed(() => device.print.mc_percent || 0)
+const getPrintPercent = computed(() => {
+  if (device.print.gcode_state == 'PREPARE') {
+    return 0
+  }
+  return device.print.mc_percent || 0
+})
 
 const getPrintStateLabel = computed(() => {
   return {
-    '': '未知',
     'IDLE': '空闲',
-    'PRINTING': '打印中',
-    'PAUSED': '已暂停'
-  }[device.print.gcode_state ?? '']
+    'PREPARE': `下载中(${device.print.gcode_file_prepare_percent}%)`,
+    'RUNNING': '打印中',
+    'PAUSE': '已暂停',
+    'FINISH': '完成',
+  }[device.print.gcode_state ?? ''] || ''
 })
 
+const getPrintSubStateLabel = computed(() => [null, null, '加热中', null, '换料中'][Number(device.print.mc_print_sub_stage ?? 0)]) || ''
+
 const getPrintInfo = computed(() => {
-  const remainingTime = humanizeDuration(device.print.mc_remaining_time || 0, {
+  let remainingTime = (device.print.mc_remaining_time || 0) * 60 * 1000
+  let remainingTimeText = ''
+  if (remainingTime === 0 && device.print.mc_print_stage !== '1') { // less than 1min
+    remainingTimeText += '< '
+    remainingTime = 60 * 1000
+  }
+  remainingTimeText += humanizeDuration(remainingTime, {
     units: ['h', 'm'],
     round: true,
     language: 'zh_CN'
   })
-  return `${device.print.layer_num || 0} / ${device.print.total_layer_num || 0} | ${remainingTime}`
+  return `${device.print.layer_num || 0} / ${device.print.total_layer_num || 0} | ${remainingTimeText}`
 })
 
-const isPaused = computed(() => device.print.gcode_state === 'PAUSED')
+const isPaused = computed(() => device.print.gcode_state === 'PAUSE')
 
 const handleSkip = () => {
   console.log('[Controls] skip')
@@ -74,9 +88,11 @@ const handleSkip = () => {
 
 const togglePause = () => {
   if (isPaused.value) {
-    console.log('[Controls] pause')
-  } else {
     console.log('[Controls] resume')
+    WSService.getInstance().setResume()
+  } else {
+    console.log('[Controls] pause')
+    WSService.getInstance().setPause()
   }
 }
 
@@ -138,6 +154,8 @@ const toggleLight = () => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: 12px;
+  text-align: center;
 }
 
 .printer-thumbnail > span {

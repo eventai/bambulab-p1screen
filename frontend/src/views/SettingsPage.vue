@@ -22,7 +22,7 @@
 
     <template v-if="isDev">
       <van-cell-group inset title="调试">
-        <van-cell title="重连 WebSocket" is-link @click="WSService.getInstance().connect()"/>
+        <van-cell title="重新连接" is-link @click="WSService.getInstance().connect()"/>
       </van-cell-group>
     </template>
   </div>

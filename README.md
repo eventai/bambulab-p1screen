@@ -15,14 +15,13 @@ P1系列屏幕操作指南：https://wiki.bambulab.com/en/p1/manual/screen-opera
     - Z轴升降（Z）
     - XY轴控制（X/Y）
 - 耗材
-    - 料盘
+    - AMS料盘
     - 外挂料盘
     - 工具
     - 指南
 - 设置
     - 账号（绑定）
     - SD卡
-    - 固件
     - 设备
     - 固件
     - 配件
@@ -44,3 +43,15 @@ P1系列屏幕操作指南：https://wiki.bambulab.com/en/p1/manual/screen-opera
 ## 后端
 - 使用 typescript 运行 mqtt to websocket 转发服务
 - 协议实现参考：https://github.com/BambuTools/bambulabs_api
+
+## 使用步骤
+1. 部署后端服务
+2. 手机端添加浏览器桌面书签（http://后端ip/?ip=打印机&serial=序列号&code=访问码）
+
+## TODO
+- 主页：预览图
+- 控制页gcode操作：Temperature、X、Y、Z、E、Home
+- 耗材页：耗材编辑、进退料、UI优化
+- 文件页：ftp获取文件列表、预览图
+- ws重连
+- apk构建

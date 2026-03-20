@@ -170,7 +170,11 @@ export class WSService {
     })
   }
 
-  // level: 1~4
+  // Print speed level as a string
+  // 1 = silent
+  // 2 = standard
+  // 3 = sport
+  // 4 = ludicrous
   setPrintSpeedLevel(level: number) {
     this.publishCommand({
       "print": {
@@ -184,6 +188,26 @@ export class WSService {
     this.publishCommand({
       "system": {
         "led_mode": on ? "on" : "off"
+      }
+    })
+  }
+
+  setPause() {
+    this.publishCommand({
+      "print": {
+        "sequence_id": "0",
+        "command": "pause",
+        "param": "",
+      }
+    })
+  }
+
+  setResume() {
+    this.publishCommand({
+      "print": {
+        "sequence_id": "0",
+        "command": "resume",
+        "param": "",
       }
     })
   }
