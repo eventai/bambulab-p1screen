@@ -39,11 +39,7 @@
 }
 
 .side-nav {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  display: grid;
   padding: 8px;
   background: var(--van-background-2);
   height: 100%;
