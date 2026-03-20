@@ -148,7 +148,7 @@ const handleMove = (axis: 'home' | 'x' | 'y' | 'z' | 'e', step: -10 | -1 | 0| 1 
   height: 100%;
   border-radius: 12px;
   display: grid;
-  grid-template-columns: minmax(170px, 250px) 320px 70px;
+  grid-template-columns: minmax(170px, 190px) minmax(0, calc(100vh - 48px)) 70px;
   gap: 4px;
   align-items: stretch;
   min-height: 0;

@@ -57,7 +57,7 @@ const emitMove = (axis: 'z', step: -10 | -1 | 1 | 10) => {
 .heatbed-card {
   background: var(--van-background-2);
   border-radius: 12px;
-  padding: 8px 16px;
+  padding: 8px;
   display: grid;
   place-items: center;
   grid-template-columns: repeat(5, 1fr);
@@ -66,7 +66,6 @@ const emitMove = (axis: 'z', step: -10 | -1 | 1 | 10) => {
 .heatbed-btn {
   border-radius: 10px;
   border: 0;
-  width: 55px;
   font-size: 13px;
   color: var(--van-text-color);
   background: var(--van-background-4);
@@ -79,6 +78,8 @@ const emitMove = (axis: 'z', step: -10 | -1 | 1 | 10) => {
 .heatbed-label {
   font-size: 13px;
   font-weight: 600;
+  text-align: center;
+  min-width: 30px;
 }
 
 </style>
