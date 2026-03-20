@@ -31,7 +31,7 @@
 .app-shell {
   display: grid;
   grid-template-columns: auto 1fr;
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -40,12 +40,13 @@
   padding: 8px;
   background: var(--van-background-2);
   height: 100%;
+  align-items: center;
 }
 
 .nav-item {
   width: 48px;
   height: 48px;
-  display: inline-flex;
+  display: grid;
   align-items: center;
   justify-content: center;
 }

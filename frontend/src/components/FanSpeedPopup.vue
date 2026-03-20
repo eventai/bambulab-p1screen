@@ -1,21 +1,18 @@
 <template>
-  <van-popup :show="show" position="right" @click-overlay="handleClose">
-    <div class="popup">
-      <div class="popup-header">
-        <button class="popup-header-back" type="button" @click="handleClose">
-          <span class="material-symbols-rounded">arrow_back_ios</span>
-        </button>
-        <div class="popup-header-title">风扇</div>
-      </div>
+  <van-popup :show="show" class="popup" position="right" @click-overlay="handleClose">
+    <div class="popup-header">
+      <button class="popup-header-back" type="button" @click="handleClose">
+        <span class="material-symbols-rounded">arrow_back_ios</span>
+      </button>
+      <div class="popup-header-title">风扇</div>
+    </div>
 
-      <div class="popup-fan-speed-card" v-for:="item in fans" :key="item.type">
-        <div>
-          <img class="popup-fan-speed-icon" :src="WSService.getInstance().getFanSpeed(item.type) !== 0 ? fanOnIcon : fanOffIcon" />
-          <span class="popup-fan-speed-name">{{ item.name }} {{ (WSService.getInstance().getFanSpeed(item.type) / 255 * 100).toFixed(0) }}%</span>
-        </div>
-        <van-slider v-model="fanSpeeds[item.type].value" @change="(value) => onChange(item.type, value)"/>
+    <div class="popup-fan-speed-card" v-for:="item in fans" :key="item.type">
+      <div>
+        <img class="popup-fan-speed-icon" :src="WSService.getInstance().getFanSpeed(item.type) !== 0 ? fanOnIcon : fanOffIcon" />
+        <span class="popup-fan-speed-name">{{ item.name }} {{ (WSService.getInstance().getFanSpeed(item.type) / 255 * 100).toFixed(0) }}%</span>
       </div>
-
+      <van-slider v-model="fanSpeeds[item.type].value" @change="(value) => onChange(item.type, value)"/>
     </div>
   </van-popup>
 </template>
@@ -62,6 +59,7 @@ const onChange = (type: 'part' | 'aux' | 'chamber', value: number) => {
 .popup-fan-speed-card {
   background: var(--van-background-5);
   border-radius: 10px;
+  max-height: 100px;
 }
 
 .popup-fan-speed-card div {

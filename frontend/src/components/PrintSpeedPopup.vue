@@ -1,17 +1,14 @@
 <template>
-  <van-popup :show="show" position="right" @click-overlay="handleClose">
-    <div class="popup">
-      <div class="popup-header">
-        <button class="popup-header-back" type="button" @click="handleClose">
-          <span class="material-symbols-rounded">arrow_back_ios</span>
-        </button>
-        <div class="popup-header-title">打印速度</div>
-      </div>
+  <van-popup :show="show" class="popup" position="right" @click-overlay="handleClose">
+    <div class="popup-header">
+      <button class="popup-header-back" type="button" @click="handleClose">
+        <span class="material-symbols-rounded">arrow_back_ios</span>
+      </button>
+      <div class="popup-header-title">打印速度</div>
+    </div>
 
-      <div class="print-speed-buttons">
-        <van-button v-for="item in buttons" :key="item.value" :class="`print-speed-button ${item.value === value ? 'print-speed-button-active' : ''}`" type="primary" size="large" @click="handleConfirm(item.value)">{{ item.label }}</van-button>
-      </div>
-
+    <div class="print-speed-buttons">
+      <van-button v-for="item in buttons" :key="item.value" :class="`print-speed-button ${item.value === value ? 'print-speed-button-active' : ''}`" type="primary" size="large" @click="handleConfirm(item.value)">{{ item.label }}</van-button>
     </div>
   </van-popup>
 </template>

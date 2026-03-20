@@ -1,29 +1,26 @@
 <template>
-  <van-popup :show="show" position="right" @click-overlay="handleClose">
-    <div class="popup">
-      <div class="popup-header">
-        <button class="popup-header-back" type="button" @click="handleClose">
-          <span class="material-symbols-rounded">arrow_back_ios</span>
-        </button>
-        <div class="popup-header-title">{{ title }}</div>
-        <van-button class="popup-header-confirm" type="primary" size="normal" :disabled="inputValue.length === 0" @click="handleConfirm">确定</van-button>
-      </div>
+  <van-popup :show="show" class="popup" position="right" @click-overlay="handleClose">
+    <div class="popup-header">
+      <button class="popup-header-back" type="button" @click="handleClose">
+        <span class="material-symbols-rounded">arrow_back_ios</span>
+      </button>
+      <div class="popup-header-title">{{ title }}</div>
+      <van-button class="popup-header-confirm" type="primary" size="normal" :disabled="inputValue.length === 0" @click="handleConfirm">确定</van-button>
+    </div>
 
-      <div class="temp-display">
-        <div class="temp-value">{{ displayValue }}</div>
-        <div class="temp-unit">°C</div>
-      </div>
+    <div class="temp-display">
+      <div class="temp-value">{{ displayValue }}</div>
+      <div class="temp-unit">°C</div>
+    </div>
 
-      <div class="temp-keypad">
-        <button v-for="key in keys" :key="key" class="temp-key" type="button" @click="handleKey(key)">
-          {{ key }}
-        </button>
-        <button class="temp-key temp-key--zero" type="button" @click="handleKey('0')">0</button>
-        <button class="temp-key temp-key--back" type="button" @click="handleBackspace">
-          <span class="material-symbols-rounded">backspace</span>
-        </button>
-      </div>
-
+    <div class="temp-keypad">
+      <button v-for="key in keys" :key="key" class="temp-key" type="button" @click="handleKey(key)">
+        {{ key }}
+      </button>
+      <button class="temp-key temp-key--zero" type="button" @click="handleKey('0')">0</button>
+      <button class="temp-key temp-key--back" type="button" @click="handleBackspace">
+        <span class="material-symbols-rounded">backspace</span>
+      </button>
     </div>
   </van-popup>
 </template>
