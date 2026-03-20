@@ -5,7 +5,7 @@
           <span class="material-symbols-rounded">home</span>
         </RouterLink>
         <RouterLink class="nav-item" to="/controls">
-          <span class="material-symbols-rounded">tune</span>
+          <span class="material-symbols-rounded">discover_tune</span>
         </RouterLink>
         <RouterLink class="nav-item" to="/filament">
           <span class="material-symbols-rounded">database</span>
