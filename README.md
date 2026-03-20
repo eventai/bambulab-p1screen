@@ -3,6 +3,7 @@
 
 P2S屏幕操作指南：https://wiki.bambulab.com/en/p2s/manual/screen-operation
 P1系列屏幕操作指南：https://wiki.bambulab.com/en/p1/manual/screen-operation
+MQTT协议文档：https://github.com/Doridian/OpenBambuAPI/
 
 # 打印屏功能列表
 - 主页

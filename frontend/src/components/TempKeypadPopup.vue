@@ -32,7 +32,7 @@ const props = withDefaults(
   defineProps<{
     show: boolean
     value?: number
-    type?: 'nozzle' | 'bed' | 'chamber'
+    type?: 'nozzle' | 'heatbed' | 'chamber'
   }>(),
   {
     value: undefined
@@ -43,7 +43,7 @@ const title = computed(() => {
   switch (props.type) {
     case 'nozzle':
       return '喷嘴温度'
-    case 'bed':
+    case 'heatbed':
       return '热床温度'
     case 'chamber':
       return '机箱温度'
@@ -54,7 +54,7 @@ const title = computed(() => {
 
 const emit = defineEmits<{
   (event: 'update:show', value: boolean): void
-  (event: 'confirm', type: 'nozzle' | 'bed' | 'chamber' | undefined, value: number): void
+  (event: 'confirm', type: 'nozzle' | 'heatbed' | 'chamber' | undefined, value: number): void
 }>()
 
 const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9']

@@ -2,7 +2,7 @@
   <div class="controls-page">
     <div class="control-list">
       <ControlButton v-for="item in temps" :key="item.type"
-        :icon="item.icon"
+        :icon="item.icon.value"
         :label="`${item.current.value} / ${item.target.value} ℃`"
         @click="openTempPopup(item.type)"
       />
@@ -47,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ComputedRef, ref } from 'vue'
 import { showDialog } from 'vant'
 import XYMotion from '../components/XYMotion.vue'
 import ZMotion from '../components/ZMotion.vue'
@@ -74,29 +74,31 @@ import ControlButton from '../components/ControlButton.vue'
 // ------------------------------
 // Temperature
 const showTempPopup = ref(false)
-const tempPopupType = ref<'bed' | 'nozzle' | 'chamber' | undefined>(undefined)
-const temps: { type: 'bed' | 'nozzle' | 'chamber', icon: string, activeIcon: string, current: any, target: any }[] = [{
+const tempPopupType = ref<'nozzle' | 'heatbed' | 'chamber' | undefined>(undefined)
+const temps: { type: 'nozzle' | 'heatbed' | 'chamber', icon: ComputedRef<string>, current: any, target: any }[] = [{
   type: 'nozzle',
-  icon: nozzleTempIcon,
-  activeIcon: nozzleTempActiveIcon,
+  icon: computed(() => (Math.floor(Number(device.print.nozzle_target_temper ?? '0')) > Math.floor(Number(device.print.nozzle_temper ?? '0'))) ? nozzleTempActiveIcon : nozzleTempIcon),
   current: computed(() => Math.floor(Number(device.print.nozzle_temper ?? '0'))),
   target: computed(() => Math.floor(Number(device.print.nozzle_target_temper ?? '0'))),
 }, {
-  type: 'bed',
-  icon: bedTempIcon,
-  activeIcon: bedTempActiveIcon,
+  type: 'heatbed',
+  icon: computed(() => (Math.floor(Number(device.print.bed_target_temper ?? '0')) > Math.floor(Number(device.print.bed_temper ?? '0'))) ? bedTempActiveIcon : bedTempIcon),
   current: computed(() => Math.floor(Number(device.print.bed_temper ?? '0'))),
   target: computed(() => Math.floor(Number(device.print.bed_target_temper ?? '0'))),
 }]
 
-const openTempPopup = (type: 'bed' | 'nozzle' | 'chamber') => {
+const openTempPopup = (type: 'nozzle' | 'heatbed' | 'chamber') => {
   tempPopupType.value = type
   showTempPopup.value = true
 }
 
-const handleTempConfirm = (type: 'bed' | 'nozzle' | 'chamber' | undefined, value: number) => {
-  console.log('[Controls] temp confirm', type, value)
-  // TODO set temperature
+const handleTempConfirm = (type: 'nozzle' | 'heatbed' | 'chamber' | undefined, value: number) => {
+  if (type === 'chamber' || type === undefined) {
+    return
+  }
+
+  console.log('[Controls] set temperature', type, value)
+  WSService.getInstance().setTemperature(type, value)
 }
 
 // ------------------------------

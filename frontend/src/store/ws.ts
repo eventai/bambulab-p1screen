@@ -192,6 +192,17 @@ export class WSService {
     })
   }
 
+  setTemperature(type: 'nozzle' | 'heatbed', temperature: number) {
+    // TODO not working
+    this.publishCommand({
+      "print": {
+        "sequence_id": 0,
+        "command": "gcode_line",
+        "param": `${{ nozzle: 'M104', heatbed: 'M140' }[type]} S${temperature.toFixed(0)}\n`
+      }
+    })
+  }
+
   setPause() {
     this.publishCommand({
       "print": {
