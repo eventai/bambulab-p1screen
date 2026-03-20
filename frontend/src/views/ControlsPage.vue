@@ -146,13 +146,10 @@ const handleMove = (axis: 'home' | 'x' | 'y' | 'z' | 'e', step: -10 | -1 | 0| 1 
 <style scoped>
 .controls-page {
   height: 100%;
-  border-radius: 12px;
   display: grid;
   grid-template-columns: minmax(170px, 190px) minmax(0, calc(100vh - 48px)) 70px;
   gap: 4px;
-  align-items: stretch;
-  min-height: 0;
-  overflow: hidden;
+  padding: 4px;
   color: var(--van-text-color);
 }
 

@@ -63,6 +63,5 @@
   height: 100%;
   min-height: 0;
   overflow: auto;
-  padding: 4px;
 }
 </style>

@@ -98,7 +98,7 @@ const toggleLight = () => {
   display: grid;
   grid-template-rows: 1fr auto;
   height: 100%;
-  padding: 4px;
+  padding: 8px;
   gap: 8px;
 }
 
