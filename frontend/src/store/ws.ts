@@ -40,7 +40,7 @@ export class WSService {
     this.connecting = true
     this.readyState.value = WebSocket.CONNECTING
     try {
-      const url = `/ws?ip=${encodeURIComponent(ip)}&serial=${encodeURIComponent(serial)}&code=${encodeURIComponent(code)}`
+      const url = `ws://${location.host}/ws?ip=${encodeURIComponent(ip)}&serial=${encodeURIComponent(serial)}&code=${encodeURIComponent(code)}`
       this.ws = new WebSocket(url)
       this.ws.addEventListener('open', this.onOpen.bind(this))
       this.ws.addEventListener('close', this.onClose.bind(this))
