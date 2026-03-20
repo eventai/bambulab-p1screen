@@ -15,8 +15,8 @@ import AMS from '../components/AMS.vue'
 import Tray from '../components/Tray.vue'
 import { device } from '../store/device';
 
-const amsList = computed(() => device.print?.ams?.ams ?? [{} as any])
-const extTray = computed(() => device.print?.vt_tray)
+const amsList = computed(() => device.print.ams?.ams ?? [{} as any])
+const extTray = computed(() => device.print.vt_tray)
 </script>
 
 <style scoped>

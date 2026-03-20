@@ -17,9 +17,10 @@ export class WSService {
   connect() {
     if (typeof window === 'undefined') return null
 
-    const ip = window.localStorage.getItem('ip')
-    const serial = window.localStorage.getItem('serial')
-    const code = window.localStorage.getItem('accessCode')
+    const params = new URLSearchParams(location.search)
+    const ip = params.get('ip') ?? ''
+    const serial = params.get('serial') ?? ''
+    const code = params.get('code') ?? ''
 
     if (!ip || !serial || !code) {
       console.warn('[WebSocket] missing connection parameters')
@@ -91,12 +92,12 @@ export class WSService {
         console.debug(`[WebSocket] update print.${key} = ${JSON.stringify(data.print[key])}`)
       }
     } else if (data.print?.command === 'print_speed') {
-      console.debug(`[WebSocket] update print_speed_level = ${JSON.stringify(data.print?.param)}`)
-      device.print.spd_lvl = Number(data.print?.param)
+      console.debug(`[WebSocket] update print_speed_level = ${JSON.stringify(data.print.param)}`)
+      device.print.spd_lvl = Number(data.print.param)
       device.print.spd_mag = [50, 100, 124, 166][device.print.spd_lvl - 1]
     } else if (data.print?.command === 'gcode_line') {
-      if ((data.print?.param as string).startsWith('M106')) { // fan speed
-        const items = (data.print?.param as string).trim().split(' ')
+      if ((data.print.param as string).startsWith('M106')) { // fan speed
+        const items = (data.print.param as string).trim().split(' ')
         if (items.length !== 3) {
           return
         }
@@ -107,10 +108,10 @@ export class WSService {
         device.print.fan_gear = (fanGear & ~(0xFF << fanBit)) | (speed << fanBit);
         console.debug(`[WebSocket] update fanNum = ${fanNum}, fanSpeed = ${speed}`)
       }
-    } else if (data?.info?.command === 'get_version') {
+    } else if (data.info?.command === 'get_version') {
       device.module = data.info.module
       console.debug(`[WebSocket] update module = ${JSON.stringify(data.info.module)}`)
-    } else if (data?.system?.led_mode) {
+    } else if (data.system?.led_mode) {
       const chamber_light = device.print.lights_report?.find(item => item.node === 'chamber_light')
       if (chamber_light) {
         chamber_light.mode = data.system.led_mode

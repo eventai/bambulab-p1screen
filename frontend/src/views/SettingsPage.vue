@@ -1,24 +1,8 @@
 <template>
   <div class="settings-page">
-    <van-cell-group inset title="基础信息">
-      <van-cell
-        title="IP地址"
-        :value="baseInfo.ip"
-        is-link
-        @click="onBaseClick('ip')"
-      />
-      <van-cell
-        title="序列号"
-        :value="baseInfo.serial"
-        is-link
-        @click="onBaseClick('serial')"
-      />
-      <van-cell
-        title="访问码"
-        :value="baseInfo.accessCode"
-        is-link
-        @click="onBaseClick('accessCode')"
-      />
+    <van-cell-group inset title="网络信息">
+      <van-cell title="IP 地址" :value="ip" />
+      <van-cell title="WiFi 信号强度" :value="device.print.wifi_signal ?? '未知'" />
       <van-cell title="状态" :value="statusLabel" />
     </van-cell-group>
 
@@ -26,7 +10,6 @@
       <van-cell title="设备型号" :value="deviceInfo.product_name" />
       <van-cell title="序列号" :value="deviceInfo.sn" />
       <van-cell title="固件版本" :value="deviceInfo.sw_ver" />
-      <van-cell title="WiFi信号强度" :value="device.print.wifi_signal" />
     </van-cell-group>
 
     <template v-for="(module, index) in modules" :key="index">
@@ -39,7 +22,7 @@
 
     <template v-if="isDev">
       <van-cell-group inset title="调试">
-        <van-cell title="重连WebSocket" is-link @click="WSService.getInstance().connect()"/>
+        <van-cell title="重连 WebSocket" is-link @click="WSService.getInstance().connect()"/>
       </van-cell-group>
     </template>
   </div>
@@ -51,18 +34,10 @@ import { device } from '../store/device'
 import { WSService } from '../store/ws'
 
 const isDev = import.meta.env.DEV
-
-const onBaseClick = (key: 'ip' | 'serial' | 'accessCode') => {
-  console.log('[Settings] base click', key)
-}
-
-const baseInfo = computed(() => {
-  return {
-    ip: window.localStorage.getItem('ip') ?? '',
-    serial: window.localStorage.getItem('serial') ?? '',
-    accessCode: window.localStorage.getItem('accessCode') ?? ''
-  }
-})
+const params = new URLSearchParams(location.search)
+const ip = params.get('ip') ?? ''
+const serial = params.get('serial') ?? ''
+const code = params.get('code') ?? ''
 
 const deviceInfo = computed(() => {
   if (!device.module) return null

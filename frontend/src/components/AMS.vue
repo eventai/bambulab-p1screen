@@ -31,7 +31,7 @@ const props = withDefaults(
 )
 
 const amsPrefix = ref(String.fromCharCode('A'.charCodeAt(0) + Number(props.amsId ?? '0')))
-const ams = computed(() => device.print?.ams?.ams?.find(item => item.id === props.amsId))
+const ams = computed(() => device.print.ams?.ams?.find(item => item.id === props.amsId))
 const trayList = computed(() => {
   return ams.value?.tray.sort((a, b) => Number(a.id) - Number(b.id))
 })

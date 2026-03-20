@@ -3,7 +3,7 @@
     <div class="row-1">
       <div>
         <img class="task-thumbnail" src="../assets/images/monitor_sdcard_thumbnail.png"/>
-        <span class="task-name">{{ computed(() => device.print?.subtask_name || '') }}</span>
+        <span class="task-name">{{ computed(() => device.print.subtask_name || '') }}</span>
       </div>
       <div class="printer-thumbnail" :style="{ backgroundImage: `url(${p1sThumbnail})`}">
         <span class="nozzle-temp">{{ computed(() => Math.floor(Number(device.print.nozzle_temper ?? '0'))) }} ℃</span>
@@ -46,7 +46,7 @@ import stopIcon from '../assets/images/print_control_stop.svg'
 import p1sThumbnail from '../assets/images/printer_thumbnail_p1s_png.png'
 
 
-const getPrintPercent = computed(() => device.print?.mc_percent || 0)
+const getPrintPercent = computed(() => device.print.mc_percent || 0)
 
 const getPrintStateLabel = computed(() => {
   return {
@@ -54,19 +54,19 @@ const getPrintStateLabel = computed(() => {
     'IDLE': '空闲',
     'PRINTING': '打印中',
     'PAUSED': '已暂停'
-  }[device.print?.gcode_state ?? '']
+  }[device.print.gcode_state ?? '']
 })
 
 const getPrintInfo = computed(() => {
-  const remainingTime = humanizeDuration(device.print?.mc_remaining_time || 0, {
+  const remainingTime = humanizeDuration(device.print.mc_remaining_time || 0, {
     units: ['h', 'm'],
     round: true,
     language: 'zh_CN'
   })
-  return `${device.print?.layer_num || 0} / ${device.print?.total_layer_num || 0} | ${remainingTime}`
+  return `${device.print.layer_num || 0} / ${device.print.total_layer_num || 0} | ${remainingTime}`
 })
 
-const isPaused = computed(() => device.print?.gcode_state === 'PAUSED')
+const isPaused = computed(() => device.print.gcode_state === 'PAUSED')
 
 const handleSkip = () => {
   console.log('[Controls] skip')
