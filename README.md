@@ -1,9 +1,9 @@
 # 简介
-为拓竹P1提供与拓竹P2S屏幕接近一致的操作界面与使用体验。
+为拓竹P1系列提供的控制屏操作软件
 
-P2S屏幕操作指南：https://wiki.bambulab.com/en/p2s/manual/screen-operation
 P1系列屏幕操作指南：https://wiki.bambulab.com/en/p1/manual/screen-operation
-MQTT协议文档：https://github.com/Doridian/OpenBambuAPI/
+P2S屏幕操作指南：https://wiki.bambulab.com/en/p2s/manual/screen-operation
+拓竹局域网控制协议文档：https://github.com/Doridian/OpenBambuAPI/
 
 # 打印屏功能列表
 - 主页
@@ -31,7 +31,6 @@ MQTT协议文档：https://github.com/Doridian/OpenBambuAPI/
 
 # 使用场景
 - 触屏移动端设备，横屏使用
-<!-- - 分辨率最低需适配640x360 -->
 - 分辨率最低需适配568x320（iPhone5）
 - 老旧设备，避免性能开销大的阴影和动画效果
 
@@ -50,8 +49,13 @@ MQTT协议文档：https://github.com/Doridian/OpenBambuAPI/
 2. 手机端添加浏览器桌面书签（http://后端ip/?ip=打印机&serial=序列号&code=访问码）
 
 ## TODO
-- 主页：打印任务数据持久化
-- 控制页gcode操作：X、Y、Z、E、Home
-- 耗材页：耗材编辑、进退料、UI优化
-<!-- - 文件页：ftp获取文件列表 -->
+- 主页
+    - 打印任务数据（项目id，url，预览图）持久化
+- 控制页
+    - gcode操作：X、Y、Z、E、Home
+    - fan滑动条随状态改变
+- 耗材页
+    - 耗材编辑、进退料、UI优化
+- 文件页
+    - ftps获取文件列表
 - apk构建

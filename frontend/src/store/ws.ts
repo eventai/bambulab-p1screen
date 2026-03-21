@@ -170,6 +170,8 @@ export class WSService {
         chamber_light.mode = data.system.led_mode
       }
       console.debug('[WebSocket][led_mode]', data.system.led_mode)
+    } else if (data.liveview) {
+      return
     } else {
       console.warn('[WebSocket] unhandled message:', data)
     }
