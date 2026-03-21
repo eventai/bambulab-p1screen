@@ -36,8 +36,6 @@ import { WSService } from '../store/ws'
 const isDev = import.meta.env.DEV
 const params = new URLSearchParams(location.search)
 const ip = params.get('ip') ?? ''
-const serial = params.get('serial') ?? ''
-const code = params.get('code') ?? ''
 
 const deviceInfo = computed(() => {
   if (!device.module) return null

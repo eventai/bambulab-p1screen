@@ -208,6 +208,21 @@ export class WSService {
     return 0
   }
 
+  getWifiSignalPercentage() {
+    const wifiSignal = device.print.wifi_signal
+    if (!wifiSignal) return 0
+    const dbm = parseInt(wifiSignal)
+    if (isNaN(dbm)) return 0
+
+    // Normalize dBm to percentage
+    // -30dBm or better -> 100%
+    // -100dBm or worse -> 0%
+    const minDbm = -100
+    const maxDbm = -30
+    const percentage = Math.round(((dbm - minDbm) / (maxDbm - minDbm)) * 100)
+    return Math.max(0, Math.min(100, percentage))
+  }
+
   // speed: 0~255
   setFanSpeed(type: 'part' | 'aux' | 'chamber', speed: number) {
     const fanNum = {

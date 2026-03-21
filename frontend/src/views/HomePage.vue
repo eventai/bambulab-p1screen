@@ -6,8 +6,9 @@
         <span class="task-name">{{ computed(() => device.print.subtask_name || '') }}</span>
       </div>
       <div class="printer-thumbnail" :style="{ backgroundImage: `url(${p1sThumbnail})`}">
-        <span class="nozzle-temp">{{ computed(() => Math.floor(Number(device.print.nozzle_temper ?? '0'))) }} ℃</span>
-        <span class="heatbed-temp">{{ computed(() => Math.floor(Number(device.print.bed_temper ?? '0'))) }} ℃</span>
+        <span id="nozzle-temp">{{ computed(() => Math.floor(Number(device.print.nozzle_temper ?? '0'))) }} ℃</span>
+        <span id="heatbed-temp">{{ computed(() => Math.floor(Number(device.print.bed_temper ?? '0'))) }} ℃</span>
+        <span id="wifi-signal"><img :src="getWifiSignalIcon"/></span>
       </div>
     </div>
     <div class="row-2">
@@ -47,6 +48,25 @@ import resumeIcon from '../assets/images/print_control_resume.svg'
 import stopIcon from '../assets/images/print_control_stop.svg'
 import sdcardThumbnail from '../assets/images/monitor_sdcard_thumbnail.png'
 import p1sThumbnail from '../assets/images/printer_thumbnail_p1s_png.png'
+import signalNoIcon from '../assets/images/monitor_signal_no.svg'
+import signalWeakIcon from '../assets/images/monitor_signal_weak.svg'
+import signalMiddleIcon from '../assets/images/monitor_signal_middle.svg'
+import signalStrongIcon from '../assets/images/monitor_signal_strong.svg'
+
+const getWifiSignalIcon = computed(() => {
+  if (WSService.getInstance().getReadyStateRef().value !== WebSocket.OPEN) {
+    return signalNoIcon
+  }
+
+  const percent = WSService.getInstance().getWifiSignalPercentage()
+  if (percent >= 75) {
+    return signalStrongIcon
+  } else if (percent >= 50) {
+    return signalMiddleIcon
+  } else {
+    return signalWeakIcon
+  }
+})
 
 const getPrintThumbnail = computed(() => device.print.url ? `/api/getThumbnail?url=${encodeURIComponent(device.print.url)}&plate_idx=${device.print.plate_idx}` : sdcardThumbnail)
 
@@ -173,14 +193,29 @@ const toggleLight = () => {
   padding: 4px 8px;
 }
 
-.nozzle-temp {
+#nozzle-temp {
   left: 60%;
   top: calc(50% - 100px + 45px);
 }
 
-.heatbed-temp {
+#heatbed-temp {
   left: 8%;
   top: calc(50% - 100px + 130px);;
+}
+
+#wifi-signal {
+  left: 15%;
+  top: calc(50% - 100px - 18px);
+  display: block;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  padding: 8px;
+}
+
+#wifi-signal img {
+  width: 18px;
+  height: 18px;
 }
 
 .progress-card {
