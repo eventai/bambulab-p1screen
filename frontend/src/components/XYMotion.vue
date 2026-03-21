@@ -116,10 +116,6 @@ const emitMove = (axis: 'home' | 'x' | 'y', step: -10 | -1 | 0 | 1 | 10) => {
   border-radius: 0 0 0 100%;
 }
 
-.axis-seg:active {
-  filter: brightness(1.1);
-}
-
 .axis-label-outer {
   position: absolute;
   font-size: 14px;
@@ -206,8 +202,8 @@ const emitMove = (axis: 'home' | 'x' | 'y', step: -10 | -1 | 0 | 1 | 10) => {
   background-position: center;
 }
 
-.axis-home:active {
-  filter: brightness(1.5);
+.axis-seg:active, .axis-home:active {
+  filter: brightness(0.9);
 }
 
 .axis-home img {

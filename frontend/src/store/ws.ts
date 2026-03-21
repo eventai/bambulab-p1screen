@@ -133,10 +133,10 @@ export class WSService {
         if (['command', 'msg', 'sequence_id'].includes(key))
           continue
         (device.print as any)[key] = data.print[key]
-        console.debug(`[WebSocket] update print.${key} = ${JSON.stringify(data.print[key])}`)
+        console.debug(`[WebSocket][push_status] update print.${key} = ${JSON.stringify(data.print[key])}`)
       }
     } else if (data.print?.command === 'print_speed') {
-      console.debug(`[WebSocket] update print_speed_level = ${JSON.stringify(data.print.param)}`)
+      console.debug(`[WebSocket][print_speed] update print_speed_level = ${JSON.stringify(data.print.param)}`)
       device.print.spd_lvl = Number(data.print.param)
       device.print.spd_mag = [50, 100, 124, 166][device.print.spd_lvl - 1]
     } else if (data.print?.command === 'gcode_line') {
@@ -150,17 +150,24 @@ export class WSService {
         const speed = Number(items[2].replace('S', ''))
         let fanGear = device.print.fan_gear ?? 0
         device.print.fan_gear = (fanGear & ~(0xFF << fanBit)) | (speed << fanBit);
-        console.debug(`[WebSocket] update fanNum = ${fanNum}, fanSpeed = ${speed}`)
+        console.debug(`[WebSocket][gcode_line] update fanNum = ${fanNum}, fanSpeed = ${speed}`)
+      }
+    } else if (data.print?.command === 'project_file') {
+      for (const key in data.print) {
+        if (['command', 'msg', 'sequence_id'].includes(key))
+          continue
+        (device.print as any)[key] = data.print[key]
+        console.debug(`[WebSocket][project_file] update print.${key} = ${JSON.stringify(data.print[key])}`)
       }
     } else if (data.info?.command === 'get_version') {
       device.module = data.info.module
-      console.debug(`[WebSocket] update module = ${JSON.stringify(data.info.module)}`)
+      console.debug(`[WebSocket][get_version] update module = ${JSON.stringify(data.info.module)}`)
     } else if (data.system?.led_mode) {
       const chamber_light = device.print.lights_report?.find(item => item.node === 'chamber_light')
       if (chamber_light) {
         chamber_light.mode = data.system.led_mode
       }
-      console.debug(`[WebSocket] update led_mode = ${JSON.stringify(data.system.led_mode)}`)
+      console.debug(`[WebSocket][led_mode] update led_mode = ${JSON.stringify(data.system.led_mode)}`)
     } else {
       console.warn('[WebSocket] unhandled message:', data)
     }

@@ -37,6 +37,7 @@ export type DevicePrint = {
   total_layer_num?: number
   subtask_name?: string
   url?: string
+  plate_idx?: string
 
   ams?: DeviceAMSInfo
   vt_tray?: DeviceTray

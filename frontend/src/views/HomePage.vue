@@ -2,7 +2,7 @@
   <div class="homepage">
     <div class="row-1">
       <div>
-        <img class="task-thumbnail" src="../assets/images/monitor_sdcard_thumbnail.png"/>
+        <img class="task-thumbnail" :src="getPrintThumbnail"/>
         <span class="task-name">{{ computed(() => device.print.subtask_name || '') }}</span>
       </div>
       <div class="printer-thumbnail" :style="{ backgroundImage: `url(${p1sThumbnail})`}">
@@ -45,8 +45,10 @@ import skipIcon from '../assets/images/print_control_partskip.svg'
 import pauseIcon from '../assets/images/print_control_pause.svg'
 import resumeIcon from '../assets/images/print_control_resume.svg'
 import stopIcon from '../assets/images/print_control_stop.svg'
+import sdcardThumbnail from '../assets/images/monitor_sdcard_thumbnail.png'
 import p1sThumbnail from '../assets/images/printer_thumbnail_p1s_png.png'
 
+const getPrintThumbnail = computed(() => device.print.url ? `/api/getThumbnail?url=${encodeURIComponent(device.print.url)}&plate_idx=${device.print.plate_idx}` : sdcardThumbnail)
 
 const getPrintPercent = computed(() => {
   if (device.print.gcode_state == 'PREPARE') {
@@ -150,6 +152,7 @@ const toggleLight = () => {
 .task-thumbnail {
   width: 50%;
   height: auto;
+  background-color: var(--van-background-5);
 }
 
 .task-name {

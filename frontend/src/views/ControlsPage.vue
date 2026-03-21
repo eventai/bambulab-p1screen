@@ -77,12 +77,12 @@ const showTempPopup = ref(false)
 const tempPopupType = ref<'nozzle' | 'heatbed' | 'chamber' | undefined>(undefined)
 const temps: { type: 'nozzle' | 'heatbed' | 'chamber', icon: ComputedRef<string>, current: any, target: any }[] = [{
   type: 'nozzle',
-  icon: computed(() => (Math.floor(Number(device.print.nozzle_target_temper ?? '0')) > Math.floor(Number(device.print.nozzle_temper ?? '0'))) ? nozzleTempActiveIcon : nozzleTempIcon),
+  icon: computed(() => (Math.floor(Number(device.print.nozzle_target_temper ?? '0')) - Math.floor(Number(device.print.nozzle_temper ?? '0')) > 2) ? nozzleTempActiveIcon : nozzleTempIcon),
   current: computed(() => Math.floor(Number(device.print.nozzle_temper ?? '0'))),
   target: computed(() => Math.floor(Number(device.print.nozzle_target_temper ?? '0'))),
 }, {
   type: 'heatbed',
-  icon: computed(() => (Math.floor(Number(device.print.bed_target_temper ?? '0')) > Math.floor(Number(device.print.bed_temper ?? '0'))) ? bedTempActiveIcon : bedTempIcon),
+  icon: computed(() => (Math.floor(Number(device.print.bed_target_temper ?? '0')) - Math.floor(Number(device.print.bed_temper ?? '0')) > 2) ? bedTempActiveIcon : bedTempIcon),
   current: computed(() => Math.floor(Number(device.print.bed_temper ?? '0'))),
   target: computed(() => Math.floor(Number(device.print.bed_target_temper ?? '0'))),
 }]
