@@ -39,6 +39,16 @@ window.addEventListener('contextmenu', (event) => {
   event.preventDefault()
 })
 
+const syncAppSize = () => {
+  const appElement = document.getElementById('app')
+  const appHeight = appElement?.clientHeight ?? window.innerHeight
+  const appWidth =  appElement?.clientWidth ?? window.innerWidth
+  document.documentElement.style.setProperty('--app-height', `${appHeight}px`)
+  document.documentElement.style.setProperty('--app-width', `${appWidth}px`)
+}
+syncAppSize()
+window.addEventListener('resize', syncAppSize)
+
 const params = new URLSearchParams(location.search)
 const ip = params.get('ip') ?? ''
 const serial = params.get('serial') ?? ''

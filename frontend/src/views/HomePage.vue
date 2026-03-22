@@ -187,13 +187,16 @@ const toggleLight = () => {
 }
 
 .task-thumbnail {
-  width: 50%;
+  width: min(calc(max(306px, var(--app-height)) - 82px - 8 * 8px), var(--app-width) - 64px - 200px - 3 * 8px);
   height: auto;
   background-color: var(--van-background-5);
+  margin-top: 8px
 }
 
 .task-name {
-  width: 250px;
+  width: fit-content;
+  max-width: 250px;
+  line-height: 22px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
