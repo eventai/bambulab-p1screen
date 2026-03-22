@@ -6,25 +6,21 @@
       <van-cell title="状态" :value="statusLabel" />
     </van-cell-group>
 
-    <van-cell-group inset title="设备信息" v-if="deviceInfo">
+    <van-cell-group v-if="deviceInfo" inset title="设备信息">
       <van-cell title="设备型号" :value="deviceInfo.product_name" />
       <van-cell title="序列号" :value="deviceInfo.sn" />
       <van-cell title="固件版本" :value="deviceInfo.sw_ver" />
     </van-cell-group>
 
-    <template v-for="(module, index) in modules" :key="index">
-      <van-cell-group inset title="配件信息">
-        <van-cell title="配件" :value="module.product_name" />
-        <van-cell title="序列号" :value="module.sn" />
-        <van-cell title="固件版本" :value="module.sw_ver" />
-      </van-cell-group>
-    </template>
+    <van-cell-group v-for="(module, index) in modules" :key="index" inset title="配件信息">
+      <van-cell title="配件" :value="module.product_name" />
+      <van-cell title="序列号" :value="module.sn" />
+      <van-cell title="固件版本" :value="module.sw_ver" />
+    </van-cell-group>
 
-    <template v-if="isDev">
-      <van-cell-group inset title="调试">
-        <van-cell title="重新连接" is-link @click="client.connect(ip, serial, code)"/>
-      </van-cell-group>
-    </template>
+    <van-cell-group v-if="isDev" inset title="调试">
+      <van-cell title="重新连接" is-link @click="client.connect(ip, serial, code)"/>
+    </van-cell-group>
   </div>
 </template>
 
@@ -40,15 +36,8 @@ const ip = params.get('ip') ?? ''
 const serial = params.get('serial') ?? ''
 const code = params.get('code') ?? ''
 
-const deviceInfo = computed(() => {
-  if (!device.module) return null
-  return device.module.find(item => item.name === 'ota')
-})
-
-const modules = computed(() => {
-  if (!device.module) return []
-  return device.module.filter(item => item.name.includes('ams'))
-})
+const deviceInfo = computed(() => device.module.find(item => item.name === 'ota') ?? null)
+const modules = computed(() => device.module.filter(item => item.name.includes('ams')))
 
 const statusLabel = computed(() => {
   const state = client.readyState.value

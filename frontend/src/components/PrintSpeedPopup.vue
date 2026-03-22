@@ -8,14 +8,27 @@
     </div>
 
     <div class="print-speed-buttons">
-      <van-button v-for="item in buttons" :key="item.value" :class="`print-speed-button ${item.value === value ? 'print-speed-button-active' : ''}`" type="primary" size="large" @click="handleConfirm(item.value)">{{ item.label }}</van-button>
+      <van-button
+        v-for="item in buttons"
+        :key="item.value"
+        :class="{ 'print-speed-button': true, 'print-speed-button-active': item.value === value }"
+        type="primary"
+        size="large"
+        @click="handleConfirm(item.value)"
+      >
+        {{ item.label }}
+      </van-button>
     </div>
   </van-popup>
 </template>
 
 <script setup lang="ts">
+type SpeedButton = {
+  label: string
+  value: number
+}
 
-const buttons = [{
+const buttons: SpeedButton[] = [{
   label: '狂暴模式（166%）',
   value: 4
 }, {

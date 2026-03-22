@@ -1,8 +1,8 @@
 <template>
-  <div class="control-button" @click="onClick">
+  <button class="control-button" type="button" :disabled="disabled" @click="handleClick">
     <img :src="icon" />
     <span :style="{ fontSize }">{{ label }}</span>
-  </div>
+  </button>
 </template>
 
 <script setup lang="ts">
@@ -13,12 +13,21 @@ const props = withDefaults(
     label: string
     fontSize?: string
     disabled?: boolean
-    onClick?: () => void
   }>(),
   {
-    fontSize: '14px'
+    fontSize: '14px',
+    disabled: false
   }
 )
+
+const emit = defineEmits<{
+  (event: 'click'): void
+}>()
+
+const handleClick = () => {
+  if (props.disabled) return
+  emit('click')
+}
 </script>
 
 <style scoped>
@@ -33,12 +42,19 @@ const props = withDefaults(
   background: var(--van-background-3);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  border: 0;
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
 }
 
-.control-button:active {
+.control-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.control-button:not(:disabled):active {
   filter: brightness(0.9);
 }
 

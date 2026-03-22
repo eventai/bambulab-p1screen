@@ -1,10 +1,13 @@
 <template>
   <div class="ams-card">
     <div class="ams-card-container">
-      <Tray :name="`${amsPrefix}1`" :material="trayList ? trayList[0].tray_type : '?'" :color="trayList ? `#${trayList[0].tray_color}` : ''" />
-      <Tray :name="`${amsPrefix}2`" :material="trayList ? trayList[1].tray_type : '?'" :color="trayList ? `#${trayList[1].tray_color}` : ''" />
-      <Tray :name="`${amsPrefix}3`" :material="trayList ? trayList[2].tray_type : '?'" :color="trayList ? `#${trayList[2].tray_color}` : ''" />
-      <Tray :name="`${amsPrefix}4`" :material="trayList ? trayList[3].tray_type : '?'" :color="trayList ? `#${trayList[3].tray_color}` : ''" />
+      <Tray
+        v-for="tray in displayTrays"
+        :key="tray.slot"
+        :name="`${amsPrefix}${tray.slot + 1}`"
+        :material="tray.material"
+        :color="tray.color"
+      />
       <span class="ams-name" >AMS-{{ amsPrefix }}</span>
     </div>
     <img class="ams-hum" :src="humIcon"/>
@@ -34,7 +37,18 @@ const client = PrinterClient.getInstance()
 const amsPrefix = ref(String.fromCharCode('A'.charCodeAt(0) + Number(props.amsId ?? '0')))
 const ams = computed(() => client.device.print.ams?.ams?.find(item => item.id === props.amsId))
 const trayList = computed(() => {
-  return ams.value?.tray.sort((a, b) => Number(a.id) - Number(b.id))
+  return [...(ams.value?.tray ?? [])].sort((a, b) => Number(a.id) - Number(b.id))
+})
+const traySlots = [0, 1, 2, 3] as const
+const displayTrays = computed(() => {
+  return traySlots.map((slot) => {
+    const tray = trayList.value[slot]
+    return {
+      slot,
+      material: tray?.tray_type ?? '?',
+      color: tray?.tray_color ? `#${tray.tray_color}` : ''
+    }
+  })
 })
 
 const humIcon = computed(() => {

@@ -1,6 +1,6 @@
 <template>
-  <div class="tray">
-    <div class="filament" :style="{ backgroundColor: bgColor }" @click="onClick"></div>
+  <div class="tray" @click="emit('click')">
+    <div class="filament" :style="{ backgroundColor: bgColor }"></div>
     <span class="name" :style="{ color: textColor }">{{ name }}</span>
     <span class="material" :style="{ color: textColor }">{{ material.length > 0 ? material : '?' }}</span>
     <span class="icon" :style="{ backgroundColor: textColor}"></span>
@@ -16,22 +16,26 @@ const props = withDefaults(
     name: string
     material: string
     color: string
-    onClick?: () => void
   }>(),
   {
   }
 )
 
+const emit = defineEmits<{
+  (event: 'click'): void
+}>()
+
 const bgColor = computed(() => {
+  if (props.color === '') return getComputedStyle(document.documentElement).getPropertyValue('--van-text-color')
   // fix vt_tray wrong alpha
-  const bgColor = colord(props.color)
-  bgColor.rgba.a = 1
-  return bgColor.toRgbString()
+  const parsedColor = colord(props.color)
+  parsedColor.rgba.a = 1
+  return parsedColor.toRgbString()
 })
 
 const textColor = computed(() => {
-  const bgColor = colord(props.color)
-  return bgColor.brightness() > 0.5 ? 'black' : 'white'
+  const parsedColor = colord(bgColor.value)
+  return parsedColor.brightness() > 0.5 ? 'black' : 'white'
 })
 
 </script>
@@ -47,7 +51,7 @@ const textColor = computed(() => {
   width: 48px;
   height: 64px;
   border: var(--van-background-5) 2px solid;
-  background-color: var(--van-background-2);
+  background-color: var(--van-text-color-2);
 }
 .filament::before, .filament::after {
   display: block;

@@ -1,10 +1,10 @@
 <template>
   <div class="filament-page">
     <div class="ext-card">
-      <Tray name="Ext" :material="extTray ? extTray.tray_type : '?'" :color="extTray ? `#${extTray.tray_color}` : ''" />
+      <Tray name="Ext" :material="extTrayMaterial" :color="extTrayColor" />
     </div>
     <div class="ams-cards">
-      <AMS v-for="ams in amsList" :ams-id="ams.id ?? '0'" />
+      <AMS v-for="ams in amsList" :key="ams.id ?? '0'" :ams-id="ams.id ?? '0'" />
     </div>
   </div>
 </template>
@@ -18,8 +18,10 @@ import { PrinterClient } from '../services/PrinterClient'
 const client = PrinterClient.getInstance()
 const device = client.device
 
-const amsList = computed(() => device.print.ams?.ams ?? [{} as any])
+const amsList = computed(() => device.print.ams?.ams ?? [{ id: '0' }])
 const extTray = computed(() => device.print.vt_tray)
+const extTrayMaterial = computed(() => extTray.value?.tray_type ?? '?')
+const extTrayColor = computed(() => extTray.value?.tray_color ? `#${extTray.value.tray_color}` : '')
 </script>
 
 <style scoped>

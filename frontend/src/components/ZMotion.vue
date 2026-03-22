@@ -41,12 +41,12 @@
 </template>
 
 <script setup lang="ts">
+import bedUpIcon from '../assets/images/monitor_bed_up.svg'
+import bedDownIcon from '../assets/images/monitor_bed_down.svg'
+
 const emit = defineEmits<{
   (event: 'move', axis: 'z', step: -10 | -1 | 1 | 10): void
 }>()
-
-import bedUpIcon from '../assets/images/monitor_bed_up.svg'
-import bedDownIcon from '../assets/images/monitor_bed_down.svg'
 
 const emitMove = (axis: 'z', step: -10 | -1 | 1 | 10) => {
   emit('move', axis, step)

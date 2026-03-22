@@ -56,7 +56,7 @@ import TempKeypadPopup from '../components/TempKeypadPopup.vue'
 import FanSpeedPopup from '../components/FanSpeedPopup.vue'
 import PrintSpeedPopup from '../components/PrintSpeedPopup.vue'
 import { fans } from '../constant'
-import { TemperatureType } from '../services/device'
+import { GcodeState, TemperatureType } from '../services/device'
 import { PrinterClient } from '../services/PrinterClient'
 
 import nozzleTempIcon from '../assets/images/monitor_nozzle_temp.svg'
@@ -79,7 +79,13 @@ const device = client.device
 // Temperature
 const showTempPopup = ref(false)
 const tempPopupType = ref<TemperatureType | undefined>(undefined)
-const temps: { type: TemperatureType, icon: ComputedRef<string>, current: any, target: any }[] = [{
+type TempItem = {
+  type: TemperatureType
+  icon: ComputedRef<string>
+  current: ComputedRef<number>
+  target: ComputedRef<number>
+}
+const temps: TempItem[] = [{
   type: TemperatureType.Nozzle,
   icon: computed(() => (Math.floor(Number(device.print.nozzle_target_temper ?? '0')) - Math.floor(Number(device.print.nozzle_temper ?? '0')) > 2) ? nozzleTempActiveIcon : nozzleTempIcon),
   current: computed(() => Math.floor(Number(device.print.nozzle_temper ?? '0'))),
@@ -97,9 +103,7 @@ const openTempPopup = (type: TemperatureType) => {
 }
 
 const handleTempConfirm = (type: TemperatureType | undefined, value: number) => {
-  if (!type) {
-    return
-  }
+  if (!type) return
 
   console.log('[Controls] set temperature', type, value)
   client.setTemperature(type, value)
@@ -120,7 +124,7 @@ const getPrintSpeedLevel = computed(() => device.print.spd_lvl ?? 0)
 
 const handlePrintSpeedConfirm = (speedLevel: number) => {
   console.log('[Controls] set print speed', speedLevel)
-  if (device.print.gcode_state === 'IDLE') {
+  if (device.print.gcode_state === GcodeState.Idle) {
     showDialog({ message: '空闲状态下调整打印速度不生效。' })
   }
   client.setPrintSpeedLevel(speedLevel)

@@ -7,7 +7,7 @@
       <div class="popup-header-title">风扇</div>
     </div>
 
-    <div class="popup-fan-speed-card" v-for:="item in fans" :key="item.type">
+    <div class="popup-fan-speed-card" v-for="item in fans" :key="item.type">
       <div>
         <img class="popup-fan-speed-icon" :src="client.getFanSpeed(item.type) !== 0 ? fanOnIcon : fanOffIcon" />
         <span class="popup-fan-speed-name">{{ item.name }} {{ (client.getFanSpeed(item.type) / 255 * 100).toFixed(0) }}%</span>

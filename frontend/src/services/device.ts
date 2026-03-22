@@ -10,6 +10,15 @@ export enum TemperatureType {
   Chamber = 'chamber',
 }
 
+export enum GcodeState {
+  Idle = 'IDLE',
+  Prepare = 'PREPARE',
+  Running = 'RUNNING',
+  Pause = 'PAUSE',
+  Finish = 'FINISH',
+  Unknown = '',
+}
+
 export type DeviceModule = {
   name: string
   sw_ver: string
@@ -41,7 +50,7 @@ export type DevicePrint = {
   mc_remaining_time?: number
   mc_print_stage?: string // 1:空闲,2:打印中,3:暂停
   mc_print_sub_stage?: number // 0:无,1,2:加热,4:换料中
-  gcode_state?: string
+  gcode_state?: GcodeState
   gcode_file_prepare_percent?: string
   layer_num?: number
   total_layer_num?: number

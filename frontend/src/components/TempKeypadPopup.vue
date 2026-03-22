@@ -9,7 +9,7 @@
     </div>
 
     <div class="temp-display">
-      <div class="temp-value">{{ displayValue }}</div>
+      <div class="temp-value">{{ inputValue }}</div>
       <div class="temp-unit">°C</div>
     </div>
 
@@ -69,10 +69,6 @@ watch(
     }
   }
 )
-
-const displayValue = computed(() => {
-  return inputValue.value
-})
 
 const handleKey = (key: string) => {
   if (inputValue.value.length >= 3) return

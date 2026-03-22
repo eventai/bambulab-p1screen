@@ -3,11 +3,11 @@
     <div class="row-1">
       <div>
         <img class="task-thumbnail" :src="getPrintThumbnail"/>
-        <span class="task-name">{{ computed(() => device.print.subtask_name || '') }}</span>
+        <span class="task-name">{{ taskName }}</span>
       </div>
       <div class="printer-thumbnail" :style="{ backgroundImage: `url(${p1sThumbnail})`}">
-        <span id="nozzle-temp">{{ computed(() => Math.floor(Number(device.print.nozzle_temper ?? '0'))) }} ℃</span>
-        <span id="heatbed-temp">{{ computed(() => Math.floor(Number(device.print.bed_temper ?? '0'))) }} ℃</span>
+        <span id="nozzle-temp">{{ nozzleTemp }} ℃</span>
+        <span id="heatbed-temp">{{ heatbedTemp }} ℃</span>
         <span id="wifi-signal"><img :src="getWifiSignalIcon"/></span>
       </div>
     </div>
@@ -21,7 +21,7 @@
           <van-progress :percentage="getPrintPercent" :show-pivot="false" />
           <span class="progress-status">{{ getPrintStateLabel }}</span>
         </div>
-        <template v-if="!['IDLE', 'FINISH'].includes(device.print.gcode_state ?? '')">
+        <template v-if="showPrintActions">
           <!-- <ControlButton :icon="skipIcon" label="跳过" @click="handleSkip" /> -->
           <ControlButton v-if="!isPaused" :icon="pauseIcon" label="暂停" @click="handlePause" />
           <ControlButton v-if="isPaused" :icon="resumeIcon" label="继续" @click="handleResume" />
@@ -37,6 +37,7 @@
 import { computed } from 'vue'
 import humanizeDuration from 'humanize-duration'
 import { PrinterClient } from '../services/PrinterClient'
+import { GcodeState } from '../services/device'
 import ControlButton from '../components/ControlButton.vue'
 
 import lightOnIcon from '../assets/images/monitor_lamp_on.svg'
@@ -54,6 +55,10 @@ import signalStrongIcon from '../assets/images/monitor_signal_strong.svg'
 
 const client = PrinterClient.getInstance()
 const device = client.device
+
+const taskName = computed(() => device.print.subtask_name || '')
+const nozzleTemp = computed(() => Math.floor(Number(device.print.nozzle_temper ?? '0')))
+const heatbedTemp = computed(() => Math.floor(Number(device.print.bed_temper ?? '0')))
 
 const getWifiSignalIcon = computed(() => {
   if (client.readyState.value !== WebSocket.OPEN) {
@@ -73,20 +78,28 @@ const getWifiSignalIcon = computed(() => {
 const getPrintThumbnail = computed(() => device.print.url ? `/api/getThumbnail?url=${encodeURIComponent(device.print.url)}&plate_idx=${device.print.plate_idx}` : sdcardThumbnail)
 
 const getPrintPercent = computed(() => {
-  if (device.print.gcode_state == 'PREPARE') {
+  if (device.print.gcode_state === GcodeState.Prepare) {
     return 0
   }
   return device.print.mc_percent || 0
 })
 
 const getPrintStateLabel = computed(() => {
-  return {
-    'IDLE': '空闲',
-    'PREPARE': `下载中(${device.print.gcode_file_prepare_percent}%)`,
-    'RUNNING': '打印中',
-    'PAUSE': '已暂停',
-    'FINISH': '完成',
-  }[device.print.gcode_state ?? ''] || ''
+  const state = device.print.gcode_state
+  switch (state) {
+    case GcodeState.Idle:
+      return '空闲'
+    case GcodeState.Prepare:
+      return `下载中(${device.print.gcode_file_prepare_percent}%)`
+    case GcodeState.Running:
+      return '打印中'
+    case GcodeState.Pause:
+      return '已暂停'
+    case GcodeState.Finish:
+      return '完成'
+    default:
+      return ''
+  }
 })
 
 const getPrintSubStateLabel = computed(() => [null, null, '加热中', null, '换料中'][Number(device.print.mc_print_sub_stage ?? 0)]) || ''
@@ -106,7 +119,8 @@ const getPrintInfo = computed(() => {
   return `${device.print.layer_num || 0} / ${device.print.total_layer_num || 0} | ${remainingTimeText}`
 })
 
-const isPaused = computed(() => device.print.gcode_state === 'PAUSE')
+const isPaused = computed(() => device.print.gcode_state === GcodeState.Pause)
+const showPrintActions = computed(() => ![GcodeState.Unknown, GcodeState.Idle, GcodeState.Finish].includes(device.print.gcode_state ?? GcodeState.Unknown))
 
 const handleSkip = () => {
   console.log('[Controls] skip')
