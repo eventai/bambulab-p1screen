@@ -49,12 +49,16 @@ export type DevicePrint = {
   mc_percent?: number
   mc_remaining_time?: number
   mc_print_stage?: string // 1:空闲,2:打印中,3:暂停
-  mc_print_sub_stage?: number // 0:无,1,2:加热,4:换料中
+  mc_print_sub_stage?: number // 0:无,1:?,2:加热,4:换料中
   gcode_state?: GcodeState
   gcode_file_prepare_percent?: string
   layer_num?: number
   total_layer_num?: number
   subtask_name?: string
+  
+  stg_cur?: number
+  print_type?: string
+
   url?: string
   plate_idx?: string
 

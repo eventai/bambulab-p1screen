@@ -4,6 +4,7 @@ import {
   FanType,
   TemperatureType
 } from './device'
+import { FAN_PROFILE } from '../const'
 
 type ConnectionParams = {
   ip: string
@@ -12,10 +13,14 @@ type ConnectionParams = {
 }
 
 const PRINT_SPEED_MAGNITUDES = [50, 100, 124, 166] as const
-const FAN_NUMBER_BY_TYPE: Record<FanType, number> = {
-  [FanType.Part]: 1,
-  [FanType.Aux]: 2,
-  [FanType.Chamber]: 3
+
+const getFanNumberByType = (type: FanType): number | undefined => {
+  for (const [fanNum, fanType] of Object.entries(FAN_PROFILE)) {
+    if (fanType === type) {
+      return Number(fanNum)
+    }
+  }
+  return undefined
 }
 
 export class PrinterClient {
@@ -284,7 +289,7 @@ export class PrinterClient {
    */
   getFanSpeed(type: FanType) {
     const fanGear = this.device.print.fan_gear ?? 0
-    const fanBit = 8 * (FAN_NUMBER_BY_TYPE[type] - 1)
+    const fanBit = 8 * (getFanNumberByType(type) - 1)
     return (fanGear >> fanBit) % 256
   }
 
@@ -314,7 +319,7 @@ export class PrinterClient {
    * @returns No return value.
    */
   setFanSpeed(type: FanType, speed: number) {
-    const fanNum = FAN_NUMBER_BY_TYPE[type]
+    const fanNum = getFanNumberByType(type)
 
     this.publishCommand({
       "print": {

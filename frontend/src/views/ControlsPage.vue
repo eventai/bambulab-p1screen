@@ -55,8 +55,7 @@ import EMotion from '../components/EMotion.vue'
 import TempKeypadPopup from '../components/TempKeypadPopup.vue'
 import FanSpeedPopup from '../components/FanSpeedPopup.vue'
 import PrintSpeedPopup from '../components/PrintSpeedPopup.vue'
-import { fans } from '../constant'
-import { GcodeState, TemperatureType } from '../services/device'
+import { FanType, GcodeState, TemperatureType } from '../services/device'
 import { PrinterClient } from '../services/PrinterClient'
 
 import nozzleTempIcon from '../assets/images/monitor_nozzle_temp.svg'
@@ -113,6 +112,17 @@ const handleTempConfirm = (type: TemperatureType | undefined, value: number) => 
 // Fan
 
 const showFanSpeedPopup = ref(false)
+
+const fans: { type: FanType, name: string }[] = [{
+  type: FanType.Part,
+  name: '部件'
+}, {
+  type: FanType.Aux,
+  name: '辅助'
+}, {
+  type: FanType.Chamber,
+  name: '机箱'
+}]
 
 // ------------------------------
 // Speed

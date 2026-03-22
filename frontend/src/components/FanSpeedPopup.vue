@@ -18,20 +18,11 @@
 </template>
 
 <script setup lang="ts">
-import { fans } from '../constant'
 import { FanType } from '../services/device'
 import { PrinterClient } from '../services/PrinterClient'
 import fanOnIcon from '../assets/images/monitor_fan_on.svg'
 import fanOffIcon from '../assets/images/monitor_fan_off.svg'
 import { ref, type Ref } from 'vue'
-
-const client = PrinterClient.getInstance()
-
-const fanSpeeds: Record<FanType, Ref<number>> = {
-  [FanType.Part]: ref(client.getFanSpeed(FanType.Part)),
-  [FanType.Aux]: ref(client.getFanSpeed(FanType.Aux)),
-  [FanType.Chamber]: ref(client.getFanSpeed(FanType.Chamber))
-}
 
 const props = withDefaults(
   defineProps<{
@@ -44,6 +35,25 @@ const props = withDefaults(
 const emit = defineEmits<{
   (event: 'update:show', value: boolean): void
 }>()
+
+const client = PrinterClient.getInstance()
+
+const fans: { type: FanType, name: string }[] = [{
+  type: FanType.Part,
+  name: '部件'
+}, {
+  type: FanType.Aux,
+  name: '辅助'
+}, {
+  type: FanType.Chamber,
+  name: '机箱'
+}]
+
+const fanSpeeds: Record<FanType, Ref<number>> = {
+  [FanType.Part]: ref(client.getFanSpeed(FanType.Part)),
+  [FanType.Aux]: ref(client.getFanSpeed(FanType.Aux)),
+  [FanType.Chamber]: ref(client.getFanSpeed(FanType.Chamber))
+}
 
 const handleClose = () => {
   emit('update:show', false)

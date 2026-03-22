@@ -59,3 +59,7 @@ P2S屏幕操作指南：https://wiki.bambulab.com/en/p2s/manual/screen-operation
 - 文件页
     - ftps获取文件列表
 - apk构建
+- 观察状态变化(https://github.com/greghesp/ha-bambulab/blob/054946b6ab40bdeb772a22abb91b1537a24263fb/custom_components/bambu_lab/pybambu/const.py#L71)
+    - stg_cur: CURRENT_STAGE_IDS
+    - print_type: GCODE_STATE_OPTIONS
+
