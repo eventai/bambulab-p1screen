@@ -2,8 +2,7 @@
   <div class="ext-tray-card">
     <Tray
       name="Ext"
-      :material="extTrayMaterial"
-      :color="extTrayColor"
+      :tray="extTray"
     />
     <span class="name" >外挂料盘</span>
   </div>
@@ -16,8 +15,6 @@ import { PrinterClient } from '../services/PrinterClient'
 
 const client = PrinterClient.getInstance()
 const extTray = computed(() => client.device.print.vt_tray)
-const extTrayMaterial = computed(() => extTray.value?.tray_type ?? '?')
-const extTrayColor = computed(() => extTray.value?.tray_color ? `#${extTray.value.tray_color}` : '')
 </script>
 
 <style scoped>

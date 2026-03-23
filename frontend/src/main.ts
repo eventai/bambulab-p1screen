@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
-import { Button, Slider, Progress, Popup, Dialog, Cell, CellGroup } from 'vant'
+import { Button, Slider, Progress, Popup, Popover, Dialog, Cell, CellGroup } from 'vant'
 import App from './App.vue'
 import { PrinterClient } from './services/PrinterClient'
 import HomePage from './views/HomePage.vue'
@@ -30,6 +30,7 @@ createApp(App)
   .use(Slider)
   .use(Progress)
   .use(Popup)
+  .use(Popover)
   .use(Dialog)
   .use(Cell)
   .use(CellGroup)

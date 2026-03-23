@@ -1,11 +1,11 @@
 <template>
   <div class="filament-page">
-    <div class="ext-card">
-      <ExtTray />
-    </div>
     <div class="ams-cards">
       <AMS v-for="ams in amsList" :key="ams.id ?? '0'" :ams-id="ams.id ?? '0'" />
       <!-- <AMS v-for="ams in amsList" :key="ams.id ?? '0'" :ams-id="ams.id ?? '0'" /> -->
+    </div>
+    <div class="ext-card">
+      <ExtTray />
     </div>
   </div>
 </template>
@@ -32,7 +32,7 @@ const amsList = computed(() => device.print.ams?.ams ?? [{ id: '0' }])
 }
 .ext-card {
   padding: 60px 28px;
-  border-right: var(--van-background-4) 2px dotted;
+  border-left: var(--van-background-4) 2px dotted;
 }
 .ams-cards {
   height: 100%;

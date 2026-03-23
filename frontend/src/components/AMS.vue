@@ -2,11 +2,10 @@
   <div>
     <div class="ams-card">
       <Tray
-        v-for="tray in displayTrays"
-        :key="tray.slot"
-        :name="`${amsPrefix}${tray.slot + 1}`"
-        :material="tray.material"
-        :color="tray.color"
+        v-for="slot in 4"
+        :key="slot"
+        :name="`${amsPrefix}${slot}`"
+        :tray="trayList[slot - 1]"
       />
       <span class="ams-name" >AMS-{{ amsPrefix }}</span>
     </div>
@@ -39,17 +38,6 @@ const amsPrefix = ref(String.fromCharCode('A'.charCodeAt(0) + Number(props.amsId
 const ams = computed(() => client.device.print.ams?.ams?.find(item => item.id === props.amsId))
 const trayList = computed(() => {
   return [...(ams.value?.tray ?? [])].sort((a, b) => Number(a.id) - Number(b.id))
-})
-const traySlots = [0, 1, 2, 3] as const
-const displayTrays = computed(() => {
-  return traySlots.map((slot) => {
-    const tray = trayList.value[slot]
-    return {
-      slot,
-      material: tray?.tray_type ?? '?',
-      color: tray?.tray_color ? `#${tray.tray_color}` : ''
-    }
-  })
 })
 
 const humIcon = computed(() => {

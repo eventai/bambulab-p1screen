@@ -79,7 +79,7 @@ type DeviceAMS = {
   tray: DeviceTray[]
 }
 
-type DeviceTray = {
+export type DeviceTray = {
   id: string
   state?: number
   k: number
