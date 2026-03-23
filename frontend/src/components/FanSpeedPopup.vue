@@ -58,25 +58,32 @@ const onChange = (type: FanType, value: number) => {
 </script>
 
 <style scoped>
-
 .fan-speed-card {
   background: var(--van-background-5);
   border-radius: 10px;
+  width: 250px;
+  max-width: 100%;
   max-height: 100px;
+  padding: 8px 22px 14px;
 }
 
 .fan-speed-card div {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin: 8px;
+  margin: 0;
   font-size: 13px;
 }
 
 .fan-speed-card .van-slider {
   height: 4px;
-  width: 200px;
-  margin: 22px;
+  width: 100%;
+  margin: 22px 0 0;
 }
 
+@media (orientation: portrait) {
+  .fan-speed-card {
+    width: 100%;
+  }
+}
 </style>

@@ -69,6 +69,7 @@ const handleConfirm = (value: number) => {
 .print-speed-buttons {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 10px;
   padding: 0 8px;
 }

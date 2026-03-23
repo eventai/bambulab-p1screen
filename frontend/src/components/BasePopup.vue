@@ -1,5 +1,10 @@
 <template>
-  <van-popup :show="show" class="popup" position="right" @click-overlay="handleClose">
+  <van-popup
+    :show="show"
+    :class="{ popup: true, 'popup-bottom': isPortrait }"
+    :position="isPortrait ? 'bottom' : 'right'"
+    @click-overlay="handleClose"
+  >
     <div class="popup-header">
       <button class="popup-header-back" type="button" @click="handleClose">
         <i-material-symbols-arrow-back-ios-new-rounded />
@@ -22,6 +27,8 @@
 </template>
 
 <script setup lang="ts">
+import { onBeforeUnmount, onMounted, ref } from 'vue'
+
 withDefaults(
   defineProps<{
     show: boolean
@@ -34,6 +41,21 @@ withDefaults(
     confirmDisabled: false,
   }
 )
+
+const isPortrait = ref(false)
+
+const updateOrientation = () => {
+  isPortrait.value = window.innerHeight > window.innerWidth
+}
+
+onMounted(() => {
+  updateOrientation()
+  window.addEventListener('resize', updateOrientation)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateOrientation)
+})
 
 const emit = defineEmits<{
   (event: 'update:show', value: boolean): void
@@ -56,8 +78,17 @@ const handleConfirm = () => {
   padding: 4px 12px;
   display: grid;
   gap: 8px;
+  min-width: 320px;
   height: 100%;
   padding-right: calc(12px + env(safe-area-inset-right));
+}
+
+.popup-bottom {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  padding-right: 12px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
 }
 
 .popup-header {

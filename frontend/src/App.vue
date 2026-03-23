@@ -51,7 +51,6 @@
   align-items: center;
   justify-content: center;
   -webkit-user-drag: none;
-  user-drag: none;
   -webkit-touch-callout: none;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
@@ -71,5 +70,32 @@
   height: 100%;
   padding-right: env(safe-area-inset-right);
   overflow: auto;
+}
+
+@media (orientation: portrait) {
+  .app-shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .side-nav {
+    grid-auto-flow: column;
+    grid-auto-columns: 48px;
+    justify-content: space-between;
+    justify-items: center;
+    height: auto;
+    padding: 0;
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .nav-item {
+    width: 40px;
+    height: 40px;
+  }
+  .main {
+    min-height: 0;
+    padding-right: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 }
 </style>

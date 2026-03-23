@@ -7,19 +7,21 @@
     @update:show="emit('update:show', $event)"
     @confirm="handleConfirm"
   >
-    <div class="temp-display">
-      <div class="temp-value">{{ inputValue }}</div>
-      <div class="temp-unit">°C</div>
-    </div>
+    <div class="temp-popup-content">
+      <div class="temp-display">
+        <div class="temp-value">{{ inputValue }}</div>
+        <div class="temp-unit">°C</div>
+      </div>
 
-    <div class="temp-keypad">
-      <button v-for="key in keys" :key="key" class="temp-key" type="button" @click="handleKey(key)">
-        {{ key }}
-      </button>
-      <button class="temp-key temp-key--zero" type="button" @click="handleKey('0')">0</button>
-      <button class="temp-key temp-key--back" type="button" @click="handleBackspace">
-        <i-material-symbols-backspace-rounded />
-      </button>
+      <div class="temp-keypad">
+        <button v-for="key in keys" :key="key" class="temp-key" type="button" @click="handleKey(key)">
+          {{ key }}
+        </button>
+        <button class="temp-key temp-key--zero" type="button" @click="handleKey('0')">0</button>
+        <button class="temp-key temp-key--back" type="button" @click="handleBackspace">
+          <i-material-symbols-backspace-rounded />
+        </button>
+      </div>
     </div>
   </BasePopup>
 </template>
@@ -91,6 +93,13 @@ const handleConfirm = () => {
 </script>
 
 <style scoped>
+.temp-popup-content {
+  width: 340px;
+  max-width: 100%;
+  display: grid;
+  gap: 8px;
+}
+
 .temp-display {
   background: var(--van-background-2);
   border-radius: 10px;
@@ -114,7 +123,8 @@ const handleConfirm = () => {
 
 .temp-keypad {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   align-self: start;
 }
@@ -123,7 +133,8 @@ const handleConfirm = () => {
   background: var(--van-background-5);
   border: 0;
   border-radius: 8px;
-  width: 100px;
+  width: 100%;
+  min-width: 0;
   height: 44px;
   font-size: 18px;
 }
@@ -135,5 +146,11 @@ const handleConfirm = () => {
 .temp-key--back {
   display: grid;
   place-items: center;
+}
+
+@media (orientation: portrait) {
+  .temp-popup-content {
+    width: 100%;
+  }
 }
 </style>
