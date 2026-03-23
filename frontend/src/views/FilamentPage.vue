@@ -41,4 +41,18 @@ const amsList = computed(() => device.print.ams?.ams ?? [{ id: '0' }])
   padding: 28px;
   gap: 20px;
 }
+
+@media (orientation: portrait) {
+  .filament-page {
+    height: auto;
+    grid-template-columns: auto;
+    grid-template-rows: auto auto;
+  }
+
+  .ext-card {
+    padding: 28px;
+    padding-top: 0;
+    border-left: none;
+  }
+}
 </style>

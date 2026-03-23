@@ -119,4 +119,10 @@ const handleConfirm = () => {
   height: 32px;
   font-size: 16px;
 }
+
+@media (orientation: portrait) {
+  .popup {
+    padding-bottom: calc(4px + env(safe-area-inset-bottom));
+  }
+}
 </style>
