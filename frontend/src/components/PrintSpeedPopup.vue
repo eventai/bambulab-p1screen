@@ -1,12 +1,9 @@
 <template>
-  <van-popup :show="show" class="popup" position="right" @click-overlay="handleClose">
-    <div class="popup-header">
-      <button class="popup-header-back" type="button" @click="handleClose">
-        <span class="material-symbols-rounded">arrow_back_ios</span>
-      </button>
-      <div class="popup-header-title">打印速度</div>
-    </div>
-
+  <BasePopup
+    :show="show"
+    title="打印速度"
+    @update:show="emit('update:show', $event)"
+  >
     <div class="print-speed-buttons">
       <van-button
         v-for="item in buttons"
@@ -19,10 +16,12 @@
         {{ item.label }}
       </van-button>
     </div>
-  </van-popup>
+  </BasePopup>
 </template>
 
 <script setup lang="ts">
+import BasePopup from './BasePopup.vue'
+
 type SpeedButton = {
   label: string
   value: number
@@ -56,10 +55,6 @@ const emit = defineEmits<{
   (event: 'update:show', value: boolean): void
   (event: 'confirm', value: number): void
 }>()
-
-const handleClose = () => {
-  emit('update:show', false)
-}
 
 const handleConfirm = (value: number) => {
   emit('confirm', value)

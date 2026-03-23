@@ -1,13 +1,12 @@
 <template>
-  <van-popup :show="show" class="popup" position="right" @click-overlay="handleClose">
-    <div class="popup-header">
-      <button class="popup-header-back" type="button" @click="handleClose">
-        <span class="material-symbols-rounded">arrow_back_ios</span>
-      </button>
-      <div class="popup-header-title">{{ title }}</div>
-      <van-button class="popup-header-confirm" type="primary" size="normal" :disabled="inputValue.length === 0" @click="handleConfirm">确定</van-button>
-    </div>
-
+  <BasePopup
+    :show="show"
+    :title="title"
+    :show-confirm="true"
+    :confirm-disabled="inputValue.length === 0"
+    @update:show="emit('update:show', $event)"
+    @confirm="handleConfirm"
+  >
     <div class="temp-display">
       <div class="temp-value">{{ inputValue }}</div>
       <div class="temp-unit">°C</div>
@@ -22,12 +21,13 @@
         <span class="material-symbols-rounded">backspace</span>
       </button>
     </div>
-  </van-popup>
+  </BasePopup>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { TemperatureType } from '../services/device'
+import BasePopup from './BasePopup.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -81,10 +81,6 @@ const handleKey = (key: string) => {
 
 const handleBackspace = () => {
   inputValue.value = inputValue.value.slice(0, -1)
-}
-
-const handleClose = () => {
-  emit('update:show', false)
 }
 
 const handleConfirm = () => {
