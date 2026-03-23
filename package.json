@@ -24,7 +24,6 @@
     "express": "^4.19.2",
     "fflate": "^0.8.2",
     "humanize-duration": "^3.33.2",
-    "material-symbols": "^0.32.0",
     "mqtt": "^5.10.1",
     "vant": "^4.9.13",
     "vue": "^3.5.12",
@@ -32,6 +31,7 @@
     "ws": "^8.18.0"
   },
   "devDependencies": {
+    "@iconify-json/material-symbols": "^1.2.63",
     "@types/express": "^5.0.6",
     "@types/humanize-duration": "^3.27.4",
     "@types/node": "^22.10.1",
@@ -45,6 +45,8 @@
     "globals": "^17.4.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
+    "unplugin-icons": "^23.0.1",
+    "unplugin-vue-components": "^32.0.0",
     "vite": "^5.4.11",
     "vue-eslint-parser": "^10.4.0",
     "vue-tsc": "^3.2.6"

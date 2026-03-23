@@ -1,14 +1,14 @@
 <template>
   <div class="extruder-card">
     <button class="extruder-btn" type="button" @click="emitMove('e', -1)">
-      <span class="material-symbols-rounded">arrow_drop_up</span>
+      <img src="../assets/images/monitor_extruder_up.svg" />
     </button>
     <div class="extruder-imgs">
       <img src="../assets/images/pipe_of_empty.svg" />
       <img src="../assets/images/single_nozzle_xp.svg" />
     </div>
     <button class="extruder-btn" type="button" @click="emitMove('e', 1)">
-      <span class="material-symbols-rounded">arrow_drop_down</span>
+      <img src="../assets/images/monitor_extruder_down.svg" />
     </button>
     <div class="extruder-label">挤出机</div>
   </div>

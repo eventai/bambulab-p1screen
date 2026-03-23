@@ -9,7 +9,6 @@ import FilamentPage from './views/FilamentPage.vue'
 import SettingsPage from './views/SettingsPage.vue'
 import FilesPage from './views/FilesPage.vue'
 import 'vant/lib/index.css'
-import 'material-symbols/rounded.css'
 import './styles/theme.css'
 
 const router = createRouter({

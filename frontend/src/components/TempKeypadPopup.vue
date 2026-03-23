@@ -18,7 +18,7 @@
       </button>
       <button class="temp-key temp-key--zero" type="button" @click="handleKey('0')">0</button>
       <button class="temp-key temp-key--back" type="button" @click="handleBackspace">
-        <span class="material-symbols-rounded">backspace</span>
+        <i-material-symbols-backspace-rounded />
       </button>
     </div>
   </BasePopup>

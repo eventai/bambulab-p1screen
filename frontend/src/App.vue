@@ -2,19 +2,19 @@
   <div class="app-shell">
     <aside class="side-nav">
         <RouterLink class="nav-item" to="/home" draggable="false" @dragstart.prevent @contextmenu.prevent>
-          <span class="material-symbols-rounded">home</span>
+          <i-material-symbols-home-rounded class="nav-icon" />
         </RouterLink>
         <RouterLink class="nav-item" to="/controls" draggable="false" @dragstart.prevent @contextmenu.prevent>
-          <span class="material-symbols-rounded">discover_tune</span>
+          <i-material-symbols-tune-rounded class="nav-icon" />
         </RouterLink>
         <RouterLink class="nav-item" to="/filament" draggable="false" @dragstart.prevent @contextmenu.prevent>
-          <span class="material-symbols-rounded">database</span>
+          <i-material-symbols-database class="nav-icon" />
         </RouterLink>
         <RouterLink class="nav-item" to="/settings" draggable="false" @dragstart.prevent @contextmenu.prevent>
-          <span class="material-symbols-rounded">settings</span>
+          <i-material-symbols-settings-rounded class="nav-icon" />
         </RouterLink>
         <RouterLink class="nav-item" to="/files" draggable="false" @dragstart.prevent @contextmenu.prevent>
-          <span class="material-symbols-rounded">folder</span>
+          <i-material-symbols-folder-rounded class="nav-icon" />
         </RouterLink>
     </aside>
 
@@ -55,13 +55,15 @@
   -webkit-touch-callout: none;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-}
-
-.nav-item .material-symbols-rounded {
   color: var(--van-text-color-2);
 }
 
-.nav-item.router-link-active .material-symbols-rounded {
+.nav-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.nav-item.router-link-active {
   color: var(--van-primary-color);
 }
 

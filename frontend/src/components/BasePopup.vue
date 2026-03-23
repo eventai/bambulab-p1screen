@@ -2,7 +2,7 @@
   <van-popup :show="show" class="popup" position="right" @click-overlay="handleClose">
     <div class="popup-header">
       <button class="popup-header-back" type="button" @click="handleClose">
-        <span class="material-symbols-rounded">arrow_back_ios</span>
+        <i-material-symbols-arrow-back-ios-new-rounded />
       </button>
       <div class="popup-header-title">{{ title }}</div>
       <van-button
