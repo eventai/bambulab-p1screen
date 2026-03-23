@@ -203,10 +203,12 @@ const toggleLight = () => {
 .printer-thumbnail > span {
   font-size: 14px;
   font-weight: 500;
+  display: block;
   position: relative;
   background: rgba(0, 0, 0, 0.55);
   border-radius: 8px;
   padding: 4px 8px;
+  width: fit-content;
 }
 
 #nozzle-temp {
@@ -215,14 +217,13 @@ const toggleLight = () => {
 }
 
 #heatbed-temp {
-  left: 8%;
-  top: calc(50% - 100px + 130px);;
+  left: 25%;
+  top: calc(50% - 100px + 90px);
 }
 
 #wifi-signal {
   left: 15%;
-  top: calc(50% - 100px - 18px);
-  display: block;
+  top: calc(50% - 100px - 50px);
   border-radius: 50%;
   width: 34px;
   height: 34px;

@@ -1,19 +1,19 @@
 <template>
   <div class="app-shell">
     <aside class="side-nav">
-        <RouterLink class="nav-item" to="/home">
+        <RouterLink class="nav-item" to="/home" draggable="false" @dragstart.prevent @contextmenu.prevent>
           <span class="material-symbols-rounded">home</span>
         </RouterLink>
-        <RouterLink class="nav-item" to="/controls">
+        <RouterLink class="nav-item" to="/controls" draggable="false" @dragstart.prevent @contextmenu.prevent>
           <span class="material-symbols-rounded">discover_tune</span>
         </RouterLink>
-        <RouterLink class="nav-item" to="/filament">
+        <RouterLink class="nav-item" to="/filament" draggable="false" @dragstart.prevent @contextmenu.prevent>
           <span class="material-symbols-rounded">database</span>
         </RouterLink>
-        <RouterLink class="nav-item" to="/settings">
+        <RouterLink class="nav-item" to="/settings" draggable="false" @dragstart.prevent @contextmenu.prevent>
           <span class="material-symbols-rounded">settings</span>
         </RouterLink>
-        <RouterLink class="nav-item" to="/files">
+        <RouterLink class="nav-item" to="/files" draggable="false" @dragstart.prevent @contextmenu.prevent>
           <span class="material-symbols-rounded">folder</span>
         </RouterLink>
     </aside>
@@ -38,6 +38,7 @@
 .side-nav {
   display: grid;
   padding: 8px;
+  padding-left: calc(8px + env(safe-area-inset-left));
   background: var(--van-background-2);
   height: 100%;
   align-items: center;
@@ -49,6 +50,11 @@
   display: grid;
   align-items: center;
   justify-content: center;
+  -webkit-user-drag: none;
+  user-drag: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .nav-item .material-symbols-rounded {
@@ -61,6 +67,7 @@
 
 .main {
   height: 100%;
+  padding-right: env(safe-area-inset-right);
   overflow: auto;
 }
 </style>

@@ -43,14 +43,10 @@ const handleClick = () => {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   border: 0;
-  cursor: pointer;
-  user-select: none;
-  -webkit-user-select: none;
 }
 
 .control-button:disabled {
   opacity: 0.6;
-  cursor: not-allowed;
   pointer-events: none;
 }
 

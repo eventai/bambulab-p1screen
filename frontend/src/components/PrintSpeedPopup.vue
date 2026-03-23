@@ -78,7 +78,6 @@ const handleConfirm = (value: number) => {
   border-radius: 8px;
   width: 200px;
   height: 55px;
-  cursor: pointer;
 }
 
 .print-speed-button-active {

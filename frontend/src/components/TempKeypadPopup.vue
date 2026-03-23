@@ -126,7 +126,6 @@ const handleConfirm = () => {
   width: 100px;
   height: 44px;
   font-size: 18px;
-  cursor: pointer;
 }
 
 .temp-key--zero {

@@ -81,9 +81,6 @@ const emitMove = (axis: 'home' | 'x' | 'y', step: -10 | -1 | 0 | 1 | 10) => {
   width: 50%;
   height: 50%;
   background: var(--van-background-4);
-  cursor: pointer;
-  user-select: none;
-  -webkit-user-select: none;
   overflow: hidden;
   -webkit-tap-highlight-color: transparent;
 }
@@ -189,9 +186,6 @@ const emitMove = (axis: 'home' | 'x' | 'y', step: -10 | -1 | 0 | 1 | 10) => {
   place-items: center;
   z-index: 3;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  user-select: none;
-  -webkit-user-select: none;
   overflow: hidden;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;

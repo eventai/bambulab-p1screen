@@ -61,10 +61,9 @@ const emitMove = (axis: 'e', step: -1 | 1) => {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  user-select: none;
-  -webkit-user-select: none;
   border: 0;
-  cursor: pointer;
+  width: 40px;
+  height: 40px;
 }
 
 .extruder-btn:active {

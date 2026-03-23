@@ -57,6 +57,7 @@ const handleConfirm = () => {
   display: grid;
   gap: 8px;
   height: 100%;
+  padding-right: calc(12px + env(safe-area-inset-right));
 }
 
 .popup-header {
@@ -75,7 +76,6 @@ const handleConfirm = () => {
   background: none;
   display: grid;
   place-items: center;
-  cursor: pointer;
 }
 
 .popup-header-title {
