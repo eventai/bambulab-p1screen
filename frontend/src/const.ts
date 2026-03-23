@@ -84,16 +84,3 @@ export const GCODE_STATE_OPTIONS = [
   'slicing',
   'unknown'
 ]
-
-export const SPEED_PROFILE = {
-  1: 'silent',
-  2: 'standard',
-  3: 'sport',
-  4: 'ludicrous'
-}
-
-export const FAN_PROFILE = {
-  1: 'part',
-  2: 'aux',
-  3: 'chamber',
-}

@@ -1,7 +1,7 @@
 export enum FanType {
-  Part = 'part',
-  Aux = 'aux',
-  Chamber = 'chamber',
+  Part = 1,
+  Aux = 2,
+  Chamber = 3,
 }
 
 export enum TemperatureType {
@@ -11,7 +11,12 @@ export enum TemperatureType {
 }
 
 export enum LightType {
-  Chamber = 'chamber_light'
+  Chamber = 'chamber_light',
+}
+
+export enum LightMode {
+  On = 'on',
+  Off = 'off',
 }
 
 export enum GcodeState {
@@ -20,7 +25,15 @@ export enum GcodeState {
   Running = 'RUNNING',
   Pause = 'PAUSE',
   Finish = 'FINISH',
-  Unknown = '',
+  Failed = 'FAILED',
+  Unknown = 'UNKNOWN',
+}
+
+export enum PrintSpeedLevel {
+  Silent = 1,
+  Standard = 2,
+  Sport = 3,
+  Ludicrous = 4,
 }
 
 export type DeviceModule = {
@@ -36,46 +49,55 @@ export type DeviceModule = {
 }
 
 export type DevicePrint = {
+
+  // device
+  wifi_signal?: string
+  sdcard?: boolean
+
+  // nozzle
+  nozzle_diameter?: '0.2' | '0.4' | '0.6' | '0.8'
+  nozzle_type?: 'stainless_steel' | 'hardened_steel'
   nozzle_temper?: number
   nozzle_target_temper?: number
+
+  // heatbed
   bed_temper?: number
   bed_target_temper?: number
 
-  wifi_signal?: string
-
-  nozzle_diameter?: number
-  nozzle_type?: string
-
-  spd_mag?: number
-  spd_lvl?: number
+  // fan speed
   fan_gear?: number
 
-  mc_percent?: number
-  mc_remaining_time?: number
-  mc_print_stage?: string // 1:空闲,2:打印中,3:暂停
-  mc_print_sub_stage?: number // 0:无,1:?,2:加热,4:换料中
-  gcode_state?: GcodeState
-  gcode_file_prepare_percent?: string
-  layer_num?: number
-  total_layer_num?: number
-  
-  stg_cur?: number
-  print_type?: string
+  // print speed
+  spd_lvl?: PrintSpeedLevel
 
+  // light
+  lights_report?: DeviceLight[]
+
+  // filament
   ams?: DeviceAMSInfo
   vt_tray?: DeviceTray
-  lights_report?: DeviceLight[]
+  
+  // print state
+  stg_cur?: number
+  gcode_state?: GcodeState
+  gcode_file_prepare_percent?: string
+  mc_percent?: number
+  mc_remaining_time?: number // minute
+  mc_print_stage?: string // 1:空闲,2:打印中,3:暂停
+  mc_print_sub_stage?: number // 0:无,1:?,2:加热,4:换料中
+  layer_num?: number
+  total_layer_num?: number
 }
 
-type DeviceAMSInfo = {
+export type DeviceAMSInfo = {
   ams: DeviceAMS[]
 }
 
-type DeviceAMS = {
+export type DeviceAMS = {
   id: string
-  humidity: string
-  humidity_raw: string
-  temp: string
+  humidity: '1' | '2' | '3' | '4' | '5' // humidity level
+  humidity_raw: string // humidity percent
+  temp: string // °C
   tray: DeviceTray[]
 }
 
@@ -90,9 +112,9 @@ export type DeviceTray = {
   nozzle_temp_min: string
 }
 
-type DeviceLight = {
-  node: string
-  mode: 'on' | 'off'
+export type DeviceLight = {
+  node: LightType
+  mode: LightMode
 }
 
 export type DeviceState = {

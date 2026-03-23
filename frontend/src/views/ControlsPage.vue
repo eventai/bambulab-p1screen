@@ -15,7 +15,7 @@
         />
       </div>
       <div class="control-row two">
-        <ControlButton :icon="speedIcon" :label="`${getPrintSpeed}%`" @click="showPrintSpeedPopup = true" />
+        <ControlButton :icon="speedIcon" :label="getPrintSpeed" @click="showPrintSpeedPopup = true" />
         <ControlButton :icon="lightState ? lightOnIcon : lightOffIcon" :label="'照明'" @click="toggleLight" />
       </div>
     </div>
@@ -129,8 +129,8 @@ const fans: { type: FanType, name: string }[] = [{
 
 const showPrintSpeedPopup = ref(false)
 
-const getPrintSpeed = computed(() => device.print.spd_mag ?? 0)
-const getPrintSpeedLevel = computed(() => device.print.spd_lvl ?? 0)
+const getPrintSpeed = computed(() => ['0%', '50%', '100%', '124%', '166%'][Number(device.print.spd_lvl ?? '')])
+const getPrintSpeedLevel = computed(() => device.print.spd_lvl)
 
 const handlePrintSpeedConfirm = (speedLevel: number) => {
   console.log('[Controls] set print speed', speedLevel)

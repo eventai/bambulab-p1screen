@@ -21,24 +21,25 @@
 
 <script setup lang="ts">
 import BasePopup from './BasePopup.vue'
+import { PrintSpeedLevel } from '../services/device'
 
 type SpeedButton = {
   label: string
-  value: number
+  value: PrintSpeedLevel
 }
 
 const buttons: SpeedButton[] = [{
   label: '狂暴模式（166%）',
-  value: 4
+  value: PrintSpeedLevel.Ludicrous,
 }, {
   label: '运动模式（124%）',
-  value: 3
+  value: PrintSpeedLevel.Sport,
 }, {
   label: '标准模式（100%）',
-  value: 2
+  value: PrintSpeedLevel.Standard,
 }, {
   label: '静音模式（50%）',
-  value: 1
+  value: PrintSpeedLevel.Silent,
 }]
 
 withDefaults(

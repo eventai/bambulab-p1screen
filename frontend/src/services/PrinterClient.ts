@@ -4,25 +4,14 @@ import {
   FanType,
   TemperatureType,
   LightType,
+  PrintSpeedLevel,
 } from './device'
 import { Project } from './project'
-import { FAN_PROFILE } from '../const'
 
 type ConnectionParams = {
   ip: string
   serial: string
   code: string
-}
-
-const PRINT_SPEED_MAGNITUDES = [50, 100, 124, 166] as const
-
-const getFanNumberByType = (type: FanType): number | undefined => {
-  for (const [fanNum, fanType] of Object.entries(FAN_PROFILE)) {
-    if (fanType === type) {
-      return Number(fanNum)
-    }
-  }
-  return undefined
 }
 
 export class PrinterClient {
@@ -205,8 +194,7 @@ export class PrinterClient {
 
     if (command === 'print_speed') {
       console.debug(`[PrintClient][print_speed] update print_speed_level = ${JSON.stringify(printData.param)}`)
-      this.device.print.spd_lvl = Number(printData.param)
-      this.device.print.spd_mag = PRINT_SPEED_MAGNITUDES[this.device.print.spd_lvl - 1]
+      this.device.print.spd_lvl = printData.param as PrintSpeedLevel
       return
     }
 
@@ -312,7 +300,7 @@ export class PrinterClient {
    */
   getFanSpeed(type: FanType) {
     const fanGear = this.device.print.fan_gear ?? 0
-    const fanBit = 8 * (getFanNumberByType(type) ?? 0 - 1)
+    const fanBit = 8 * (type as number - 1)
     return (fanGear >> fanBit) % 256
   }
 
@@ -342,13 +330,11 @@ export class PrinterClient {
    * @returns No return value.
    */
   setFanSpeed(type: FanType, speed: number) {
-    const fanNum = getFanNumberByType(type)
-
     this.publishCommand({
       "print": {
         "sequence_id": 0,
         "command": "gcode_line",
-        "param": `M106 P${fanNum} S${speed}\n`
+        "param": `M106 P${type as number} S${speed}\n`
       }
     })
   }
