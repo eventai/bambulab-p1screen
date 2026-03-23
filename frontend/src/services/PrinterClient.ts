@@ -40,7 +40,7 @@ export class PrinterClient {
     module: [],
     print: {},
   })
-  project?: reactive<Project> = null
+  project: Project | null = null
 
   /**
    * Returns the singleton PrinterClient instance.
@@ -312,7 +312,7 @@ export class PrinterClient {
    */
   getFanSpeed(type: FanType) {
     const fanGear = this.device.print.fan_gear ?? 0
-    const fanBit = 8 * (getFanNumberByType(type) - 1)
+    const fanBit = 8 * (getFanNumberByType(type) ?? 0 - 1)
     return (fanGear >> fanBit) % 256
   }
 

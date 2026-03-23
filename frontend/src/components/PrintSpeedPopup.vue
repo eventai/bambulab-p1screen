@@ -41,7 +41,7 @@ const buttons: SpeedButton[] = [{
   value: 1
 }]
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     show: boolean
     value?: number

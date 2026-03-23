@@ -22,13 +22,9 @@ import fanOffIcon from '../assets/images/monitor_fan_off.svg'
 import { ref, type Ref } from 'vue'
 import BasePopup from './BasePopup.vue'
 
-const props = withDefaults(
-  defineProps<{
-    show: boolean
-  }>(),
-  {
-  }
-)
+defineProps<{
+  show: boolean
+}>()
 
 const emit = defineEmits<{
   (event: 'update:show', value: boolean): void

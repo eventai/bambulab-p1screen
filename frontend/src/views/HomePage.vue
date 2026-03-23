@@ -22,7 +22,6 @@
           <span class="progress-status">{{ getPrintStateLabel }}</span>
         </div>
         <template v-if="showPrintActions">
-          <!-- <ControlButton :icon="skipIcon" label="跳过" @click="handleSkip" /> -->
           <ControlButton v-if="!isPaused" :icon="pauseIcon" label="暂停" @click="handlePause" />
           <ControlButton v-if="isPaused" :icon="resumeIcon" label="继续" @click="handleResume" />
           <ControlButton :icon="stopIcon" label="停止" @click="handleStop" />
@@ -42,7 +41,6 @@ import ControlButton from '../components/ControlButton.vue'
 
 import lightOnIcon from '../assets/images/monitor_lamp_on.svg'
 import lightOffIcon from '../assets/images/monitor_lamp_off.svg'
-import skipIcon from '../assets/images/print_control_partskip.svg'
 import pauseIcon from '../assets/images/print_control_pause.svg'
 import resumeIcon from '../assets/images/print_control_resume.svg'
 import stopIcon from '../assets/images/print_control_stop.svg'
@@ -103,7 +101,7 @@ const getPrintStateLabel = computed(() => {
   }
 })
 
-const getPrintSubStateLabel = computed(() => [null, null, '加热中', null, '换料中'][Number(device.print.mc_print_sub_stage ?? 0)]) || ''
+// const getPrintSubStateLabel = computed(() => [null, null, '加热中', null, '换料中'][Number(device.print.mc_print_sub_stage ?? 0)]) || ''
 
 const getPrintInfo = computed(() => {
   if (device.print.gcode_state === GcodeState.Finish) return ''
@@ -118,10 +116,6 @@ const getPrintInfo = computed(() => {
 
 const isPaused = computed(() => device.print.gcode_state === GcodeState.Pause)
 const showPrintActions = computed(() => ![GcodeState.Unknown, GcodeState.Idle, GcodeState.Finish].includes(device.print.gcode_state ?? GcodeState.Unknown))
-
-const handleSkip = () => {
-  console.log('[Controls] skip')
-}
 
 const handleResume = () => {
   console.log('[Controls] resume')
