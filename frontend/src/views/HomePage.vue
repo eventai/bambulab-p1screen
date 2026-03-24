@@ -1,37 +1,32 @@
 <template>
   <div class="homepage">
-    <div class="row-1">
-      <div>
-        <img class="task-thumbnail" :src="getPrintThumbnail"/>
-        <span class="task-name">{{ taskName }}</span>
-      </div>
-      <div class="printer-thumbnail" :style="{ backgroundImage: `url(${p1sThumbnail})`}">
-        <span id="nozzle-temp">{{ nozzleTemp }} ℃</span>
-        <span id="heatbed-temp">{{ heatbedTemp }} ℃</span>
-        <span id="wifi-signal"><img :src="getWifiSignalIcon"/></span>
-      </div>
+    <div class="task-card">
+      <img class="task-thumbnail" :src="getPrintThumbnail"/>
+      <span class="task-name">{{ taskName }}</span>
     </div>
-    <div class="row-2">
-      <div class="progress-card">
-        <div class="progress-card-left">
-          <div class="progress-labels">
-            <span>{{ getPrintPercent }} %</span>
-            <span>{{ getPrintInfo }}</span>
-          </div>
-          <van-progress :percentage="getPrintPercent" :show-pivot="false" />
-          <span class="progress-status">{{ getPrintStateLabel }}</span>
+    <div class="printer-card" :style="{ backgroundImage: `url(${p1sThumbnail})`}">
+      <span id="nozzle-temp">{{ nozzleTemp }} ℃</span>
+      <span id="heatbed-temp">{{ heatbedTemp }} ℃</span>
+      <span id="wifi-signal"><img :src="getWifiSignalIcon"/></span>
+    </div>
+    <div class="progress-card">
+      <div class="progress-card-left">
+        <div class="progress-labels">
+          <span>{{ getPrintPercent }} %</span>
+          <span>{{ getPrintInfo }}</span>
         </div>
-        <template v-if="showPrintActions">
-          <ControlButton v-if="!isPaused" :icon="pauseIcon" label="暂停" @click="handlePause" />
-          <ControlButton v-if="isPaused" :icon="resumeIcon" label="继续" @click="handleResume" />
-          <ControlButton :icon="stopIcon" label="停止" @click="handleStop" />
-        </template>
+        <van-progress :percentage="getPrintPercent" :show-pivot="false" />
+        <span class="progress-status">{{ getPrintStateLabel }}</span>
       </div>
-      <ControlButton class="light-button" :icon="lightState ? lightOnIcon : lightOffIcon" label="照明" @click="toggleLight" />
+      <div v-if="showPrintActions" class="progress-card-buttons">
+        <ControlButton v-if="!isPaused" :icon="pauseIcon" label="暂停" @click="handlePause" />
+        <ControlButton v-if="isPaused" :icon="resumeIcon" label="继续" @click="handleResume" />
+        <ControlButton :icon="stopIcon" label="停止" @click="handleStop" />
+      </div>
     </div>
+    <ControlButton class="light-button" :icon="lightState ? lightOnIcon : lightOffIcon" label="照明" @click="toggleLight" />
   </div>
 </template>
-
 <script setup lang="ts">
 import { computed } from 'vue'
 import humanizeDuration from 'humanize-duration'
@@ -144,32 +139,35 @@ const toggleLight = () => {
 <style scoped>
 .homepage {
   display: grid;
-  grid-template-rows: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) 200px;
+  grid-template-rows: minmax(0, 1fr) auto;
   height: 100%;
   padding: 8px;
   gap: 8px;
 }
 
-.row-1, .row-2 {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 8px;
-}
-
-.row-1 > div, .row-2 > div {
+.task-card,
+.printer-card,
+.progress-card,
+.light-button {
   background: var(--van-background-2);
   border-radius: 12px;
 }
 
-.row-1 > div:first-child {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+.task-card {
+  grid-column: 1;
+  grid-row: 1;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  justify-items: center;
   align-items: center;
+  padding: 8px;
   gap: 8px;
 }
 
-.row-1 > :last-child {
+.printer-card {
+  grid-column: 2;
+  grid-row: 1;
   width: 200px;
   background-size: contain;
   background-position: center;
@@ -177,16 +175,19 @@ const toggleLight = () => {
 }
 
 .task-thumbnail {
-  width: min(calc(max(306px, var(--app-height)) - 82px - 8 * 8px), var(--app-width) - 64px - 200px - 3 * 8px);
+  display: block;
+  width: auto;
   height: auto;
+  max-width: 100%;
+  max-height: 100%;
   background-color: var(--van-background-5);
-  margin-top: 8px
 }
 
 .task-name {
   width: fit-content;
   max-width: 250px;
   line-height: 22px;
+  height: 22px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -194,7 +195,7 @@ const toggleLight = () => {
   text-align: center;
 }
 
-.printer-thumbnail > span {
+.printer-card > span {
   font-size: 14px;
   font-weight: 500;
   display: block;
@@ -230,16 +231,27 @@ const toggleLight = () => {
 }
 
 .progress-card {
+  grid-column: 1 / 3;
+  grid-row: 2;
   display: grid;
-  grid-template-columns: 1fr auto auto auto;
+  grid-template-columns: 1fr auto;
   font-size: 12px;
   gap: 8px;
   padding: 8px;
+  margin-right: calc(66px + 8px);
 }
 
 .progress-card-left {
   display: grid;
   padding: 4px;
+}
+
+.progress-card-buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
 }
 
 .progress-labels {
@@ -258,14 +270,58 @@ const toggleLight = () => {
   height: 22px;
 }
 
-.progress-card > .control-button {
+.progress-card-buttons > .control-button {
   width: 66px;
   height: 66px;
 }
 
 .light-button {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: end;
   width: 66px;
   height: 82px;
+}
+
+@media (orientation: portrait) {
+  .homepage {
+    grid-template-columns: 1fr;
+    grid-template-rows: 250px 200px auto auto;
+    height: auto;
+    padding-bottom: 8px;
+  }
+
+  .task-card {
+    grid-column: 1;
+    grid-row: 1;
+    height: 250px;
+  }
+
+  .printer-card {
+    grid-column: 1;
+    grid-row: 2;
+    width: 100%;
+    height: 200px;
+  }
+
+  .progress-card {
+    grid-column: 1;
+    grid-row: 3;
+    margin-right: 0;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+  }
+
+  .progress-card-buttons {
+    justify-content: flex-start;
+  }
+
+  .light-button {
+    grid-column: 1;
+    grid-row: 4;
+    justify-self: start;
+    margin-left: 8px;
+  }
 }
 
 </style>
