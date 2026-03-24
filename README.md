@@ -1,5 +1,11 @@
 # Introduction
-[中文](./README.zh.md)
+[English](./README.md) | [简体中文](./README.zh.md)
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Vue](https://img.shields.io/badge/Vue-3.5.12-42b883?logo=vuedotjs&logoColor=white)](https://vuejs.org/)
+[![Vite](https://img.shields.io/badge/Vite-5.4.11-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Build](https://github.com/0x5e/bambulab-p1screen/actions/workflows/build.yml/badge.svg)](https://github.com/0x5e/bambulab-p1screen/actions/workflows/build.yml)
+[![Lint](https://github.com/0x5e/bambulab-p1screen/actions/workflows/lint.yml/badge.svg)](https://github.com/0x5e/bambulab-p1screen/actions/workflows/lint.yml)
 
 Control screen software for the Bambu Lab P1 series upgrade kit.
 
