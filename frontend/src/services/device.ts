@@ -103,11 +103,11 @@ export type DeviceAMS = {
 
 export type DeviceTray = {
   id: string
-  state?: number
+  state?: number // AMS only
   k: number
   n: number
   tray_type: string
-  tray_color: string
+  tray_color: string // rgba
   nozzle_temp_max: string
   nozzle_temp_min: string
 }
