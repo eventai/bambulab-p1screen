@@ -10,7 +10,7 @@
   >
     <template #reference>
       <div class="tray" @click.stop="handleTrayClick">
-        <div class="filament" :style="{ backgroundColor: bgColor }"></div>
+        <div class="filament" :style="{ '--tray-bg': bgColor }"></div>
         <span class="name" :style="{ color: textColor }">{{ name }}</span>
         <span class="material" :style="{ color: textColor }">{{ material }}</span>
         <span class="icon" :style="{ backgroundColor: textColor}"></span>
@@ -48,7 +48,7 @@ const actions = computed<PopoverAction[]>(() => {
 })
 
 const material = computed(() => props.tray?.tray_type || '?')
-const color = computed(() => props.tray?.tray_color ? `#${props.tray.tray_color}` : '')
+const color = computed(() => props.tray ? `#${props.tray.tray_color}` : getComputedStyle(document.documentElement).getPropertyValue('--van-text-color').trim())
 
 const handleTrayClick = () => {
   if (!props.tray) return
@@ -61,17 +61,13 @@ const handleSelect = (action: PopoverAction) => {
 }
 
 const bgColor = computed(() => {
-  if (color.value === '') {
-    return getComputedStyle(document.documentElement).getPropertyValue('--van-text-color').trim()
-  }
-  // fix vt_tray wrong alpha
   const parsedColor = colord(color.value)
-  parsedColor.rgba.a = 1
   return parsedColor.toRgbString()
 })
 
 const textColor = computed(() => {
-  const parsedColor = colord(bgColor.value)
+  let parsedColor = colord(bgColor.value)
+  if (parsedColor.rgba.a === 0) return 'white'
   return parsedColor.brightness() > 0.5 ? 'black' : 'white'
 })
 
@@ -88,7 +84,13 @@ const textColor = computed(() => {
   width: 48px;
   height: 64px;
   border: var(--van-background-5) 2px solid;
-  background-color: var(--van-text-color-2);
+  --tray-bg: var(--van-text-color-2);
+  background-image:
+    linear-gradient(var(--tray-bg), var(--tray-bg)),
+    linear-gradient(45deg, var(--van-background-5) 25%, transparent 25%, transparent 75%, var(--van-background-5) 75%),
+    linear-gradient(45deg, var(--van-background-5) 25%, transparent 25%, transparent 75%, var(--van-background-5) 75%);
+  background-size: 12px 12px;
+  background-position: 0 0, 0 0, 6px 6px;
 }
 .filament::before, .filament::after {
   display: block;
