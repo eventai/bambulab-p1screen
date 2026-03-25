@@ -5,6 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Vue](https://img.shields.io/badge/Vue-3.5.12-42b883?logo=vuedotjs&logoColor=white)](https://vuejs.org/)
 [![Vite](https://img.shields.io/badge/Vite-5.4.11-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
+[![GHCR](https://img.shields.io/badge/GHCR-ghcr.io%2F0x5e%2Fbambulab--p1screen-2496ED?logo=docker&logoColor=white)](https://github.com/0x5e/bambulab-p1screen/pkgs/container/bambulab-p1screen)
 [![Build](https://github.com/0x5e/bambulab-p1screen/actions/workflows/build.yml/badge.svg)](https://github.com/0x5e/bambulab-p1screen/actions/workflows/build.yml)
 [![Lint](https://github.com/0x5e/bambulab-p1screen/actions/workflows/lint.yml/badge.svg)](https://github.com/0x5e/bambulab-p1screen/actions/workflows/lint.yml)
 
