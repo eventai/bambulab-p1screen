@@ -58,10 +58,6 @@ Status: In development
 #### 1. Deploy backend service
 Deploy the backend service on any device in the same LAN as the printer (mainly MQTT forwarding):
 
-Note: The printer validates the source IP during the TLS handshake. If the source is not in the same subnet, the connection cannot be established. Therefore, running the backend with Docker or Docker Compose has the following requirements:
-1. Network mode must be `host`
-2. The host machine must be Linux; macOS cannot connect in real-world testing.
-
 ##### Option 1: npm
 
 ```bash
@@ -72,7 +68,7 @@ npm run start
 
 ##### Option 2: Docker
 ```bash
-docker run -d --name bambulab-p1screen --network host ghcr.io/0x5e/bambulab-p1screen:latest
+docker run -d 0x5e/bambulab-p1screen:latest
 ```
 
 ##### Option 3: Docker Compose
@@ -102,8 +98,6 @@ Planned
 - [P1S Screen Mod - iPhone 7/Plus Version](https://makerworld.com.cn/zh/models/1945893)
 
 ## TODOs
-- Home
-  - Persist print task data (project id, url, preview image)
 - Controls
   - G-code actions: X, Y, Z, E, Home
   - Sync fan slider with live status
@@ -112,9 +106,7 @@ Planned
 - Files
   - Fetch file list
 - APK build
-- Observe status transitions ([reference](https://github.com/greghesp/ha-bambulab/blob/054946b6ab40bdeb772a22abb91b1537a24263fb/custom_components/bambu_lab/pybambu/const.py#L71))
-  - `stg_cur`: `CURRENT_STAGE_IDS`
-  - `print_type`: `GCODE_STATE_OPTIONS`
+- Multi languages
 
 ## References
 - [P1 Screen Operation Guide](https://wiki.bambulab.com/en/p1/manual/screen-operation)

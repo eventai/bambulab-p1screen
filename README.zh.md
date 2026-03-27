@@ -58,10 +58,6 @@
 #### 1. 部署后端服务
 在打印机局域网内任意设备部署（主要负责 MQTT 转发）：
 
-注：打印机在TLS握手阶段会对请求来源IP进行校验，若非同一个网段，请求将无法成功建立。因此，Docker 或 Docker Compose 方式运行后端服务具有以下限制：
-1. network 必须以 host 模式运行
-2. 宿主机必须为 Linux 设备，macOS 实测无法连接。
-
 ##### 方式 1：npm
 
 ```bash
@@ -73,7 +69,7 @@ npm run start
 ##### 方式 2：Docker
 
 ```bash
-docker run -d --name bambulab-p1screen --network host ghcr.io/0x5e/bambulab-p1screen:latest
+docker run -d 0x5e/bambulab-p1screen:latest
 ```
 
 ##### 方式 3：Docker Compose
@@ -103,8 +99,6 @@ docker compose up -d
 - [P1S 屏幕改装 - iPhone7/Plus版](https://makerworld.com.cn/zh/models/1945893)
 
 ## TODOs
-- 主页
-  - 打印任务数据（项目 id、url、预览图）持久化
 - 控制页
   - gcode 操作：X、Y、Z、E、Home
   - 风扇滑动条随状态改变
@@ -113,9 +107,7 @@ docker compose up -d
 - 文件页
   - 获取文件列表
 - APK 构建
-- 观察状态变化（[参考链接](https://github.com/greghesp/ha-bambulab/blob/054946b6ab40bdeb772a22abb91b1537a24263fb/custom_components/bambu_lab/pybambu/const.py#L71)）
-  - `stg_cur`: `CURRENT_STAGE_IDS`
-  - `print_type`: `GCODE_STATE_OPTIONS`
+- 多语言
 
 ## 参考内容
 - [P1 系列屏幕操作指南](https://wiki.bambulab.com/en/p1/manual/screen-operation)

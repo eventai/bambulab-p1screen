@@ -1,8 +1,10 @@
 services:
   p1screen:
-    image: ghcr.io/0x5e/bambulab-p1screen:latest
+    image: 0x5e/bambulab-p1screen:latest
     container_name: bambulab-p1screen
     restart: unless-stopped
-    network_mode: host
-    environment:
-      PORT: 8888
+    ports:
+      - 8888:8888
+    # network_mode: host
+    # environment:
+    #   PORT: 8888
