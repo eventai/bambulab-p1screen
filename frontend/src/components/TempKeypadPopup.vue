@@ -94,7 +94,7 @@ const handleConfirm = () => {
 
 <style scoped>
 .temp-popup-content {
-  width: 340px;
+  width: 250px;
   max-width: 100%;
   display: grid;
   gap: 8px;
@@ -108,7 +108,7 @@ const handleConfirm = () => {
   grid-template-columns: 1fr auto;
   align-items: center;
   font-size: 20px;
-  height: 58px;
+  height: 50px;
 }
 
 .temp-value {

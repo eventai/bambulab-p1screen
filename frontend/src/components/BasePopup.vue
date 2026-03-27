@@ -78,7 +78,6 @@ const handleConfirm = () => {
   padding: 4px 12px;
   display: grid;
   gap: 8px;
-  min-width: 320px;
   height: 100%;
   padding-right: calc(12px + env(safe-area-inset-right));
 }
