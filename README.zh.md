@@ -69,7 +69,7 @@ npm run start
 ##### 方式 2：Docker
 
 ```bash
-docker run -d 0x5e/bambulab-p1screen:latest
+docker run -d ghcr.io/0x5e/bambulab-p1screen:latest
 ```
 
 ##### 方式 3：Docker Compose

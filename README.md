@@ -68,7 +68,7 @@ npm run start
 
 ##### Option 2: Docker
 ```bash
-docker run -d 0x5e/bambulab-p1screen:latest
+docker run -d ghcr.io/0x5e/bambulab-p1screen:latest
 ```
 
 ##### Option 3: Docker Compose
