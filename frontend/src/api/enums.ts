@@ -37,7 +37,7 @@ export enum PrintSpeedLevel {
   Ludicrous = 4,
 }
 
-export enum CURRENT_STAGE_IDS {
+export enum CurrentStage {
   PRINTING = 0,
   AUTO_BED_LEVELING = 1,
   HEATBED_PREHEATING = 2,

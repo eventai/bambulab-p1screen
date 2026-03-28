@@ -272,15 +272,15 @@ export class PrinterClient {
   getCurrentProject() {
     if (typeof window === 'undefined') return null
 
-    const taskId = String(this.device.print.task_id ?? '')
-    const subtaskId = String(this.device.print.subtask_id ?? '')
+    const taskId = this.device.print.task_id
+    const subtaskId = this.device.print.subtask_id
     if (!taskId || !subtaskId) {
       return null
     }
 
     const projects = this.getProjectsFromStorage()
     return projects.find(project => (
-      String(project.task_id) === taskId && String(project.subtask_id) === subtaskId
+      project.task_id === taskId && project.subtask_id === subtaskId
     )) ?? null
   }
 

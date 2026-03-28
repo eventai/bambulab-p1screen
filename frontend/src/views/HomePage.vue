@@ -31,7 +31,7 @@
 import { computed } from 'vue'
 import humanizeDuration from 'humanize-duration'
 import { PrinterClient } from '../api/PrinterClient'
-import { LightType, GcodeState, CURRENT_STAGE_IDS } from '../api/enums'
+import { LightType, GcodeState, CurrentStage } from '../api/enums'
 import ControlButton from '../components/ControlButton.vue'
 
 import lightOnIcon from '../assets/images/monitor_lamp_on.svg'
@@ -97,15 +97,15 @@ const getPrintStateLabel = computed(() => {
 
 const getPrintSubStateLabel = computed(() => {
   switch (device.print.stg_cur) {
-    case CURRENT_STAGE_IDS.PRINTING:
+    case CurrentStage.PRINTING:
       return '打印中'
-    case CURRENT_STAGE_IDS.HEATBED_PREHEATING:
+    case CurrentStage.HEATBED_PREHEATING:
       return '预加热热床'
-    case CURRENT_STAGE_IDS.CHANGING_FILAMENT:
+    case CurrentStage.CHANGING_FILAMENT:
       return '换料中'
-    case CURRENT_STAGE_IDS.HOMING_TOOLHEAD:
+    case CurrentStage.HOMING_TOOLHEAD:
       return '工具头回中'
-    case CURRENT_STAGE_IDS.CLEANING_NOZZLE_TIP:
+    case CurrentStage.CLEANING_NOZZLE_TIP:
       return '清理喷嘴头'
     default:
       return ''

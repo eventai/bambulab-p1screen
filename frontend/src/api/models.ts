@@ -1,5 +1,5 @@
 import type {
-  CURRENT_STAGE_IDS,
+  CurrentStage,
   GcodeState,
   LightMode,
   LightType,
@@ -50,7 +50,7 @@ export type DevicePrint = {
   vt_tray?: DeviceTray
   
   // print state
-  stg_cur?: CURRENT_STAGE_IDS
+  stg_cur?: CurrentStage
   gcode_state?: GcodeState
   gcode_file_prepare_percent?: string
   mc_percent?: number
