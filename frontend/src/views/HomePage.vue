@@ -39,7 +39,7 @@ import lightOffIcon from '../assets/images/monitor_lamp_off.svg'
 import pauseIcon from '../assets/images/print_control_pause.svg'
 import resumeIcon from '../assets/images/print_control_resume.svg'
 import stopIcon from '../assets/images/print_control_stop.svg'
-import sdcardThumbnail from '../assets/images/monitor_sdcard_thumbnail.png'
+import brokenThumbnail from '../assets/images/monitor_brokenimg.png'
 import p1sThumbnail from '../assets/images/printer_thumbnail_p1s_png.png'
 import signalNoIcon from '../assets/images/monitor_signal_no.svg'
 import signalWeakIcon from '../assets/images/monitor_signal_weak.svg'
@@ -68,7 +68,7 @@ const getWifiSignalIcon = computed(() => {
   }
 })
 
-const getPrintThumbnail = computed(() => client.getCurrentProject()?.thumbnail_url || sdcardThumbnail)
+const getPrintThumbnail = computed(() => client.getCurrentProject()?.thumbnail_url || brokenThumbnail)
 
 const getPrintPercent = computed(() => {
   if (device.print.gcode_state === GcodeState.Prepare) {
