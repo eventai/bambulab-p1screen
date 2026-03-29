@@ -84,7 +84,7 @@ const getPrintStateLabel = computed(() => {
     case GcodeState.Prepare:
       return `下载中(${device.print.gcode_file_prepare_percent}%)`
     case GcodeState.Running:
-      return getPrintSubStateLabel
+      return getPrintSubStateLabel()
       // return '打印中'
     case GcodeState.Pause:
       return '已暂停'
@@ -95,7 +95,7 @@ const getPrintStateLabel = computed(() => {
   }
 })
 
-const getPrintSubStateLabel = computed(() => {
+const getPrintSubStateLabel = () => {
   switch (device.print.stg_cur) {
     case CurrentStage.PRINTING:
       return '打印中'
@@ -110,7 +110,7 @@ const getPrintSubStateLabel = computed(() => {
     default:
       return ''
   }
-})
+}
 
 const getPrintInfo = computed(() => {
   if (device.print.gcode_state === GcodeState.Finish) return ''

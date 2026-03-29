@@ -1,21 +1,17 @@
 <template>
   <div class="app-shell">
     <aside class="side-nav">
-        <RouterLink class="nav-item" to="/home" draggable="false" @dragstart.prevent @contextmenu.prevent>
-          <i-material-symbols-home-rounded class="nav-icon" />
-        </RouterLink>
-        <RouterLink class="nav-item" to="/controls" draggable="false" @dragstart.prevent @contextmenu.prevent>
-          <i-material-symbols-tune-rounded class="nav-icon" />
-        </RouterLink>
-        <RouterLink class="nav-item" to="/filament" draggable="false" @dragstart.prevent @contextmenu.prevent>
-          <i-material-symbols-database class="nav-icon" />
-        </RouterLink>
-        <RouterLink class="nav-item" to="/settings" draggable="false" @dragstart.prevent @contextmenu.prevent>
-          <i-material-symbols-settings-rounded class="nav-icon" />
-        </RouterLink>
-        <RouterLink class="nav-item" to="/files" draggable="false" @dragstart.prevent @contextmenu.prevent>
-          <i-material-symbols-folder-rounded class="nav-icon" />
-        </RouterLink>
+      <RouterLink
+        v-for="item in navItems"
+        :key="item.key"
+        :class="{ 'nav-item': true, 'nav-item-active': item.key === activeNavKey }"
+        :to="item.to"
+        draggable="false"
+        @dragstart.prevent
+        @contextmenu.prevent
+      >
+        <component :is="item.icon" class="nav-icon" />
+      </RouterLink>
     </aside>
 
     <main class="main">
@@ -25,6 +21,35 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import type { Component } from 'vue'
+import IconHome from '~icons/material-symbols/home-rounded'
+import IconTune from '~icons/material-symbols/tune-rounded'
+import IconFilament from '~icons/material-symbols/database'
+import IconSettings from '~icons/material-symbols/settings-rounded'
+import IconFiles from '~icons/material-symbols/folder-rounded'
+
+const route = useRoute()
+
+type NavItem = {
+  key: string
+  to: string
+  icon: Component
+}
+
+const navItems: NavItem[] = [
+  { key: 'home', to: '/home', icon: IconHome },
+  { key: 'controls', to: '/controls', icon: IconTune },
+  { key: 'filament', to: '/filament', icon: IconFilament },
+  { key: 'settings', to: '/settings', icon: IconSettings },
+  { key: 'files', to: '/files', icon: IconFiles },
+]
+
+const activeNavKey = computed(() => {
+  const firstSegment = route.path.split('/')[1]
+  return firstSegment ?? ''
+})
 </script>
 
 <style scoped>
@@ -63,6 +88,10 @@
 }
 
 .nav-item.router-link-active {
+  color: var(--van-primary-color);
+}
+
+.nav-item.nav-item-active {
   color: var(--van-primary-color);
 }
 

@@ -6,6 +6,8 @@ import { PrinterClient } from './api/PrinterClient'
 import HomePage from './views/HomePage.vue'
 import ControlsPage from './views/ControlsPage.vue'
 import FilamentPage from './views/FilamentPage.vue'
+import FilamentAutoRefillPage from './views/FilamentAutoRefillPage.vue'
+import FilamentEditPage from './views/FilamentEditPage.vue'
 import SettingsPage from './views/SettingsPage.vue'
 import FilesPage from './views/FilesPage.vue'
 import 'vant/lib/index.css'
@@ -18,6 +20,8 @@ const router = createRouter({
     { path: '/home', component: HomePage },
     { path: '/controls', component: ControlsPage },
     { path: '/filament', component: FilamentPage },
+    { path: '/filament/auto-refill', component: FilamentAutoRefillPage },
+    { path: '/filament/edit/:id', component: FilamentEditPage, props: true },
     { path: '/settings', component: SettingsPage },
     { path: '/files', component: FilesPage },
   ]

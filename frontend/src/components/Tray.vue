@@ -22,8 +22,11 @@
 <script setup lang="ts">
 import { colord } from 'colord'
 import { computed, toRaw, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import type { PopoverAction } from 'vant'
 import type { DeviceTray } from '../api/models'
+
+const router = useRouter()
 
 const props = withDefaults(
   defineProps<{
@@ -58,6 +61,11 @@ const handleTrayClick = () => {
 const handleSelect = (action: PopoverAction) => {
   console.log('[Tray] type =', action.type, ', tray =', toRaw(props.tray))
   showPopover.value = false
+  switch (action.type) {
+    case 'edit':
+      router.push(`/filament/edit/${props.tray?.id}`)
+
+  }
 }
 
 const bgColor = computed(() => {

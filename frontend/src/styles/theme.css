@@ -15,6 +15,7 @@
   --van-button-default-color: var(--van-text-color);
   --van-button-default-background: var(--van-background);
   --van-button-default-border-color: var(--van-background-4);
+  --van-button-plain-background: var(--van-background-4);
   --van-button-primary-color: var(--van-text-color);
   --van-button-primary-background: var(--van-primary-color);
   

@@ -5,22 +5,13 @@
     :position="isPortrait ? 'bottom' : 'right'"
     @click-overlay="handleClose"
   >
-    <div class="popup-header">
-      <button class="popup-header-back" type="button" @click="handleClose">
-        <i-material-symbols-arrow-back-ios-new-rounded />
-      </button>
-      <div class="popup-header-title">{{ title }}</div>
-      <van-button
-        v-if="showConfirm"
-        class="popup-header-confirm"
-        type="primary"
-        size="normal"
-        :disabled="confirmDisabled"
-        @click="handleConfirm"
-      >
-        确定
-      </van-button>
-    </div>
+    <NavHeader
+      :title="title"
+      :show-confirm="showConfirm"
+      :confirm-disabled="confirmDisabled"
+      @back="handleClose"
+      @confirm="handleConfirm"
+    />
 
     <slot></slot>
   </van-popup>
@@ -28,6 +19,7 @@
 
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import NavHeader from './NavHeader.vue'
 
 withDefaults(
   defineProps<{
@@ -88,35 +80,6 @@ const handleConfirm = () => {
   max-height: 100%;
   padding-right: 12px;
   padding-bottom: calc(12px + env(safe-area-inset-bottom));
-}
-
-.popup-header {
-  display: grid;
-  grid-template-columns: 32px 1fr auto;
-  gap: 12px;
-  align-items: center;
-  height: 40px;
-}
-
-.popup-header-back {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  border: 0;
-  background: none;
-  display: grid;
-  place-items: center;
-}
-
-.popup-header-title {
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.popup-header-confirm {
-  width: 80px;
-  height: 32px;
-  font-size: 16px;
 }
 
 @media (orientation: portrait) {

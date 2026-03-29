@@ -30,10 +30,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import type { PopoverAction } from 'vant'
+import { useRouter } from 'vue-router'
 import AMS from '../components/AMS.vue'
 import ExtTray from '../components/ExtTray.vue'
 import { PrinterClient } from '../api/PrinterClient'
 
+const router = useRouter()
 const client = PrinterClient.getInstance()
 const device = client.device
 
@@ -43,6 +45,10 @@ const settingsActions: PopoverAction[] = [{ type: 'auto-refill', text: '自动�
 
 const handleSettingsSelect = (action: PopoverAction) => {
   console.log('[FilamentPage] settings action:', action.type)
+  showSettingsPopover.value = false
+  if (action.type === 'auto-refill') {
+    router.push('/filament/auto-refill')
+  }
 }
 </script>
 
