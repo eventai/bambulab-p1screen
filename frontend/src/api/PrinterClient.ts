@@ -26,11 +26,32 @@ export class PrinterClient {
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null
   private readonly maxReconnectDelay = 30
   private connectionParams: ConnectionParams | null = null
+  private readonly onVisibilityChange = () => {
+    if (typeof document === 'undefined' || document.hidden) {
+      return
+    }
+    if (!this.shouldReconnect || !this.connectionParams) {
+      return
+    }
+    if (this.ws && (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)) {
+      return
+    }
+
+    this.clearReconnectTimer()
+    this.reconnectAttempt = 0
+    this.connect(this.connectionParams.ip, this.connectionParams.serial, this.connectionParams.code)
+  }
 
   device = reactive<DeviceState>({
     module: [],
     print: {},
   })
+
+  constructor() {
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', this.onVisibilityChange)
+    }
+  }
 
   /**
    * Returns the singleton PrinterClient instance.
