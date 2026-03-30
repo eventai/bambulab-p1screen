@@ -13,7 +13,7 @@
       <div class="form-row">
         <label class="form-label">颜色</label>
         <button class="color-field" type="button" @click="handleEditColor">
-          <span class="color-swatch" :style="{ background: colorValue }"></span>
+          <span class="color-swatch" :style="{ background: `#${trayColor}` }"></span>
           <i-material-symbols-edit-outline-rounded class="color-edit-icon" />
         </button>
       </div>
@@ -52,30 +52,30 @@ const route = useRoute()
 const router = useRouter()
 const client = PrinterClient.getInstance()
 const device = client.device
+const amsId = route.params.ams_id as string
+const trayId = route.params.tray_id as string
 
-const allTrays = computed<DeviceTray[]>(() => {
-  const amsTrays = device.print.ams?.ams?.flatMap((ams) => ams.tray ?? []) ?? []
-  const vtTray = device.print.vt_tray ? [device.print.vt_tray] : []
-  return [...amsTrays, ...vtTray]
-})
+const ams = computed(() => device.print.ams!.ams.find((item) => item.id === amsId)!)
 
-const currentTray = computed<DeviceTray | null>(() => {
-  if (!route.params.id) return null
-  return allTrays.value.find((tray) => String(tray.id) === route.params.id) ?? null
+const tray = computed<DeviceTray>(() => {
+  if (trayId === device.print.vt_tray?.id) {
+    return device.print.vt_tray!
+  }
+  return ams.value.tray.find((item) => item.id === trayId)!
 })
 
 const trayType = ref('?')
+const trayColor = ref('')
 const nozzleTempMin = ref('')
 const nozzleTempMax = ref('')
-const colorValue = ref('')
 
 watch(
-  currentTray,
-  (tray) => {
-    trayType.value = tray?.tray_type || '?'
-    nozzleTempMin.value = tray?.nozzle_temp_min || ''
-    nozzleTempMax.value = tray?.nozzle_temp_max || ''
-    colorValue.value = tray ? `#${tray.tray_color}` : ''
+  tray,
+  (nextTray) => {
+    trayType.value = nextTray.tray_type
+    trayColor.value = nextTray.tray_color
+    nozzleTempMin.value = nextTray.nozzle_temp_min
+    nozzleTempMax.value = nextTray.nozzle_temp_max
   },
   { immediate: true }
 )
@@ -85,15 +85,20 @@ const handleEditColor = () => {
 }
 
 const handleConfirm = () => {
-  console.log('[FilamentEditPage] confirm', {
-    id: route.params.id,
-    tray: currentTray.value,
-    trayType: trayType.value,
-    nozzleTempMin: nozzleTempMin.value,
-    nozzleTempMax: nozzleTempMax.value,
-    colorValue: colorValue.value,
-  })
-  // TODO
+  const payload = {
+    sequence_id: 0,
+    command: 'ams_filament_setting',
+    ams_id: amsId, // TODO: Ext Tray?
+    tray_id: trayId,
+    tray_info_idx: tray.value?.tray_info_idx,
+    tray_color: trayColor.value,
+    tray_type: trayType.value,
+    nozzle_temp_min: Number(nozzleTempMin.value),
+    nozzle_temp_max: Number(nozzleTempMax.value),
+  }
+
+  console.log('[FilamentEditPage] confirm', payload)
+  // client.publishCommand({ print: payload })
 }
 </script>
 

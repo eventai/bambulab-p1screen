@@ -21,7 +21,7 @@ const router = createRouter({
     { path: '/controls', component: ControlsPage },
     { path: '/filament', component: FilamentPage },
     { path: '/filament/auto-refill', component: FilamentAutoRefillPage },
-    { path: '/filament/edit/:id', component: FilamentEditPage, props: true },
+    { path: '/filament/edit/:ams_id/:tray_id', component: FilamentEditPage, props: true },
     { path: '/settings', component: SettingsPage },
     { path: '/files', component: FilesPage },
   ]

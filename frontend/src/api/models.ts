@@ -84,6 +84,7 @@ export type DeviceTray = {
   state?: number // AMS only
   k: number
   n: number
+  tray_info_idx: string
   tray_type: string
   tray_color: string // rgba
   nozzle_temp_max: string

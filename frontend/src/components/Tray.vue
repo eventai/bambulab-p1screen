@@ -31,6 +31,7 @@ const router = useRouter()
 const props = withDefaults(
   defineProps<{
     name: string
+    amsId: string
     tray?: DeviceTray
   }>(),
   {
@@ -59,12 +60,11 @@ const handleTrayClick = () => {
 }
 
 const handleSelect = (action: PopoverAction) => {
-  console.log('[Tray] type =', action.type, ', tray =', toRaw(props.tray))
+  console.log('[Tray] type =', action.type, 'amsId = ', props.amsId, ', tray =', toRaw(props.tray))
   showPopover.value = false
   switch (action.type) {
     case 'edit':
-      router.push(`/filament/edit/${props.tray?.id}`)
-
+      router.push(`/filament/edit/${props.amsId}/${props.tray?.id}`)
   }
 }
 

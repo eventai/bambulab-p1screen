@@ -5,6 +5,7 @@
         v-for="slot in 4"
         :key="slot"
         :name="`${amsPrefix}${slot}`"
+        :amsId="props.amsId"
         :tray="trayList[slot - 1]"
       />
       <span class="ams-name" >AMS-{{ amsPrefix }}</span>
