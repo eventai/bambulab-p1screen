@@ -203,7 +203,7 @@ export class PrinterClient {
       delete params.sequence_id
       delete params.result
       delete params.reason
-      console.debug(`[PrintClient]  report: sequence_id=${sequenceId}, command=${command}, result=${result}, reason=${reason}, params=`, params)
+      console.debug('[PrintClient]  report:', { sequenceId, command, result, reason, params })
 
       switch(command) {
         case 'print.push_status':
@@ -215,7 +215,7 @@ export class PrinterClient {
         default:
           const flag = this.resolvePublishResponse(sequenceId, result, reason, params)
           if (!flag) {
-            console.warn(`[PrintClient] unhandled message: sequence_id=${sequenceId}, command=${command}, result=${result}, reason=${reason}, params=`, params)
+            console.warn('[PrintClient] unhandled message:', { sequenceId, command, result, reason, params })
           }
           break
       }
@@ -286,17 +286,18 @@ export class PrinterClient {
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return false // TODO: reject
     const [type, name] = command.split('.')
     this.sequenceId = (this.sequenceId + 1) & 0xFFFF
+    const sequenceId = `${this.sequenceId}`
     const req = {
       [type]: {
-        'sequence_id': `${this.sequenceId}`,
+        'sequence_id': sequenceId,
         'command': name,
         ...params,
       }
     }
     const response = new Promise<any>((resolve, reject) => {
-      this.pendingPublishes.set(`${this.sequenceId}`, { resolve, reject })
+      this.pendingPublishes.set(sequenceId, { resolve, reject })
     })
-    console.debug(`[PrintClient] request: sequence_id=${this.sequenceId}, command=${command}, params=`, params)
+    console.debug('[PrintClient] request:', { sequenceId, command, params })
     this.ws.send(JSON.stringify(req))
     return response
   }

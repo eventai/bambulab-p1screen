@@ -3,7 +3,16 @@
     <van-cell-group inset title="网络信息">
       <van-cell title="IP 地址" :value="ip" />
       <van-cell title="WiFi 信号强度" :value="device.print.wifi_signal ?? '未知'" />
-      <van-cell title="状态" :value="statusLabel" />
+      <van-cell title="状态">
+        <template #value>
+          <div class="status-cell-value">
+            <span>{{ statusLabel }}</span>
+            <button v-if="!isConnected" class="refresh-btn" type="button" @click="handleReconnect">
+              <i-material-symbols-refresh-rounded />
+            </button>
+          </div>
+        </template>
+      </van-cell>
     </van-cell-group>
 
     <van-cell-group v-if="deviceInfo" inset title="设备信息">
@@ -18,8 +27,8 @@
       <van-cell title="固件版本" :value="module.sw_ver" />
     </van-cell-group>
 
-    <van-cell-group v-if="isDev" inset title="调试">
-      <van-cell title="重新连接" is-link @click="client.connect(ip, serial, code)"/>
+    <van-cell-group inset title="关于 bambulab-p1screen">
+      <van-cell title="当前版本" :value="currentVersion" />
     </van-cell-group>
   </div>
 </template>
@@ -38,6 +47,12 @@ const code = params.get('code') ?? ''
 
 const deviceInfo = computed(() => device.module.find(item => item.name === 'ota') ?? null)
 const modules = computed(() => device.module.filter(item => item.name.includes('ams')))
+const isConnected = computed(() => client.readyState.value === WebSocket.OPEN)
+const currentVersion = computed(() => isDev ? 'dev' : import.meta.env.VITE_APP_VERSION)
+
+const handleReconnect = () => {
+  client.connect(ip, serial, code)
+}
 
 const statusLabel = computed(() => {
   const state = client.readyState.value
@@ -64,5 +79,23 @@ const statusLabel = computed(() => {
   gap: 12px;
   padding: 8px 8px 12px;
   overscroll-behavior: none;
+}
+
+.status-cell-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.refresh-btn {
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  color: var(--van-text-color-2);
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  cursor: pointer;
 }
 </style>
