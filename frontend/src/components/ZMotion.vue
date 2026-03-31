@@ -5,7 +5,7 @@
       type="default"
       size="small"
       :icon="bedUpIcon"
-      @click="emitMove('z', 10)"
+      @click="emitMove('z', -10)"
     >
       10
     </van-button>
@@ -14,7 +14,7 @@
       type="default"
       size="small"
       :icon="bedUpIcon"
-      @click="emitMove('z', 1)"
+      @click="emitMove('z', -1)"
     >
       1
     </van-button>
@@ -24,7 +24,7 @@
       type="default"
       size="small"
       :icon="bedDownIcon"
-      @click="emitMove('z', -1)"
+      @click="emitMove('z', 1)"
     >
       1
     </van-button>
@@ -33,7 +33,7 @@
       type="default"
       size="small"
       :icon="bedDownIcon"
-      @click="emitMove('z', -10)"
+      @click="emitMove('z', 10)"
     >
       10
     </van-button>

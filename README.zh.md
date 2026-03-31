@@ -99,9 +99,6 @@ docker compose up -d
 - [P1S 屏幕改装 - iPhone7/Plus版](https://makerworld.com.cn/zh/models/1945893)
 
 ## TODOs
-- 控制页
-  - gcode 操作：X、Y、Z、E、Home
-  - 风扇滑动条随状态改变
 - 耗材页
   - 耗材编辑、进退料、设置、引导
 - 文件页

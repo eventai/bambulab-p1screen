@@ -133,8 +133,9 @@ const getPrintSpeed = computed(() => ['0%', '50%', '100%', '124%', '166%'][Numbe
 const getPrintSpeedLevel = computed(() => device.print.spd_lvl)
 
 const handlePrintSpeedConfirm = (speedLevel: number) => {
-  if (device.print.gcode_state === GcodeState.Idle) {
+  if ([GcodeState.Idle, GcodeState.Finish].includes(device.print.gcode_state ?? GcodeState.Unknown)) {
     showDialog({ message: '空闲状态下调整打印速度不生效。' })
+    return
   }
   client.setPrintSpeedLevel(speedLevel)
 }
@@ -150,7 +151,40 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
 
 const handleMove = (axis: 'home' | 'x' | 'y' | 'z' | 'e', step: -10 | -1 | 0| 1 | 10) => {
   console.log('[XYMotion] move', axis, step)
-  // TODO move x/y/z/e
+  let gcode = ''
+  switch(axis) {
+    case 'home':
+      client.request('print.gcode_line', { param: 'G28 \n' })
+      break
+    case 'x':
+    case 'y':
+    case 'z':
+      gcode = `M211 S
+M211 X1 Y1 Z1
+M1002 push_ref_mode
+G91
+G1 ${axis.toUpperCase()}${step} F${axis === 'z' ? 900 : 3000}
+M1002 pop_ref_mode
+M211 R
+`
+      client.request('print.gcode_line', { param: gcode })
+      break
+    case 'e':
+      if (Number(device.print.nozzle_temper ?? '0') < 170) {
+        showDialog({ message: '请将热端加热到170℃以上。' })
+        break
+      }
+      gcode = `M211 S
+M211 X1 Y1 Z1
+M1002 push_ref_mode
+M83
+G1 E${step} F150
+M1002 pop_ref_mode
+M211 R
+`
+      client.request('print.gcode_line', { param: gcode })
+      break
+  }
 }
 
 </script>

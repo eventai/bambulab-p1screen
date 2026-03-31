@@ -98,9 +98,6 @@ Planned
 - [P1S Screen Mod - iPhone 7/Plus Version](https://makerworld.com.cn/zh/models/1945893)
 
 ## TODOs
-- Controls
-  - G-code actions: X, Y, Z, E, Home
-  - Sync fan slider with live status
 - Filament
   - Filament edit, load/unload, settings, guidance
 - Files

@@ -283,7 +283,8 @@ export class PrinterClient {
   }
 
   async request(command: string, params?: Record<string, any>) {
-    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return false // TODO: reject
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) throw new Error('Not connected')
+
     const [type, name] = command.split('.')
     this.sequenceId = (this.sequenceId + 1) & 0xFFFF
     const sequenceId = `${this.sequenceId}`
@@ -403,17 +404,19 @@ export class PrinterClient {
    * @returns No return value.
    */
   setTemperature(type: TemperatureType, temperature: number) {
-    const gcode = type === TemperatureType.Nozzle ? 'M104' : type === TemperatureType.Heatbed ? 'M140' : null
-    if (!gcode) {
-      // TODO: chamber temperature control command is not implemented yet.
-      console.warn('[PrintClient] chamber temperature control is not implemented yet')
-      return
+    let gcode = ''
+    switch (type) {
+      case TemperatureType.Nozzle:
+        gcode = `M104 S${temperature.toFixed(0)}\n`
+        break
+      case TemperatureType.Heatbed:
+        gcode = `M140 S${temperature.toFixed(0)}\n`
+        break
+      case TemperatureType.Chamber:
+        // not implemented
+        return
     }
-    // TODO not working
-    this.request('print.gcode_line', {
-      "led_node": type,
-      "param": `${gcode} S${temperature.toFixed(0)}\n`
-    })
+    this.request('print.gcode_line', { 'param': gcode })
   }
 
   /**
