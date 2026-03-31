@@ -13,7 +13,8 @@
         <div class="filament" :style="{ '--tray-bg': bgColor }"></div>
         <span class="name" :style="{ color: textColor }">{{ name }}</span>
         <span class="material" :style="{ color: textColor }">{{ material }}</span>
-        <span class="icon" :style="{ backgroundColor: textColor}"></span>
+        <span v-if="!readonly" class="icon-edit" :style="{ backgroundColor: textColor}"></span>
+        <span v-if="readonly" class="icon-view" :style="{ backgroundColor: textColor}"></span>
       </div>
     </template>
   </van-popover>
@@ -25,7 +26,9 @@ import { computed, toRaw, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { PopoverAction } from 'vant'
 import type { DeviceTray } from '../api/models'
+import { PrinterClient } from '../api/PrinterClient'
 
+const client = PrinterClient.getInstance()
 const router = useRouter()
 
 const props = withDefaults(
@@ -42,10 +45,11 @@ const showPopover = ref(false)
 
 const actions = computed<PopoverAction[]>(() => {
   const menu: PopoverAction[] = [
-    { type: 'edit', text: '编辑' },
+    { type: 'edit', text: readonly.value ? '查看' : '编辑' },
     { type: 'load', text: '进料' },
+    // { type: 'unload', text: '退料' },
   ]
-  if (Number(props.tray?.id) !== 254) {
+  if (props.amsId !== '255') {
     menu.push({ type: 'reload', text: '重读' })
   }
   return menu
@@ -53,6 +57,7 @@ const actions = computed<PopoverAction[]>(() => {
 
 const material = computed(() => props.tray?.tray_type || '?')
 const color = computed(() => props.tray ? `#${props.tray.tray_color}` : getComputedStyle(document.documentElement).getPropertyValue('--van-text-color').trim())
+const readonly = computed(() => props.tray?.tag_uid !== '0000000000000000')
 
 const handleTrayClick = () => {
   if (!props.tray) return
@@ -65,6 +70,18 @@ const handleSelect = (action: PopoverAction) => {
   switch (action.type) {
     case 'edit':
       router.push(`/filament/edit/${props.amsId}/${props.tray?.id}`)
+      break
+    case 'load':
+      // client.request('print.ams_change_filament', { ams_id: Number(props.amsId), slot_id: Number(props.tray?.id), curr_temp: -1, tar_temp: -1, target: 0 })
+      break
+    case 'unload':
+      // TODO
+      break
+    case 'reload':
+      client.request('print.ams_get_rfid', { ams_id: Number(props.amsId), slot_id: Number(props.tray?.id) })
+      break
+    default:
+      break
   }
 }
 
@@ -129,10 +146,16 @@ const textColor = computed(() => {
 .tray > .material {
   font-size: 12px;
 }
-.tray > .icon {
-  height: 18px;
+.tray > .icon-edit {
+  height: 19px;
   margin: 0 15px;
   -webkit-mask-image: url(/src/assets/images/rename_edit.svg);
   mask-image: url(/src/assets/images/rename_edit.svg);
+}
+.tray > .icon-view {
+  height: 19px;
+  margin: 0 16px;
+  -webkit-mask-image: url(/src/assets/images/ams_readonly.svg);
+  mask-image: url(/src/assets/images/ams_readonly.svg);
 }
 </style>

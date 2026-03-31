@@ -2,7 +2,7 @@
   <div class="ext-tray-card">
     <Tray
       name="Ext"
-      amsId="null"
+      amsId="255"
       :tray="extTray"
     />
     <span class="name" >外挂料盘</span>

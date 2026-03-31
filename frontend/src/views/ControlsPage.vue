@@ -133,7 +133,6 @@ const getPrintSpeed = computed(() => ['0%', '50%', '100%', '124%', '166%'][Numbe
 const getPrintSpeedLevel = computed(() => device.print.spd_lvl)
 
 const handlePrintSpeedConfirm = (speedLevel: number) => {
-  console.log('[Controls] set print speed', speedLevel)
   if (device.print.gcode_state === GcodeState.Idle) {
     showDialog({ message: '空闲状态下调整打印速度不生效。' })
   }
@@ -143,15 +142,8 @@ const handlePrintSpeedConfirm = (speedLevel: number) => {
 // ------------------------------
 // Light
 
-const lightState = computed(() => {
-  if (!device.print) return false
-  return device.print.lights_report?.find(item => item.node === LightType.Chamber)?.mode === 'on'
-})
-
-const toggleLight = () => {
-  console.log(`[Controls] setLight: on=${!lightState.value}`)
-  client.setLight(!lightState.value)
-}
+const lightState = computed(() => device.print.lights_report?.find(item => item.node === LightType.Chamber)?.mode === 'on')
+const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
 
 // ------------------------------
 // Motion

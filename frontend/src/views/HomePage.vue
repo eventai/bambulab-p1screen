@@ -142,11 +142,7 @@ const handleStop = () => {
 }
 
 const lightState = computed(() => device.print.lights_report?.find(item => item.node === LightType.Chamber)?.mode === 'on')
-
-const toggleLight = () => {
-  console.log(`[Controls] setLight: on=${!lightState.value}`)
-  client.setLight(!lightState.value)
-}
+const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
 
 </script>
 

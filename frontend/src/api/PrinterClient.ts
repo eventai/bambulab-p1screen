@@ -25,6 +25,11 @@ export class PrinterClient {
   private reconnectAttempt = 0
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null
   private readonly maxReconnectDelay = 30
+  private sequenceId = 0
+  private readonly pendingPublishes = new Map<string, {
+    resolve: (value: any) => void
+    reject: (reason?: any) => void
+  }>()
   private connectionParams: ConnectionParams | null = null
   private readonly onVisibilityChange = () => {
     if (typeof document === 'undefined' || document.hidden) {
@@ -122,6 +127,7 @@ export class PrinterClient {
     this.shouldReconnect = false
     this.reconnectAttempt = 0
     this.clearReconnectTimer()
+    this.rejectPendingPublishes('connection closed')
     if (this.ws) {
       this.ws.close()
       this.ws = null
@@ -143,6 +149,7 @@ export class PrinterClient {
     console.log('[PrintClient] closed')
     this.connecting = false
     this.readyState.value = WebSocket.CLOSED
+    this.rejectPendingPublishes('socket closed')
     this.ws = null
     this.scheduleReconnect()
   }
@@ -151,6 +158,7 @@ export class PrinterClient {
     console.error('[PrintClient] error:', event)
     this.connecting = false
     this.readyState.value = this.ws?.readyState ?? null
+    this.rejectPendingPublishes('socket error')
     this.scheduleReconnect()
   }
 
@@ -185,84 +193,42 @@ export class PrinterClient {
 
   private onMessage(event: MessageEvent<any>) {
     let data = JSON.parse(event.data) ?? {}
-    if (data.print) {
-      this.handlePrintMessage(data.print)
-      return
-    }
+    Object.keys(data).forEach(key => {
+      const params = data[key]
+      const sequenceId: string = params.sequence_id
+      const command: string = `${key}.${params.command}`
+      const result: string = params.result ?? ''
+      const reason: string = params.reason ?? ''
+      delete params.command
+      delete params.sequence_id
+      delete params.result
+      delete params.reason
+      console.debug(`[PrintClient]  report: sequence_id=${sequenceId}, command=${command}, result=${result}, reason=${reason}, params=`, params)
 
-    if (data.info) {
-      this.handleInfoMessage(data.info)
-      return
-    }
-
-    if (data.system) {
-      this.handleSystemMessage(data.system)
-      return
-    }
-
-    if (data.liveview) return
-
-    console.warn('[PrintClient] unhandled message:', data)
-  }
-
-  private handlePrintMessage(printData: any) {
-    const command = printData?.command
-    if (!command) return
-
-    if (command === 'push_status') {
-      this.handlePushStatus(printData)
-      return
-    }
-
-    if (command === 'print_speed') {
-      console.debug(`[PrintClient][print_speed] update print_speed_level = ${JSON.stringify(printData.param)}`)
-      this.device.print.spd_lvl = printData.param as PrintSpeedLevel
-      return
-    }
-
-    if (command === 'gcode_line') {
-      this.handleGcodeLine(printData.param as string)
-      return
-    }
-
-    if (command === 'project_file') {
-      this.handleProjectFile(printData)
-      return
-    }
-  }
-
-  private handleInfoMessage(infoData: any) {
-    if (infoData?.command !== 'get_version') return
-    console.debug('[PrintClient][get_version]', infoData.module)
-    this.device.module = infoData.module
-  }
-
-  private handleSystemMessage(systemData: any) {
-    if (!systemData?.led_mode) return
-    const chamberLight = this.device.print.lights_report?.find(item => item.node === LightType.Chamber)
-    if (chamberLight) {
-      chamberLight.mode = systemData.led_mode
-    }
-    console.debug('[PrintClient][led_mode]', systemData.led_mode)
+      switch(command) {
+        case 'print.push_status':
+          this.handlePushStatus(params)
+          break
+        case 'print.project_file':
+          this.handleProjectFile(params)
+          break
+        default:
+          const flag = this.resolvePublishResponse(sequenceId, result, reason, params)
+          if (!flag) {
+            console.warn(`[PrintClient] unhandled message: sequence_id=${sequenceId}, command=${command}, result=${result}, reason=${reason}, params=`, params)
+          }
+          break
+      }
+    })
   }
 
   private handlePushStatus(printData: any) {
-    delete printData.command
-    delete printData.msg
-    delete printData.sequence_id
-    console.debug(`[PrintClient][push_status]`, printData)
     for (const key in printData) {
       (this.device.print as any)[key] = printData[key]
     }
   }
 
   private handleProjectFile(projectData: any) {
-    delete projectData.command
-    delete projectData.msg
-    delete projectData.sequence_id
-    delete projectData.reason
-    delete projectData.result
-    console.debug(`[PrintClient][project_file]`, projectData)
     const project = reactive<Project>(projectData as Project)
     project.thumbnail_url = `/api/getThumbnail?url=${encodeURIComponent(project.url)}&plate_idx=${project.plate_idx}`
     this.saveProject(project)
@@ -305,47 +271,55 @@ export class PrinterClient {
     )) ?? null
   }
 
-  private handleGcodeLine(param: string) {
-    if (param.startsWith('M106')) { // fan speed
-      this.handleFanSpeed(param)
-      return
-    }
-  }
-
-  private handleFanSpeed(param: string) {
-    const items = param.trim().split(' ')
-    if (items.length !== 3) {
-      return
-    }
-    const fanNum = Number(items[1].replace('P', ''))
-    const fanBit = 8 * (fanNum - 1)
-    const speed = Number(items[2].replace('S', ''))
-    let fanGear = this.device.print.fan_gear ?? 0
-    this.device.print.fan_gear = (fanGear & ~(0xFF << fanBit)) | (speed << fanBit)
-    console.debug(`[PrintClient][gcode_line] update fanNum = ${fanNum}, fanSpeed = ${speed}`)
-  }
-
   /**
    * Requests a full status refresh from the printer.
    * @returns No return value.
    */
-  updateAllData() {
-    this.publishCommand({
-      "pushing": {"command": "pushall"},
-      "info": {"command": "get_version"},
-      // "upgrade": {"command": "get_history"},
-    })
+  async updateAllData() {
+    this.request('pushing.pushall') // no response
+
+    const result = await this.request('info.get_version')
+    this.device.module = result.module
   }
 
-  /**
-   * Sends a control command to the printer backend.
-   * @param command Command payload sent through the WebSocket.
-   * @returns `true` if sent successfully; `false` when socket is not ready.
-   */
-  publishCommand(command: {}) {
-    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return false
-    this.ws.send(JSON.stringify(command))
+  async request(command: string, params?: Record<string, any>) {
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return false // TODO: reject
+    const [type, name] = command.split('.')
+    this.sequenceId = (this.sequenceId + 1) & 0xFFFF
+    const req = {
+      [type]: {
+        'sequence_id': `${this.sequenceId}`,
+        'command': name,
+        ...params,
+      }
+    }
+    const response = new Promise<any>((resolve, reject) => {
+      this.pendingPublishes.set(`${this.sequenceId}`, { resolve, reject })
+    })
+    console.debug(`[PrintClient] request: sequence_id=${this.sequenceId}, command=${command}, params=`, params)
+    this.ws.send(JSON.stringify(req))
+    return response
+  }
+
+  private resolvePublishResponse(sequenceId: string, result: string, reason: string, params: Record<string, any>) {
+    if (sequenceId === undefined || sequenceId === null) return false
+    const key = `${sequenceId}`
+    const pending = this.pendingPublishes.get(key)
+    if (!pending) return false
+    this.pendingPublishes.delete(key)
+    if (result.toLowerCase() === 'success') {
+      pending.resolve(params)
+    } else {
+      pending.reject(new Error(reason))
+    }
     return true
+  }
+
+  private rejectPendingPublishes(reason: string) {
+    for (const [key, pending] of this.pendingPublishes.entries()) {
+      pending.reject(new Error(`[PrintClient] ${reason}: ${key}`))
+      this.pendingPublishes.delete(key)
+    }
   }
 
   /**
@@ -384,14 +358,14 @@ export class PrinterClient {
    * @param speed Fan speed value in range 0-255.
    * @returns No return value.
    */
-  setFanSpeed(type: FanType, speed: number) {
-    this.publishCommand({
-      "print": {
-        "sequence_id": 0,
-        "command": "gcode_line",
-        "param": `M106 P${type as number} S${speed}\n`
-      }
-    })
+  async setFanSpeed(type: FanType, speed: number) {
+    const param = `M106 P${type as number} S${speed}\n`
+    const result = await this.request('print.gcode_line', { param })
+    if (result.param === param) {
+      const fanBit = 8 * (type as number - 1)
+      const fanGear = this.device.print.fan_gear ?? 0
+      this.device.print.fan_gear = (fanGear & ~(0xFF << fanBit)) | (speed << fanBit)
+    }
   }
 
   /**
@@ -399,13 +373,12 @@ export class PrinterClient {
    * @param level Speed level: 1=silent, 2=standard, 3=sport, 4=ludicrous.
    * @returns No return value.
    */
-  setPrintSpeedLevel(level: number) {
-    this.publishCommand({
-      "print": {
-        "command": "print_speed",
-        "param": `${level}`
-      }
-    })
+  async setPrintSpeedLevel(level: PrintSpeedLevel) {
+    const param = `${level}`
+    const result = await this.request('print.print_speed', { param })
+    if (result.param === param) {
+      this.device.print.spd_lvl = level
+    }
   }
 
   /**
@@ -413,12 +386,13 @@ export class PrinterClient {
    * @param on `true` to turn on, `false` to turn off.
    * @returns No return value.
    */
-  setLight(on: boolean) {
-    this.publishCommand({
-      "system": {
-        "led_mode": on ? "on" : "off"
-      }
+  async setLight(type: LightType, on: boolean) {
+    const result = await this.request('system.ledctrl', {
+      "led_node": type,
+      "led_mode": on ? "on" : "off",
     })
+    const light = this.device.print.lights_report?.find(item => item.node === result.led_node)
+    if (light) light.mode = result.led_mode
   }
 
   /**
@@ -435,12 +409,9 @@ export class PrinterClient {
       return
     }
     // TODO not working
-    this.publishCommand({
-      "print": {
-        "sequence_id": 0,
-        "command": "gcode_line",
-        "param": `${gcode} S${temperature.toFixed(0)}\n`
-      }
+    this.request('print.gcode_line', {
+      "led_node": type,
+      "param": `${gcode} S${temperature.toFixed(0)}\n`
     })
   }
 
@@ -449,7 +420,7 @@ export class PrinterClient {
    * @returns No return value.
    */
   setPause() {
-    this.sendPrintCommand('pause')
+    this.request('print.pause', { 'param': '' })
   }
 
   /**
@@ -457,7 +428,7 @@ export class PrinterClient {
    * @returns No return value.
    */
   setResume() {
-    this.sendPrintCommand('resume')
+    this.request('print.resume', { 'param': '' })
   }
 
   /**
@@ -465,16 +436,7 @@ export class PrinterClient {
    * @returns No return value.
    */
   setStop() {
-    this.sendPrintCommand('stop')
+    this.request('print.stop', { 'param': '' })
   }
 
-  private sendPrintCommand(command: string) {
-    this.publishCommand({
-      "print": {
-        "sequence_id": "0",
-        "command": command,
-        "param": "",
-      }
-    })
-  }
 }

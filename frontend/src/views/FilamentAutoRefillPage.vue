@@ -1,7 +1,9 @@
 <template>
   <div class="filament-sub-page">
     <NavHeader title="自动续料" @back="router.back" />
-    <div class="filament-sub-page-content"></div>
+    <div class="filament-sub-page-content">
+      <van-empty description="开发中" />
+    </div>
   </div>
 </template>
 
@@ -24,5 +26,7 @@ const router = useRouter()
 .filament-sub-page-content {
   border-radius: 10px;
   background: var(--van-background-3);
+  display: grid;
+  place-items: center;
 }
 </style>

@@ -44,6 +44,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { closeToast, showFailToast, showLoadingToast, showSuccessToast } from 'vant'
 import NavHeader from '../components/NavHeader.vue'
 import { PrinterClient } from '../api/PrinterClient'
 import type { DeviceTray } from '../api/models'
@@ -58,7 +59,7 @@ const trayId = route.params.tray_id as string
 const ams = computed(() => device.print.ams!.ams.find((item) => item.id === amsId)!)
 
 const tray = computed<DeviceTray>(() => {
-  if (trayId === device.print.vt_tray?.id) {
+  if (amsId === '255' && trayId === device.print.vt_tray?.id) {
     return device.print.vt_tray!
   }
   return ams.value.tray.find((item) => item.id === trayId)!
@@ -84,12 +85,10 @@ const handleEditColor = () => {
   console.log('[FilamentEditPage] edit color')
 }
 
-const handleConfirm = () => {
+const handleConfirm = async () => {
   const payload = {
-    sequence_id: 0,
-    command: 'ams_filament_setting',
-    ams_id: amsId, // TODO: Ext Tray?
-    tray_id: trayId,
+    ams_id: Number(amsId), // TODO: Ext Tray?
+    tray_id: Number(trayId),
     tray_info_idx: tray.value?.tray_info_idx,
     tray_color: trayColor.value,
     tray_type: trayType.value,
@@ -98,7 +97,26 @@ const handleConfirm = () => {
   }
 
   console.log('[FilamentEditPage] confirm', payload)
-  // client.publishCommand({ print: payload })
+
+  showLoadingToast({
+    message: '保存中...',
+    duration: 0,
+    forbidClick: true,
+  })
+  try {
+    await client.request('print.ams_filament_setting', payload)
+    tray.value.tray_color = trayColor.value
+    tray.value.tray_type = trayType.value
+    tray.value.nozzle_temp_min = nozzleTempMin.value
+    tray.value.nozzle_temp_max = nozzleTempMax.value
+    closeToast()
+    showSuccessToast('保存成功')
+    router.back()
+  } catch (error) {
+    console.error('[FilamentEditPage] save failed', error)
+    closeToast()
+    showFailToast('保存失败')
+  }
 }
 </script>
 

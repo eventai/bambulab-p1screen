@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
-import { Button, Slider, Progress, Popup, Popover, Dialog, Cell, CellGroup } from 'vant'
+import { Button, Slider, Progress, Popup, Popover, Dialog, Cell, CellGroup, Empty } from 'vant'
 import App from './App.vue'
 import { PrinterClient } from './api/PrinterClient'
 import HomePage from './views/HomePage.vue'
@@ -37,6 +37,7 @@ createApp(App)
   .use(Dialog)
   .use(Cell)
   .use(CellGroup)
+  .use(Empty)
   .mount('#app')
 
 window.addEventListener('contextmenu', (event) => {
