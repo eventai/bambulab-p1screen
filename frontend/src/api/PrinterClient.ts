@@ -1,4 +1,5 @@
-import { reactive, ref } from 'vue'
+import { reactive, shallowRef, triggerRef } from 'vue'
+import mqtt, { type MqttClient } from 'mqtt'
 import {
   type DeviceState,
   type Project,
@@ -10,53 +11,22 @@ import {
   PrintSpeedLevel,
 } from './enums'
 
-type ConnectionParams = {
-  ip: string
-  serial: string
-  code: string
-}
-
 export class PrinterClient {
   private static instance: PrinterClient | null = null
-  private ws: WebSocket | null = null
-  private connecting = false
-  readyState = ref<number | null>(null)
-  private shouldReconnect = true
-  private reconnectAttempt = 0
-  private reconnectTimer: ReturnType<typeof setTimeout> | null = null
-  private readonly maxReconnectDelay = 30
+  public mqttClient = shallowRef<MqttClient | null>(null)
+  private manualDisconnect = false
   private sequenceId = 0
+  private reportTopic = ''
+  private requestTopic = ''
   private readonly pendingPublishes = new Map<string, {
     resolve: (value: any) => void
     reject: (reason?: any) => void
   }>()
-  private connectionParams: ConnectionParams | null = null
-  private readonly onVisibilityChange = () => {
-    if (typeof document === 'undefined' || document.hidden) {
-      return
-    }
-    if (!this.shouldReconnect || !this.connectionParams) {
-      return
-    }
-    if (this.ws && (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)) {
-      return
-    }
-
-    this.clearReconnectTimer()
-    this.reconnectAttempt = 0
-    this.connect(this.connectionParams.ip, this.connectionParams.serial, this.connectionParams.code)
-  }
 
   device = reactive<DeviceState>({
     module: [],
     print: {},
   })
-
-  constructor() {
-    if (typeof document !== 'undefined') {
-      document.addEventListener('visibilitychange', this.onVisibilityChange)
-    }
-  }
 
   /**
    * Returns the singleton PrinterClient instance.
@@ -70,47 +40,50 @@ export class PrinterClient {
   }
 
   /**
-   * Opens a WebSocket connection to the backend tunnel.
+   * Opens an MQTT-over-WebSocket connection to the backend tunnel.
    * @param ip Printer IP address.
    * @param serial Printer serial number.
    * @param code Printer access code.
-   * @returns The WebSocket instance when connection is initiated, otherwise null.
+   * @returns The MQTT client instance when connection is initiated, otherwise null.
    */
   connect(ip: string, serial: string, code: string) {
     if (typeof window === 'undefined') return null
-    this.shouldReconnect = true
+    this.manualDisconnect = false
 
     if (!ip || !serial || !code) {
       console.warn('[PrintClient] missing connection parameters')
-      this.readyState.value = null
       return null
     }
-    this.connectionParams = { ip, serial, code }
+    this.reportTopic = `device/${serial}/report`
+    this.requestTopic = `device/${serial}/request`
 
-    if (this.ws && (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)) {
-      this.readyState.value = this.ws.readyState
-      return this.ws
+    const client = this.mqttClient.value
+    if (client && !client.disconnected) {
+      return client
     }
 
-    if (this.connecting) {
-      return this.ws
-    }
-
-    this.clearReconnectTimer()
-    this.connecting = true
-    this.readyState.value = WebSocket.CONNECTING
     try {
-      const url = `ws://${location.host}/ws?ip=${encodeURIComponent(ip)}&serial=${encodeURIComponent(serial)}&code=${encodeURIComponent(code)}`
-      this.ws = new WebSocket(url)
-      this.ws.addEventListener('open', this.onOpen.bind(this))
-      this.ws.addEventListener('close', this.onClose.bind(this))
-      this.ws.addEventListener('error', this.onError.bind(this))
-      this.ws.addEventListener('message', this.onMessage.bind(this))
-      return this.ws
+      const wsProtocol = location.protocol === 'https:' ? 'wss' : 'ws'
+      const upstreamUrl = `mqtts://${ip}:8883`
+      const proxyUrl = `${wsProtocol}://${location.host}/mqtt?url=${encodeURIComponent(upstreamUrl)}`
+      const mqttClient = mqtt.connect(proxyUrl, {
+        username: 'bblp',
+        password: code,
+        protocolVersion: 4,
+        reconnectPeriod: 5000,
+        reconnectOnConnackError: true,
+      })
+      this.mqttClient.value = mqttClient
+      mqttClient.on('connect', this.onConnect.bind(this))
+      mqttClient.on('reconnect', this.onReconnect.bind(this))
+      mqttClient.on('offline', this.onOffline.bind(this))
+      mqttClient.on('close', this.onClose.bind(this))
+      mqttClient.on('end', this.onEnd.bind(this))
+      mqttClient.on('error', this.onError.bind(this))
+      mqttClient.on('message', this.onMessage.bind(this))
+      return mqttClient
     } catch (error) {
-      this.connecting = false
       console.error('[PrintClient] connect failed:', error)
-      this.scheduleReconnect()
       return null
     }
   }
@@ -124,81 +97,79 @@ export class PrinterClient {
   }
 
   private stopConnection() {
-    this.shouldReconnect = false
-    this.reconnectAttempt = 0
-    this.clearReconnectTimer()
+    this.manualDisconnect = true
     this.rejectPendingPublishes('connection closed')
-    if (this.ws) {
-      this.ws.close()
-      this.ws = null
+    const client = this.mqttClient.value
+    if (client) {
+      client.end(true)
+      this.mqttClient.value = null
     }
-    this.connecting = false
-    this.readyState.value = WebSocket.CLOSED
   }
 
-  private onOpen(_event: Event) {
+  private onConnect() {
     console.log('[PrintClient] connected')
-    this.connecting = false
-    this.reconnectAttempt = 0
-    this.clearReconnectTimer()
-    this.readyState.value = this.ws?.readyState ?? null
-    this.updateAllData()
+    const topic = this.reportTopic
+    this.mqttClient.value?.subscribe(topic, (err) => {
+      if (err) {
+        console.error('[PrintClient] subscribe failed:', err)
+        this.mqttClient.value?.end(true)
+        return
+      }
+      console.log('[PrintClient] subscribed:', topic)
+      this.updateAllData()
+      triggerRef(this.mqttClient)
+    })
   }
 
-  private onClose(_event: Event) {
+  private onClose() {
     console.log('[PrintClient] closed')
-    this.connecting = false
-    this.readyState.value = WebSocket.CLOSED
     this.rejectPendingPublishes('socket closed')
-    this.ws = null
-    this.scheduleReconnect()
+    if (this.manualDisconnect) {
+      this.mqttClient.value = null
+    }
+    triggerRef(this.mqttClient)
   }
 
-  private onError(event: Event) {
-    console.error('[PrintClient] error:', event)
-    this.connecting = false
-    this.readyState.value = this.ws?.readyState ?? null
+  private onReconnect() {
+    console.warn('[PrintClient] reconnecting...')
+    triggerRef(this.mqttClient)
+  }
+
+  private onOffline() {
+    console.warn('[PrintClient] offline')
+    triggerRef(this.mqttClient)
+  }
+
+  private onEnd() {
+    console.log('[PrintClient] ended')
+    this.mqttClient.value = null
+    triggerRef(this.mqttClient)
+  }
+
+  private onError(error: unknown) {
+    console.error('[PrintClient] error:', error)
     this.rejectPendingPublishes('socket error')
-    this.scheduleReconnect()
+    triggerRef(this.mqttClient)
   }
 
-  private scheduleReconnect() {
-    if (!this.shouldReconnect || this.connecting || this.reconnectTimer) {
+  private onMessage(topic: string, payload: Uint8Array) {
+    if (topic !== this.reportTopic) {
       return
     }
-
-    const delaySeconds = Math.min(2 ** this.reconnectAttempt, this.maxReconnectDelay)
-    this.reconnectAttempt += 1
-    console.warn(`[PrintClient] reconnecting in ${delaySeconds}s`)
-    this.reconnectTimer = setTimeout(() => {
-      this.reconnectTimer = null
-      if (!this.shouldReconnect) {
-        return
-      }
-      if (!this.connectionParams) {
-        console.warn('[PrintClient] reconnect skipped: missing connection parameters')
-        return
-      }
-      this.connect(this.connectionParams.ip, this.connectionParams.serial, this.connectionParams.code)
-    }, delaySeconds * 1000)
-  }
-
-  private clearReconnectTimer() {
-    if (!this.reconnectTimer) {
+    const raw = new TextDecoder().decode(payload)
+    let data: Record<string, any> = {}
+    try {
+      data = JSON.parse(raw) ?? {}
+    } catch (error) {
+      console.warn('[PrintClient] message parse failed:', error)
       return
     }
-    clearTimeout(this.reconnectTimer)
-    this.reconnectTimer = null
-  }
-
-  private onMessage(event: MessageEvent<any>) {
-    let data = JSON.parse(event.data) ?? {}
     Object.keys(data).forEach(key => {
       const params = data[key]
       const sequenceId: string = params.sequence_id
       const command: string = `${key}.${params.command}`
-      const result: string = params.result ?? ''
-      const reason: string = params.reason ?? ''
+      const result: string = params.result
+      const reason: string = params.reason
       delete params.command
       delete params.sequence_id
       delete params.result
@@ -283,7 +254,8 @@ export class PrinterClient {
   }
 
   async request(command: string, params?: Record<string, any>) {
-    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) throw new Error('Not connected')
+    const client = this.mqttClient.value
+    if (!client || !client.connected) throw new Error('Not connected')
 
     const [type, name] = command.split('.')
     this.sequenceId = (this.sequenceId + 1) & 0xFFFF
@@ -299,17 +271,27 @@ export class PrinterClient {
       this.pendingPublishes.set(sequenceId, { resolve, reject })
     })
     console.debug('[PrintClient] request:', { sequenceId, command, params })
-    this.ws.send(JSON.stringify(req))
+    client.publish(this.requestTopic, JSON.stringify(req), (err) => {
+      if (!err) {
+        return
+      }
+      const pending = this.pendingPublishes.get(sequenceId)
+      if (!pending) {
+        return
+      }
+      this.pendingPublishes.delete(sequenceId)
+      pending.reject(err)
+    })
     return response
   }
 
-  private resolvePublishResponse(sequenceId: string, result: string, reason: string, params: Record<string, any>) {
+  private resolvePublishResponse(sequenceId: string, result?: string, reason?: string, params?: Record<string, any>) {
     if (sequenceId === undefined || sequenceId === null) return false
     const key = `${sequenceId}`
     const pending = this.pendingPublishes.get(key)
     if (!pending) return false
     this.pendingPublishes.delete(key)
-    if (result.toLowerCase() === 'success') {
+    if (result?.toLowerCase() === 'success') {
       pending.resolve(params)
     } else {
       pending.reject(new Error(reason))

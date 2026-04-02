@@ -47,7 +47,7 @@ const code = params.get('code') ?? ''
 
 const deviceInfo = computed(() => device.module.find(item => item.name === 'ota') ?? null)
 const modules = computed(() => device.module.filter(item => item.name.includes('ams')))
-const isConnected = computed(() => client.readyState.value === WebSocket.OPEN)
+const isConnected = computed(() => Boolean(client.mqttClient.value?.connected))
 const currentVersion = computed(() => isDev ? 'dev' : import.meta.env.VITE_APP_VERSION)
 
 const handleReconnect = () => {
@@ -55,20 +55,13 @@ const handleReconnect = () => {
 }
 
 const statusLabel = computed(() => {
-  const state = client.readyState.value
-  if (state === null) return '未连接'
-  switch (state) {
-    case WebSocket.CONNECTING:
-      return '连接中'
-    case WebSocket.OPEN:
-      return '已连接'
-    case WebSocket.CLOSING:
-      return '断开中'
-    case WebSocket.CLOSED:
-      return '已断开'
-    default:
-      return '未知'
-  }
+  const c = client.mqttClient.value
+  if (!c) return '未连接'
+  if (c.connected) return '已连接'
+  if (c.disconnecting) return '断开中'
+  if (c.reconnecting) return '重连中'
+  if (c.disconnected) return '已断开'
+  return '未知'
 })
 
 </script>

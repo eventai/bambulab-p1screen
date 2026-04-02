@@ -54,7 +54,7 @@ const nozzleTemp = computed(() => Math.floor(Number(device.print.nozzle_temper ?
 const heatbedTemp = computed(() => Math.floor(Number(device.print.bed_temper ?? '0')))
 
 const getWifiSignalIcon = computed(() => {
-  if (client.readyState.value !== WebSocket.OPEN) {
+  if (!client.mqttClient.value?.connected) {
     return signalNoIcon
   }
 

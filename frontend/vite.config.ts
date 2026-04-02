@@ -43,7 +43,7 @@ export default defineConfig({
     port: 8888,
     proxy: {
       '/api': 'http://localhost:8889',
-      '/ws': {
+      '/mqtt': {
         target: 'ws://localhost:8889',
         ws: true
       }
