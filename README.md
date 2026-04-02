@@ -91,7 +91,7 @@ Default port: `8888`
 Any full-screen web launch method is acceptable. More ideas are welcome.
 
 ### Android App
-Planned
+[Download Link](https://github.com/0x5e/bambulab-p1screen/releases)
 
 ## Hardware
 - [P1S Screen Mod - Redmi 2 Direct Power Version](https://makerworld.com.cn/zh/models/2134336)
@@ -102,7 +102,6 @@ Planned
   - Filament edit, load/unload, settings, guidance
 - Files
   - Fetch file list
-- APK build
 - Multi languages
 
 ## References

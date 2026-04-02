@@ -92,7 +92,7 @@ docker compose up -d
 只要有办法让网页全屏运行即可，其他方案欢迎共同探索。
 
 ### Android 版
-待开发
+[下载地址](https://github.com/0x5e/bambulab-p1screen/releases)
 
 ## 硬件部分
 - [P1S 屏幕改装 - 红米2直供电版](https://makerworld.com.cn/zh/models/2134336)
@@ -103,7 +103,6 @@ docker compose up -d
   - 耗材编辑、进退料、设置、引导
 - 文件页
   - 获取文件列表
-- APK 构建
 - 多语言
 
 ## 参考内容
