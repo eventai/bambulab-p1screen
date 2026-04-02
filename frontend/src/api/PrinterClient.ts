@@ -174,7 +174,8 @@ export class PrinterClient {
       delete params.sequence_id
       delete params.result
       delete params.reason
-      console.debug('[PrintClient]  report:', { sequenceId, command, result, reason, params })
+      delete params.msg
+      console.debug('[PrintClient]  report: sequenceId =', sequenceId, ', command =', command, ', result =', result, ', reason =', reason, ', params =', params)
 
       switch(command) {
         case 'print.push_status':
@@ -186,7 +187,7 @@ export class PrinterClient {
         default:
           const flag = this.resolvePublishResponse(sequenceId, result, reason, params)
           if (!flag) {
-            console.warn('[PrintClient] unhandled message:', { sequenceId, command, result, reason, params })
+            console.warn('[PrintClient] unhandled message: sequenceId =', sequenceId, ', command =', command, ', result =', result, ', reason =', reason, ', params =', params)
           }
           break
       }
@@ -270,7 +271,7 @@ export class PrinterClient {
     const response = new Promise<any>((resolve, reject) => {
       this.pendingPublishes.set(sequenceId, { resolve, reject })
     })
-    console.debug('[PrintClient] request:', { sequenceId, command, params })
+    console.debug('[PrintClient] request: sequenceId =', sequenceId, ', command =', command, ', params =', params)
     client.publish(this.requestTopic, JSON.stringify(req), (err) => {
       if (!err) {
         return
