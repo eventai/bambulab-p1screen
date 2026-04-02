@@ -14,9 +14,9 @@ const getGitText = (command: string) => {
   }
 }
 
-const tag = getGitText('git tag --points-at HEAD').split('\n').find(Boolean) ?? ''
+const envVersion = process.env.VITE_APP_VERSION?.trim() ?? ''
 const commitHash = getGitText('git rev-parse --short=6 HEAD')
-const appVersion = tag || commitHash || 'unknown'
+const appVersion = envVersion || commitHash || 'unknown'
 
 export default defineConfig({
   root: path.resolve(__dirname),
@@ -50,7 +50,7 @@ export default defineConfig({
     }
   },
   build: {
-    assetsInlineLimit: 10240,
+    assetsInlineLimit: 1024 * 20,
     outDir: path.resolve(__dirname, '../dist/web'),
     emptyOutDir: true
   },

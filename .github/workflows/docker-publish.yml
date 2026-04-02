@@ -43,6 +43,8 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
+          build-args: |
+            VITE_APP_VERSION=${{ github.ref_name }}
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
           provenance: false

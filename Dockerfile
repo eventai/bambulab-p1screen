@@ -1,5 +1,7 @@
-FROM node:20-alpine AS builder
+FROM node:23-alpine AS builder
 WORKDIR /app
+ARG VITE_APP_VERSION=unknown
+ENV VITE_APP_VERSION=$VITE_APP_VERSION
 
 COPY package*.json ./
 COPY frontend/package.json ./frontend/package.json
@@ -9,7 +11,7 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-FROM node:20-alpine AS runner
+FROM node:23-alpine AS runner
 WORKDIR /app
 
 LABEL org.opencontainers.image.source="https://github.com/0x5e/bambulab-p1screen"
