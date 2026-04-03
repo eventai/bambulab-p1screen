@@ -54,6 +54,9 @@
 - Home Assistant 网页版 & App 版：性能开销大（不知何故），红米 2 无法正常使用，卡到死机很多次。
 
 ## 使用步骤
+### Android 版
+[下载地址](https://github.com/0x5e/bambulab-p1screen/releases)
+
 ### Web 版
 #### 1. 部署后端服务
 在打印机局域网内任意设备部署（主要负责 MQTT 转发）：
@@ -82,7 +85,7 @@ docker compose up -d
 #### 2. 移动端添加浏览器桌面书签
 访问地址：
 
-`http://后端服务地址:端口/?ip=打印机地址&serial=序列号&code=访问码`
+`http://后端服务地址:端口/`
 
 默认端口：`8888`
 
@@ -90,9 +93,6 @@ docker compose up -d
 - Android：可使用 [web-to-app](https://github.com/shiahonb777/web-to-app/) 添加桌面快捷方式（选择全屏启动）
 
 只要有办法让网页全屏运行即可，其他方案欢迎共同探索。
-
-### Android 版
-[下载地址](https://github.com/0x5e/bambulab-p1screen/releases)
 
 ## 硬件部分
 - [P1S 屏幕改装 - 红米2直供电版](https://makerworld.com.cn/zh/models/2134336)

@@ -54,6 +54,9 @@ Status: In development
 - Home Assistant Web/App: High performance overhead (for unknown reasons). Redmi 2 is unusable and may freeze.
 
 ## Usage
+### Android App
+[Download Link](https://github.com/0x5e/bambulab-p1screen/releases)
+
 ### Web
 #### 1. Deploy backend service
 Deploy the backend service on any device in the same LAN as the printer (mainly MQTT forwarding):
@@ -81,7 +84,7 @@ docker compose up -d
 #### 2. Add a home screen shortcut on mobile
 Access URL:
 
-`http://<server-address>:<port>/?ip=<printer-ip>&serial=<serial>&code=<access-code>`
+`http://<server-address>:<port>/`
 
 Default port: `8888`
 
@@ -89,9 +92,6 @@ Default port: `8888`
 - Android: You can use [web-to-app](https://github.com/shiahonb777/web-to-app/) to create a full-screen home shortcut
 
 Any full-screen web launch method is acceptable. More ideas are welcome.
-
-### Android App
-[Download Link](https://github.com/0x5e/bambulab-p1screen/releases)
 
 ## Hardware
 - [P1S Screen Mod - Redmi 2 Direct Power Version](https://makerworld.com.cn/zh/models/2134336)
