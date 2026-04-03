@@ -10,6 +10,8 @@ import FilamentAutoRefillPage from './views/FilamentAutoRefillPage.vue'
 import FilamentEditPage from './views/FilamentEditPage.vue'
 import SettingsPage from './views/SettingsPage.vue'
 import FilesPage from './views/FilesPage.vue'
+import DeviceManagePage from './views/DeviceManagePage.vue'
+import { getDevice } from './utils/device'
 import 'vant/lib/index.css'
 import './styles/theme.css'
 
@@ -23,6 +25,7 @@ const router = createRouter({
     { path: '/filament/auto-refill', component: FilamentAutoRefillPage },
     { path: '/filament/edit/:ams_id/:tray_id', component: FilamentEditPage, props: true },
     { path: '/settings', component: SettingsPage },
+    { path: '/settings/device/manage', component: DeviceManagePage },
     { path: '/files', component: FilesPage },
   ]
 })
@@ -54,9 +57,8 @@ const syncAppSize = () => {
 syncAppSize()
 window.addEventListener('resize', syncAppSize)
 
-const params = new URLSearchParams(location.search)
-const ip = params.get('ip') ?? ''
-const serial = params.get('serial') ?? ''
-const code = params.get('code') ?? ''
-const client = PrinterClient.getInstance()
-client.connect(ip, serial, code)
+const storedDevice = getDevice()
+if (storedDevice) {
+  const client = PrinterClient.getInstance()
+  client.connect(storedDevice.ip, storedDevice.serial, storedDevice.code)
+}
