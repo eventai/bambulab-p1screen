@@ -46,10 +46,10 @@ const showPopover = ref(false)
 const actions = computed<PopoverAction[]>(() => {
   const menu: PopoverAction[] = [
     { type: 'edit', text: readonly.value ? '查看' : '编辑' },
-    { type: 'load', text: '进料' },
-    // { type: 'unload', text: '退料' },
+    isCurrent.value ? { type: 'unload', text: '退料' } : { type: 'load', text: '进料' },
   ]
-  if (props.amsId !== '255') {
+
+  if (isExt.value) {
     menu.push({ type: 'reload', text: '重读' })
   }
   return menu
@@ -58,6 +58,13 @@ const actions = computed<PopoverAction[]>(() => {
 const material = computed(() => props.tray?.tray_type || '?')
 const color = computed(() => props.tray ? `#${props.tray.tray_color}` : getComputedStyle(document.documentElement).getPropertyValue('--van-text-color').trim())
 const readonly = computed(() => props.tray?.tag_uid !== '0000000000000000')
+const isCurrent = computed(() => {
+  const trayNow = Number(client.device.print.ams?.tray_now ?? '0')
+  const trayId = Number(props.tray?.id ?? '0')
+  return (trayNow === 254 && trayId === 254)
+    || (Number(props.amsId) * 4 + trayId === trayNow)
+})
+const isExt = computed(() => Number(props.tray?.id ?? '0') === 254)
 
 const handleTrayClick = () => {
   if (!props.tray) return

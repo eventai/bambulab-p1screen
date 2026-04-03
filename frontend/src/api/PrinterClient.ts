@@ -14,7 +14,6 @@ import {
 export class PrinterClient {
   private static instance: PrinterClient | null = null
   public mqttClient = shallowRef<MqttClient | null>(null)
-  private manualDisconnect = false
   private sequenceId = 0
   private reportTopic = ''
   private requestTopic = ''
@@ -47,20 +46,16 @@ export class PrinterClient {
    * @returns The MQTT client instance when connection is initiated, otherwise null.
    */
   connect(ip: string, serial: string, code: string) {
+    console.info(`[PrintClient] connect to: ${ip}, serial: ${serial}, code: ${code}`)
     if (typeof window === 'undefined') return null
-    this.manualDisconnect = false
 
     if (!ip || !serial || !code) {
       console.warn('[PrintClient] missing connection parameters')
       return null
     }
+    this.stopConnection('recreate connection')
     this.reportTopic = `device/${serial}/report`
     this.requestTopic = `device/${serial}/request`
-
-    const client = this.mqttClient.value
-    if (client && !client.disconnected) {
-      return client
-    }
 
     try {
       const wsProtocol = location.protocol === 'https:' ? 'wss' : 'ws'
@@ -84,6 +79,7 @@ export class PrinterClient {
       return mqttClient
     } catch (error) {
       console.error('[PrintClient] connect failed:', error)
+      this.stopConnection('connect failed')
       return null
     }
   }
@@ -93,17 +89,20 @@ export class PrinterClient {
    * @returns No return value.
    */
   disconnect() {
-    this.stopConnection()
+    this.stopConnection('manual disconnect')
   }
 
-  private stopConnection() {
-    this.manualDisconnect = true
-    this.rejectPendingPublishes('connection closed')
+  private stopConnection(reason: string) {
     const client = this.mqttClient.value
     if (client) {
+      client.removeAllListeners()
       client.end(true)
-      this.mqttClient.value = null
     }
+    this.mqttClient.value = null
+    this.reportTopic = ''
+    this.requestTopic = ''
+    this.rejectPendingPublishes(reason)
+    triggerRef(this.mqttClient)
   }
 
   private onConnect() {
@@ -112,7 +111,7 @@ export class PrinterClient {
     this.mqttClient.value?.subscribe(topic, (err) => {
       if (err) {
         console.error('[PrintClient] subscribe failed:', err)
-        this.mqttClient.value?.end(true)
+        this.stopConnection('subscribe failed')
         return
       }
       console.log('[PrintClient] subscribed:', topic)
@@ -124,9 +123,6 @@ export class PrinterClient {
   private onClose() {
     console.log('[PrintClient] closed')
     this.rejectPendingPublishes('socket closed')
-    if (this.manualDisconnect) {
-      this.mqttClient.value = null
-    }
     triggerRef(this.mqttClient)
   }
 
@@ -143,6 +139,8 @@ export class PrinterClient {
   private onEnd() {
     console.log('[PrintClient] ended')
     this.mqttClient.value = null
+    this.reportTopic = ''
+    this.requestTopic = ''
     triggerRef(this.mqttClient)
   }
 
@@ -288,10 +286,9 @@ export class PrinterClient {
 
   private resolvePublishResponse(sequenceId: string, result?: string, reason?: string, params?: Record<string, any>) {
     if (sequenceId === undefined || sequenceId === null) return false
-    const key = `${sequenceId}`
-    const pending = this.pendingPublishes.get(key)
+    const pending = this.pendingPublishes.get(sequenceId)
     if (!pending) return false
-    this.pendingPublishes.delete(key)
+    this.pendingPublishes.delete(sequenceId)
     if (result?.toLowerCase() === 'success') {
       pending.resolve(params)
     } else {
@@ -303,8 +300,8 @@ export class PrinterClient {
   private rejectPendingPublishes(reason: string) {
     for (const [key, pending] of this.pendingPublishes.entries()) {
       pending.reject(new Error(`[PrintClient] ${reason}: ${key}`))
-      this.pendingPublishes.delete(key)
     }
+    this.pendingPublishes.clear()
   }
 
   /**
