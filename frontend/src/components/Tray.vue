@@ -49,7 +49,7 @@ const actions = computed<PopoverAction[]>(() => {
     isCurrent.value ? { type: 'unload', text: '退料' } : { type: 'load', text: '进料' },
   ]
 
-  if (isExt.value) {
+  if (!isExt.value) {
     menu.push({ type: 'reload', text: '重读' })
   }
   return menu

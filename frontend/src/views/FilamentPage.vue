@@ -12,9 +12,9 @@
       <van-popover
         v-model:show="showSettingsPopover"
         trigger="manual"
-        placement="top"
+        placement="top-end"
         :actions="settingsActions"
-        style="--van-popover-action-width: 90px;"
+        style="--van-popover-action-width: 100px;"
         @select="handleSettingsSelect"
       >
         <template #reference>
