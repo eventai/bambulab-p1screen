@@ -5,22 +5,49 @@
     <van-cell-group inset title="设备信息">
       <van-cell title="设备名称">
         <template #value>
-          <input v-model.trim="name" class="cell-input" placeholder="设备名称" />
+          <input
+            v-model.trim="name"
+            class="cell-input"
+            placeholder="设备名称"
+            enterkeyhint="next"
+            @keydown.enter.prevent="ipInputRef?.focus()"
+          />
         </template>
       </van-cell>
       <van-cell title="IP 地址">
         <template #value>
-          <input v-model.trim="ip" class="cell-input" placeholder="IP 地址" />
+          <input
+            ref="ipInputRef"
+            v-model.trim="ip"
+            class="cell-input"
+            placeholder="IP 地址"
+            enterkeyhint="next"
+            @keydown.enter.prevent="serialInputRef?.focus()"
+          />
         </template>
       </van-cell>
       <van-cell title="序列号">
         <template #value>
-          <input v-model.trim="serial" class="cell-input" placeholder="序列号" />
+          <input
+            ref="serialInputRef"
+            v-model.trim="serial"
+            class="cell-input"
+            placeholder="序列号"
+            enterkeyhint="next"
+            @keydown.enter.prevent="codeInputRef?.focus()"
+          />
         </template>
       </van-cell>
       <van-cell title="配对码">
         <template #value>
-          <input v-model.trim="code" class="cell-input" placeholder="配对码" />
+          <input
+            ref="codeInputRef"
+            v-model.trim="code"
+            class="cell-input"
+            placeholder="配对码"
+            enterkeyhint="done"
+            @keydown.enter.prevent="(e) => (e.target as HTMLInputElement | null)?.blur()"
+          />
         </template>
       </van-cell>
     </van-cell-group>
@@ -53,6 +80,9 @@ const name = ref(stored?.name || '')
 const ip = ref(stored?.ip || '')
 const serial = ref(stored?.serial || '')
 const code = ref(stored?.code || '')
+const ipInputRef = ref<HTMLInputElement | null>(null)
+const serialInputRef = ref<HTMLInputElement | null>(null)
+const codeInputRef = ref<HTMLInputElement | null>(null)
 const canSave = computed(() => Boolean(name.value && ip.value && serial.value && code.value))
 
 const handleSave = () => {
@@ -75,12 +105,13 @@ const handleDelete = () => {
   display: grid;
   grid-template-rows: auto auto auto;
   gap: 8px;
-  padding: 8px 12px;
-  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  padding: 8px;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom) + var(--keyboard-offset, 0px));
   overflow: auto;
 }
 
 .cell-input {
+  width: 100%;
   border: 0;
   outline: none;
   text-align: right;
