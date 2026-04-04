@@ -45,6 +45,7 @@ import signalNoIcon from '../assets/images/monitor_signal_no.svg'
 import signalWeakIcon from '../assets/images/monitor_signal_weak.svg'
 import signalMiddleIcon from '../assets/images/monitor_signal_middle.svg'
 import signalStrongIcon from '../assets/images/monitor_signal_strong.svg'
+import { getProjects } from '../api/project'
 
 const client = PrinterClient.getInstance()
 const device = client.device
@@ -68,7 +69,19 @@ const getWifiSignalIcon = computed(() => {
   }
 })
 
-const getPrintThumbnail = computed(() => client.getCurrentProject()?.thumbnail_url || brokenThumbnail)
+const getCurrentProject = () => {
+  const taskId = device.print.task_id
+  const subtaskId = device.print.subtask_id
+  if (!taskId || !subtaskId) {
+    return null
+  }
+
+  return getProjects().find(project => (
+    project.task_id === taskId && project.subtask_id === subtaskId
+  )) ?? null
+}
+
+const getPrintThumbnail = computed(() => getCurrentProject()?.thumbnail_url || brokenThumbnail)
 
 const getPrintPercent = computed(() => {
   if (device.print.gcode_state === GcodeState.Prepare) {

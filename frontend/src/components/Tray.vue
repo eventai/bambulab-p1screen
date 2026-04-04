@@ -25,7 +25,7 @@ import { colord } from 'colord'
 import { computed, toRaw, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { PopoverAction } from 'vant'
-import type { DeviceTray } from '../api/models'
+import type { DeviceTray } from '../api/device'
 import { PrinterClient } from '../api/PrinterClient'
 
 const client = PrinterClient.getInstance()

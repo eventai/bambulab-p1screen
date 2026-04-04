@@ -1,15 +1,13 @@
 import { reactive, shallowRef, triggerRef } from 'vue'
 import mqtt, { type MqttClient } from 'mqtt'
-import {
-  type DeviceState,
-  type Project,
-} from './models'
+import { type DeviceState } from './device'
 import {
   FanType,
   TemperatureType,
   LightType,
   PrintSpeedLevel,
 } from './enums'
+import { saveProject, type Project } from './project'
 
 export class PrinterClient {
   private static instance: PrinterClient | null = null
@@ -199,46 +197,7 @@ export class PrinterClient {
   }
 
   private handleProjectFile(projectData: any) {
-    const project = reactive<Project>(projectData as Project)
-    project.thumbnail_url = `/api/getThumbnail?url=${encodeURIComponent(project.url)}&plate_idx=${project.plate_idx}`
-    this.saveProject(project)
-  }
-
-  private saveProject(project: Project) {
-    if (typeof window === 'undefined') return
-
-    const projects = this.getProjectsFromStorage()
-    projects.push(project)
-    localStorage.setItem('projects', JSON.stringify(projects))
-  }
-
-  private getProjectsFromStorage() {
-    try {
-      const rawProjects = localStorage.getItem('projects')
-      if (!rawProjects) {
-        return [] as Project[]
-      }
-      const parsedProjects = JSON.parse(rawProjects)
-      return Array.isArray(parsedProjects) ? parsedProjects as Project[] : []
-    } catch (error) {
-      console.warn('[PrintClient] failed to parse projects from localStorage:', error)
-      return [] as Project[]
-    }
-  }
-
-  getCurrentProject() {
-    if (typeof window === 'undefined') return null
-
-    const taskId = this.device.print.task_id
-    const subtaskId = this.device.print.subtask_id
-    if (!taskId || !subtaskId) {
-      return null
-    }
-
-    const projects = this.getProjectsFromStorage()
-    return projects.find(project => (
-      project.task_id === taskId && project.subtask_id === subtaskId
-    )) ?? null
+    saveProject(projectData as Project)
   }
 
   /**

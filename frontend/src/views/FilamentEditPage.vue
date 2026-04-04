@@ -47,7 +47,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { closeToast, showFailToast, showLoadingToast, showSuccessToast } from 'vant'
 import NavHeader from '../components/NavHeader.vue'
 import { PrinterClient } from '../api/PrinterClient'
-import type { DeviceTray } from '../api/models'
+import type { DeviceTray } from '../api/device'
 
 const route = useRoute()
 const router = useRouter()
