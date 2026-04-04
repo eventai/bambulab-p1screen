@@ -12,9 +12,16 @@
 
       <div class="form-row">
         <label class="form-label">颜色</label>
-        <button class="color-field" type="button" @click="handleEditColor">
+        <button class="color-field" type="button">
           <span class="color-swatch" :style="{ background: `#${trayColor}` }"></span>
           <i-material-symbols-edit-outline-rounded class="color-edit-icon" />
+          <input
+            class="native-color-input"
+            type="color"
+            :value="trayColorInputValue"
+            @input="handleColorInput"
+            aria-label="选择颜色"
+          />
         </button>
       </div>
 
@@ -47,7 +54,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { closeToast, showFailToast, showLoadingToast, showSuccessToast } from 'vant'
 import NavHeader from '../components/NavHeader.vue'
 import { PrinterClient } from '../api/PrinterClient'
-import type { DeviceTray } from '../api/device'
 
 const route = useRoute()
 const router = useRouter()
@@ -56,23 +62,25 @@ const device = client.device
 const amsId = route.params.ams_id as string
 const trayId = route.params.tray_id as string
 
-const ams = computed(() => device.print.ams!.ams.find((item) => item.id === amsId)!)
+const ams = computed(() => device.print.ams?.ams.find((item) => item.id === amsId))
 
-const tray = computed<DeviceTray>(() => {
+const tray = computed(() => {
   if (amsId === '255' && trayId === device.print.vt_tray?.id) {
     return device.print.vt_tray!
   }
-  return ams.value.tray.find((item) => item.id === trayId)!
+  return ams.value?.tray.find((item) => item.id === trayId)
 })
 
 const trayType = ref('?')
 const trayColor = ref('')
 const nozzleTempMin = ref('')
 const nozzleTempMax = ref('')
+const trayColorInputValue = computed(() => `#${trayColor.value.slice(0, 6)}`)
 
 watch(
   tray,
   (nextTray) => {
+    if (!nextTray) return
     trayType.value = nextTray.tray_type
     trayColor.value = nextTray.tray_color
     nozzleTempMin.value = nextTray.nozzle_temp_min
@@ -81,11 +89,14 @@ watch(
   { immediate: true }
 )
 
-const handleEditColor = () => {
-  console.log('[FilamentEditPage] edit color')
+const handleColorInput = (event: Event) => {
+  const value = (event.target as HTMLInputElement | null)?.value.toUpperCase() ?? '#000000'
+  console.log('[FilamentEditPage] select color:', value)
+  trayColor.value = value.replace('#', '').slice(0, 6) + 'FF'
 }
 
 const handleConfirm = async () => {
+  if (!tray.value) return
   const payload = {
     ams_id: Number(amsId), // TODO: Ext Tray?
     tray_id: Number(trayId),
@@ -169,6 +180,7 @@ const handleConfirm = async () => {
 }
 
 .color-field {
+  position: relative;
   height: 36px;
   width: 72px;
   border-radius: 8px;
@@ -178,6 +190,17 @@ const handleConfirm = async () => {
   align-items: center;
   justify-content: space-between;
   padding: 0 10px;
+}
+
+.native-color-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  border: none;
+  padding: 0;
 }
 
 .color-swatch {
