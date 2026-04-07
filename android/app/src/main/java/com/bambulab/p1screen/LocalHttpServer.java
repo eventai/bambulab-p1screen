@@ -27,7 +27,7 @@ public final class LocalHttpServer extends NanoWSD {
 
   @Override
   public void start() throws IOException {
-    start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
+    start(0, false);
   }
 
   @Override
@@ -46,9 +46,9 @@ public final class LocalHttpServer extends NanoWSD {
   @Override
   protected WebSocket openWebSocket(IHTTPSession handshake) {
     if (!"/mqtt".equals(handshake.getUri())) {
-      return new MqttWsTlsBridge(handshake, tlsSocketFactory, true);
+      return new WsTlsBridge(handshake, tlsSocketFactory, true);
     }
-    return new MqttWsTlsBridge(handshake, tlsSocketFactory, false);
+    return new WsTlsBridge(handshake, tlsSocketFactory, false);
   }
 
   private Response serveStatic(IHTTPSession session) {

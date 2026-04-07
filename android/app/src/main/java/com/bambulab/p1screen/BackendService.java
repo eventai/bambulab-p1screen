@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
 import android.os.Build;
 import android.os.IBinder;
 
@@ -20,10 +21,10 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-public final class LocalBackendService extends Service {
+public final class BackendService extends Service {
   public static final int PORT = 8888;
   private static final int NOTIFICATION_ID = 1001;
-  private static final String CHANNEL_ID = "backend_service";
+  private static final String CHANNEL_ID = "backend_service_v2";
 
   private LocalHttpServer server;
 
@@ -34,7 +35,11 @@ public final class LocalBackendService extends Service {
   @Override
   public void onCreate() {
     super.onCreate();
-    startForeground(NOTIFICATION_ID, createNotification());
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+      startForeground(NOTIFICATION_ID, createNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
+    } else {
+      startForeground(NOTIFICATION_ID, createNotification());
+    }
     startServer();
   }
 
@@ -87,7 +92,7 @@ public final class LocalBackendService extends Service {
       NotificationChannel channel = new NotificationChannel(
         CHANNEL_ID,
         getString(R.string.notification_channel_name),
-        NotificationManager.IMPORTANCE_LOW
+        NotificationManager.IMPORTANCE_DEFAULT
       );
       manager.createNotificationChannel(channel);
     }
@@ -104,7 +109,7 @@ public final class LocalBackendService extends Service {
     PendingIntent contentIntent = PendingIntent.getActivity(this, 0, launchIntent, pendingIntentFlags);
 
     return builder
-      .setContentTitle(getString(R.string.notification_title))
+      .setContentTitle(getString(R.string.app_name))
       .setContentText(getString(R.string.notification_text))
       .setContentIntent(contentIntent)
       .setSmallIcon(android.R.drawable.stat_notify_sync)

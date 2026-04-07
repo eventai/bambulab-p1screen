@@ -1,5 +1,7 @@
 package com.bambulab.p1screen;
 
+import android.util.Log;
+
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoWSD;
 
@@ -14,16 +16,16 @@ import java.util.Arrays;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
-public final class MqttWsTlsBridge extends NanoWSD.WebSocket {
+public final class WsTlsBridge extends NanoWSD.WebSocket {
+  private static final String TAG = "WsTlsBridge";
   private final SSLSocketFactory sslSocketFactory;
   private final boolean rejectImmediately;
 
   private SSLSocket tlsSocket;
   private OutputStream tlsOutput;
-  private Thread upstreamReader;
   private volatile boolean closed;
 
-  public MqttWsTlsBridge(NanoHTTPD.IHTTPSession handshakeRequest, SSLSocketFactory socketFactory, boolean reject) {
+  public WsTlsBridge(NanoHTTPD.IHTTPSession handshakeRequest, SSLSocketFactory socketFactory, boolean reject) {
     super(handshakeRequest);
     sslSocketFactory = socketFactory;
     rejectImmediately = reject;
@@ -31,7 +33,9 @@ public final class MqttWsTlsBridge extends NanoWSD.WebSocket {
 
   @Override
   protected void onOpen() {
+    Log.d(TAG, "WebSocket onOpen: " + getHandshakeRequest().getUri());
     if (rejectImmediately) {
+      Log.w(TAG, "Rejecting WebSocket immediately: unsupported path");
       closeBridge(NanoWSD.WebSocketFrame.CloseCode.PolicyViolation, "unsupported websocket path");
       return;
     }
@@ -39,21 +43,26 @@ public final class MqttWsTlsBridge extends NanoWSD.WebSocket {
     try {
       URI target = parseTargetUri(getHandshakeRequest());
       int targetPort = target.getPort() > 0 ? target.getPort() : 8883;
+      Log.d(TAG, "Connecting to TLS target: " + target.getHost() + ":" + targetPort);
 
       tlsSocket = (SSLSocket) sslSocketFactory.createSocket(target.getHost(), targetPort);
+      tlsSocket.setSoTimeout(0);
       tlsSocket.startHandshake();
       tlsOutput = tlsSocket.getOutputStream();
+      Log.d(TAG, "TLS handshake successful");
 
-      upstreamReader = new Thread(() -> pumpTlsToWebSocket(tlsSocket), "mqtt-tls-reader");
+      Thread upstreamReader = new Thread(() -> pumpTlsToWebSocket(tlsSocket), "mqtt-tls-reader");
       upstreamReader.setDaemon(true);
       upstreamReader.start();
     } catch (Exception e) {
+      Log.e(TAG, "Failed to establish TLS bridge", e);
       closeBridge(NanoWSD.WebSocketFrame.CloseCode.InternalServerError, "connect failed");
     }
   }
 
   @Override
   protected void onClose(NanoWSD.WebSocketFrame.CloseCode code, String reason, boolean initiatedByRemote) {
+    Log.d(TAG, "WebSocket onClose: code=" + code + ", reason=" + reason + ", initiatedByRemote=" + initiatedByRemote);
     closeBridge(code, reason);
   }
 
@@ -86,10 +95,12 @@ public final class MqttWsTlsBridge extends NanoWSD.WebSocket {
 
   @Override
   protected void onException(IOException exception) {
+    Log.e(TAG, "WebSocket onException", exception);
     closeBridge(NanoWSD.WebSocketFrame.CloseCode.InternalServerError, "ws exception");
   }
 
   private void pumpTlsToWebSocket(SSLSocket socket) {
+    Log.d(TAG, "Starting TLS to WS pump");
     try (InputStream inputStream = socket.getInputStream()) {
       byte[] buffer = new byte[4096];
       int read;
@@ -99,8 +110,12 @@ public final class MqttWsTlsBridge extends NanoWSD.WebSocket {
         }
         send(Arrays.copyOf(buffer, read));
       }
+      Log.d(TAG, "TLS stream reached EOF");
       closeBridge(NanoWSD.WebSocketFrame.CloseCode.NormalClosure, "tls closed");
     } catch (IOException e) {
+      if (!closed) {
+        Log.e(TAG, "TLS read failed", e);
+      }
       closeBridge(NanoWSD.WebSocketFrame.CloseCode.InternalServerError, "tls read failed");
     }
   }
@@ -109,6 +124,7 @@ public final class MqttWsTlsBridge extends NanoWSD.WebSocket {
     if (closed) {
       return;
     }
+    Log.d(TAG, "Closing bridge: code=" + code + ", reason=" + reason);
     closed = true;
 
     if (tlsSocket != null) {

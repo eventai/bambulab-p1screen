@@ -1,0 +1,15 @@
+[versions]
+agp = "9.1.0"
+gradleToolchainsFoojayResolverConvention = "1.0.0"
+nanohttpdWebsocket = "2.3.1"
+okhttp = "4.12.0"
+zip4j = "2.11.6"
+
+[libraries]
+nanohttpd-websocket = { group = "org.nanohttpd", name = "nanohttpd-websocket", version.ref = "nanohttpdWebsocket" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+zip4j = { group = "net.lingala.zip4j", name = "zip4j", version.ref = "zip4j" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+foojay = { id = "org.gradle.toolchains.foojay-resolver-convention", version.ref = "gradleToolchainsFoojayResolverConvention" }

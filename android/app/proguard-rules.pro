@@ -1,2 +1,0 @@
--keep class fi.iki.elonen.** { *; }
--dontwarn org.conscrypt.**

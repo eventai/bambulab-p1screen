@@ -1,6 +1,5 @@
 <resources>
-  <string name="app_name">BambuLab P1 Screen</string>
+  <string name="app_name">BambuLab Screen</string>
   <string name="notification_channel_name">Backend Service</string>
-  <string name="notification_title">BambuLab P1 Screen</string>
-  <string name="notification_text">Local backend is running</string>
+  <string name="notification_text">Running</string>
 </resources>
