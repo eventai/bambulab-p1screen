@@ -13,12 +13,12 @@ import java.util.Locale;
 
 import javax.net.ssl.SSLSocketFactory;
 
-public final class LocalHttpServer extends NanoWSD {
+public final class WebService extends NanoWSD {
   private final Context appContext;
   private final ThumbnailHandler thumbnailHandler;
   private final SSLSocketFactory tlsSocketFactory;
 
-  public LocalHttpServer(int port, Context context, SSLSocketFactory socketFactory) {
+  public WebService(int port, Context context, SSLSocketFactory socketFactory) {
     super(port);
     appContext = context;
     tlsSocketFactory = socketFactory;
@@ -45,10 +45,7 @@ public final class LocalHttpServer extends NanoWSD {
 
   @Override
   protected WebSocket openWebSocket(IHTTPSession handshake) {
-    if (!"/mqtt".equals(handshake.getUri())) {
-      return new WsTlsBridge(handshake, tlsSocketFactory, true);
-    }
-    return new WsTlsBridge(handshake, tlsSocketFactory, false);
+    return new WsTlsBridge(handshake, tlsSocketFactory);
   }
 
   private Response serveStatic(IHTTPSession session) {
@@ -65,14 +62,7 @@ public final class LocalHttpServer extends NanoWSD {
       return NanoHTTPD.newFixedLengthResponse(Response.Status.NOT_FOUND, "text/plain", "Not Found");
     }
 
-    String mime = guessMimeType(asset.path);
-    Response response = NanoHTTPD.newChunkedResponse(Response.Status.OK, mime, asset.inputStream);
-    if (asset.path.endsWith(".html")) {
-      response.addHeader("Cache-Control", "no-cache");
-    } else {
-      response.addHeader("Cache-Control", "public,max-age=86400");
-    }
-    return response;
+    return NanoHTTPD.newChunkedResponse(Response.Status.OK, guessMimeType(asset.path), asset.inputStream);
   }
 
   private AssetResult openAsset(String uri) {

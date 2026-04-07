@@ -19,34 +19,23 @@ import javax.net.ssl.SSLSocketFactory;
 public final class WsTlsBridge extends NanoWSD.WebSocket {
   private static final String TAG = "WsTlsBridge";
   private final SSLSocketFactory sslSocketFactory;
-  private final boolean rejectImmediately;
-
   private SSLSocket tlsSocket;
   private OutputStream tlsOutput;
   private volatile boolean closed;
 
-  public WsTlsBridge(NanoHTTPD.IHTTPSession handshakeRequest, SSLSocketFactory socketFactory, boolean reject) {
+  public WsTlsBridge(NanoHTTPD.IHTTPSession handshakeRequest, SSLSocketFactory socketFactory) {
     super(handshakeRequest);
     sslSocketFactory = socketFactory;
-    rejectImmediately = reject;
   }
 
   @Override
   protected void onOpen() {
     Log.d(TAG, "WebSocket onOpen: " + getHandshakeRequest().getUri());
-    if (rejectImmediately) {
-      Log.w(TAG, "Rejecting WebSocket immediately: unsupported path");
-      closeBridge(NanoWSD.WebSocketFrame.CloseCode.PolicyViolation, "unsupported websocket path");
-      return;
-    }
 
     try {
       URI target = parseTargetUri(getHandshakeRequest());
-      int targetPort = target.getPort() > 0 ? target.getPort() : 8883;
-      Log.d(TAG, "Connecting to TLS target: " + target.getHost() + ":" + targetPort);
-
-      tlsSocket = (SSLSocket) sslSocketFactory.createSocket(target.getHost(), targetPort);
-      tlsSocket.setSoTimeout(0);
+      Log.d(TAG, "Connecting to TLS target: " + target.getHost() + ":" + target.getPort());
+      tlsSocket = (SSLSocket) sslSocketFactory.createSocket(target.getHost(), target.getPort());
       tlsSocket.startHandshake();
       tlsOutput = tlsSocket.getOutputStream();
       Log.d(TAG, "TLS handshake successful");

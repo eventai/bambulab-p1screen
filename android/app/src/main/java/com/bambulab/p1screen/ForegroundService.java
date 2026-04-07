@@ -7,9 +7,10 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ServiceInfo;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.Handler;
+import android.os.Looper;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -21,12 +22,26 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-public final class BackendService extends Service {
+public final class ForegroundService extends Service {
   public static final int PORT = 8888;
   private static final int NOTIFICATION_ID = 1001;
   private static final String CHANNEL_ID = "backend_service_v2";
 
-  private LocalHttpServer server;
+  public static final String ACTION_SERVICE_READY = "com.bambulab.p1screen.SERVICE_READY";
+  private static boolean isServerReady = false;
+  private static Runnable readyCallback;
+  private WebService server;
+
+  public static synchronized void setReadyCallback(Runnable callback) {
+    readyCallback = callback;
+    if (isServerReady && callback != null) {
+      new Handler(Looper.getMainLooper()).post(callback);
+    }
+  }
+
+  public static synchronized boolean isReady() {
+    return isServerReady;
+  }
 
   public static String getBaseUrl() {
     return "http://127.0.0.1:" + PORT + "/";
@@ -35,11 +50,11 @@ public final class BackendService extends Service {
   @Override
   public void onCreate() {
     super.onCreate();
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-      startForeground(NOTIFICATION_ID, createNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
-    } else {
+//    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+//      startForeground(NOTIFICATION_ID, createNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
+//    } else {
       startForeground(NOTIFICATION_ID, createNotification());
-    }
+//    }
     startServer();
   }
 
@@ -57,6 +72,9 @@ public final class BackendService extends Service {
   @Override
   public void onDestroy() {
     stopServer();
+    synchronized (ForegroundService.class) {
+      isServerReady = false;
+    }
     stopForeground(true);
     super.onDestroy();
   }
@@ -71,8 +89,14 @@ public final class BackendService extends Service {
       return;
     }
     try {
-      server = new LocalHttpServer(PORT, getApplicationContext(), createInsecureTlsSocketFactory());
+      server = new WebService(PORT, getApplicationContext(), createInsecureTlsSocketFactory());
       server.start();
+      synchronized (ForegroundService.class) {
+        isServerReady = true;
+        if (readyCallback != null) {
+          new Handler(Looper.getMainLooper()).post(readyCallback);
+        }
+      }
     } catch (IOException | GeneralSecurityException e) {
       stopSelf();
     }

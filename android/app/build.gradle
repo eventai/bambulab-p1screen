@@ -1,5 +1,5 @@
 plugins {
-  alias libs.plugins.android.application
+  id 'com.android.application'
 }
 
 android {
@@ -34,28 +34,17 @@ android {
     }
   }
 
-  compileOptions {
-    sourceCompatibility JavaVersion.VERSION_1_8
-    targetCompatibility JavaVersion.VERSION_1_8
-  }
-
   sourceSets {
     main {
       assets.srcDirs = ['src/main/assets', '../../dist']
     }
   }
-
-  packaging {
-    resources {
-      excludes += ['/META-INF/{AL2.0,LGPL2.1}']
-    }
-  }
 }
 
 dependencies {
-  implementation libs.nanohttpd.websocket
-  implementation libs.okhttp
-  implementation libs.zip4j
+  implementation 'org.nanohttpd:nanohttpd-websocket:2.3.1'
+  implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+  implementation 'net.lingala.zip4j:zip4j:2.11.6'
 }
 
 tasks.register('buildWebAssets', Exec) {

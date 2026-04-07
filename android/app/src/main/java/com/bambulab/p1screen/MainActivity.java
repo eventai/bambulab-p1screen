@@ -6,22 +6,14 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.SslErrorHandler;
-import android.webkit.WebResourceError;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.Toast;
-
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 public final class MainActivity extends Activity {
   private static final int PERMISSION_REQUEST_CODE = 100;
@@ -45,7 +37,6 @@ public final class MainActivity extends Activity {
     WebView.setWebContentsDebuggingEnabled(isDebuggable);
 
     webView = findViewById(R.id.web_view);
-    webView.setVisibility(View.INVISIBLE);
 
     WebSettings settings = webView.getSettings();
     settings.setJavaScriptEnabled(true);
@@ -55,8 +46,8 @@ public final class MainActivity extends Activity {
     settings.setLoadsImagesAutomatically(true);
 
     webView.setPadding(0, 0, 0, 0);
-    webView.setWebViewClient(new RetryWebViewClient());
-    waitForBackendThenLoadHome();
+
+    ForegroundService.setReadyCallback(this::loadHomeUrl);
   }
 
   @Override
@@ -77,7 +68,7 @@ public final class MainActivity extends Activity {
   public void onBackPressed() {
     long now = SystemClock.elapsedRealtime();
     if (now - lastBackPressedAt < EXIT_INTERVAL_MS) {
-      stopBackendService();
+      stopForegroundService();
       finishAndRemoveTask();
       return;
     }
@@ -102,91 +93,47 @@ public final class MainActivity extends Activity {
     });
   }
 
-  private void waitForBackendThenLoadHome() {
-    new Thread(() -> {
-      int retries = 120;
-      while (!destroyed && retries-- > 0) {
-        if (isBackendReady()) {
-          runOnUiThread(() -> {
-            if (destroyed || webView == null) {
-              return;
-            }
-            webView.loadUrl(BackendService.getBaseUrl());
-          });
-          return;
-        }
-        try {
-          Thread.sleep(150L);
-        } catch (InterruptedException ignored) {
-          Thread.currentThread().interrupt();
-          return;
-        }
-      }
-
-      runOnUiThread(() -> {
-        if (destroyed || webView == null) {
-          return;
-        }
-        webView.loadUrl(BackendService.getBaseUrl());
-      });
-    }, "backend-waiter").start();
-  }
-
-  private boolean isBackendReady() {
-    HttpURLConnection connection = null;
-    try {
-      URL url = new URL(BackendService.getBaseUrl());
-      connection = (HttpURLConnection) url.openConnection();
-      connection.setConnectTimeout(300);
-      connection.setReadTimeout(300);
-      connection.setRequestMethod("GET");
-      int code = connection.getResponseCode();
-      return code >= 200 && code < 500;
-    } catch (Exception ignored) {
-      return false;
-    } finally {
-      if (connection != null) {
-        connection.disconnect();
-      }
-    }
-  }
-
-  private void startBackendService() {
-    Intent intent = new Intent(this, BackendService.class);
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      startForegroundService(intent);
+  private void loadHomeUrl() {
+    if (destroyed || webView == null) {
       return;
     }
-    startService(intent);
+    webView.loadUrl(ForegroundService.getBaseUrl());
   }
 
   private void checkPermissionsAndStartService() {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-      if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-        requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, PERMISSION_REQUEST_CODE);
-      } else {
-        startBackendService();
-      }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+      requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, PERMISSION_REQUEST_CODE);
     } else {
-      startBackendService();
+      startForegroundService();
     }
   }
 
   @Override
   public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
     if (requestCode == PERMISSION_REQUEST_CODE) {
-      startBackendService();
+      startForegroundService();
     }
   }
 
-  private void stopBackendService() {
-    Intent intent = new Intent(this, BackendService.class);
+  private void startForegroundService() {
+    Intent intent = new Intent(this, ForegroundService.class);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      startForegroundService(intent);
+    } else {
+      startService(intent);
+    }
+  }
+
+  private void stopForegroundService() {
+    Intent intent = new Intent(this, ForegroundService.class);
     stopService(intent);
   }
 
   @Override
   protected void onDestroy() {
     destroyed = true;
+    ForegroundService.setReadyCallback(null);
     if (webView != null) {
       ViewGroup parent = (ViewGroup) webView.getParent();
       if (parent != null) {
@@ -197,30 +144,5 @@ public final class MainActivity extends Activity {
       webView = null;
     }
     super.onDestroy();
-  }
-
-  private static final class RetryWebViewClient extends WebViewClient {
-    @Override
-    public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && request != null && request.isForMainFrame()) {
-        view.postDelayed(() -> view.loadUrl(BackendService.getBaseUrl()), 500L);
-      }
-    }
-
-    @Override
-    public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-      view.postDelayed(() -> view.loadUrl(BackendService.getBaseUrl()), 500L);
-    }
-
-    @Override
-    public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-      handler.cancel();
-    }
-
-    @Override
-    public void onPageFinished(WebView view, String url) {
-      view.setVisibility(View.VISIBLE);
-      super.onPageFinished(view, url);
-    }
   }
 }
