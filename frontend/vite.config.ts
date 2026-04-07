@@ -14,14 +14,13 @@ const getGitText = (command: string) => {
   }
 }
 
-const envVersion = process.env.VITE_APP_VERSION?.trim() ?? ''
+const appVersion = process.env.VITE_APP_VERSION?.trim() ?? 'dev'
 const commitHash = getGitText('git rev-parse --short=7 HEAD')
-const appVersion = envVersion || commitHash || 'unknown'
 
 export default defineConfig({
   root: path.resolve(__dirname),
   define: {
-    'import.meta.env.VITE_APP_VERSION': JSON.stringify(appVersion),
+    'import.meta.env.VITE_APP_VERSION': JSON.stringify(`${appVersion}-${commitHash}`),
   },
   plugins: [
     vue(),

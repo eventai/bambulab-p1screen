@@ -53,6 +53,8 @@ jobs:
 
       - name: Build APK
         run: gradle -p android :app:assembleRelease --no-daemon
+        env:
+          VITE_APP_VERSION: ${{ github.ref_name }}
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v6
