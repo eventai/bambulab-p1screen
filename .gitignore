@@ -26,5 +26,7 @@ frontend/src/components.d.ts
 android/.gradle/
 android/build/
 android/app/build/
+android/app/release/
 android/app/src/main/assets/web/*
 !android/app/src/main/assets/web/.gitkeep
+keystore.jks

@@ -14,12 +14,22 @@ android {
     versionName '0.1.0'
   }
 
+  signingConfigs {
+    release {
+      storeFile file('../keystore.jks')
+      storePassword 'bambulab'
+      keyAlias 'key0'
+      keyPassword 'bambulab'
+    }
+  }
+
   buildTypes {
     debug {
       minifyEnabled false
     }
     release {
       minifyEnabled true
+      signingConfig signingConfigs.release
     }
   }
 

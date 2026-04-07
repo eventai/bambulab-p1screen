@@ -4,7 +4,6 @@ on:
   push:
     tags:
       - "*"
-  pull_request:
   workflow_dispatch:
 
 jobs:
@@ -17,7 +16,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 23
           cache: npm
 
       - name: Install dependencies
@@ -38,12 +37,16 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.7'
+          gradle-version: '9.3.1'
 
       - name: Install Android SDK packages
         run: |
           yes | sdkmanager --licenses
-          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+          sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.SIGNING_KEY_STORE_BASE64 }}" | base64 --decode > android/keystore.jks
 
       - name: Build APK
         run: gradle -p android :app:assembleRelease --no-daemon
