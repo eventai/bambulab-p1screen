@@ -13,6 +13,9 @@ jobs:
   apk:
     runs-on: ubuntu-latest
     steps:
+      - name: Set Timezone
+        run: sudo ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
       - name: Checkout
         uses: actions/checkout@v6
 
@@ -21,12 +24,6 @@ jobs:
         with:
           node-version: 23
           cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build frontend
-        run: npm run build:web
 
       - name: Setup Java
         uses: actions/setup-java@v5
@@ -51,23 +48,34 @@ jobs:
         run: |
           echo "${{ secrets.SIGNING_KEY_STORE_BASE64 }}" | base64 --decode > android/keystore.jks
 
+      - name: Set Version
+        id: version
+        run: |
+          VERSION=$(echo "${{ github.ref_name }}" | sed 's/^v//')
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION_CODE=$(date +%Y%m%d%H%M)" >> $GITHUB_OUTPUT
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Build APK
         run: gradle -p android :app:assembleRelease --no-daemon
         env:
-          VITE_APP_VERSION: ${{ github.ref_name }}
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v6
-        with:
-          name: app-release-apk
-          path: android/app/build/outputs/apk/release/*release*.apk
+          TAG_NAME: ${{ github.ref_name }}
+          APP_VERSION_NAME: ${{ steps.version.outputs.VERSION }}
+          APP_VERSION_CODE: ${{ steps.version.outputs.VERSION_CODE }}
 
       - name: Create Release and Upload Asset
         if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          mkdir -p release_assets
+          cp dist/apk/release/app-release.apk "release_assets/com.bambulab.p1screen-${{ github.ref_name }}.apk"
+
+      - name: GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            android/app/build/outputs/apk/release/*release*.apk
+          files: release_assets/*.apk
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

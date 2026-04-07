@@ -1,7 +1,7 @@
 FROM node:23-alpine AS builder
 WORKDIR /app
-ARG VITE_APP_VERSION=unknown
-ENV VITE_APP_VERSION=$VITE_APP_VERSION
+ARG TAG_NAME=unknown
+ENV TAG_NAME=$TAG_NAME
 
 COPY package*.json ./
 COPY frontend/package.json ./frontend/package.json

@@ -54,7 +54,7 @@ const ip = computed(() => getDevice()?.ip ?? '')
 const deviceInfo = computed(() => device.module.find(item => item.name === 'ota') ?? null)
 const modules = computed(() => device.module.filter(item => item.name.includes('ams')))
 const isConnected = computed(() => Boolean(client.mqttClient.value?.connected))
-const currentVersion = computed(() => import.meta.env.VITE_APP_VERSION)
+const currentVersion = computed(() => import.meta.env.APP_VERSION)
 const hasDeviceInStorage = computed(() => Boolean(getDevice()))
 
 const handleReconnect = () => {
