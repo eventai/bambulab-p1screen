@@ -112,9 +112,8 @@ public final class BackendService extends Service {
       .setContentTitle(getString(R.string.app_name))
       .setContentText(getString(R.string.notification_text))
       .setContentIntent(contentIntent)
-      .setSmallIcon(android.R.drawable.stat_notify_sync)
+      .setSmallIcon(R.drawable.ic_notification_logo)
       .setOngoing(true)
-      .setShowWhen(false)
       .build();
   }
 

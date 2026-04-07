@@ -15,7 +15,7 @@ const getGitText = (command: string) => {
 }
 
 const envVersion = process.env.VITE_APP_VERSION?.trim() ?? ''
-const commitHash = getGitText('git rev-parse --short=6 HEAD')
+const commitHash = getGitText('git rev-parse --short=7 HEAD')
 const appVersion = envVersion || commitHash || 'unknown'
 
 export default defineConfig({
