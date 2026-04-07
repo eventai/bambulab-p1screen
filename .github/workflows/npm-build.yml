@@ -1,4 +1,4 @@
-name: Build
+name: NPM Build
 
 on:
   push:
