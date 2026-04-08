@@ -1,33 +1,31 @@
 <template>
   <div class="settings-page">
-    <template v-if="computed(() => getDevices().length > 0)">
-      <van-cell-group inset title="网络信息">
-        <van-cell title="IP 地址" :value="ip" />
-        <van-cell title="WiFi 信号强度" :value="device.print.wifi_signal ?? '未知'" />
-        <van-cell title="状态">
-          <template #value>
-            <div class="status-cell-value">
-              <span>{{ statusLabel }}</span>
-              <button v-if="!isConnected" class="refresh-btn" type="button" @click="handleReconnect">
-                <i-material-symbols-refresh-rounded />
-              </button>
-            </div>
-          </template>
-        </van-cell>
-      </van-cell-group>
+    <van-cell-group inset title="网络信息">
+      <van-cell title="IP 地址" :value="ip ?? ''" />
+      <van-cell title="WiFi 信号强度" :value="device.print.wifi_signal ?? ''" />
+      <van-cell title="状态">
+        <template #value>
+          <div class="status-cell-value">
+            <span>{{ statusLabel }}</span>
+            <button v-if="!isConnected" class="refresh-btn" type="button" @click="handleReconnect">
+              <i-material-symbols-refresh-rounded />
+            </button>
+          </div>
+        </template>
+      </van-cell>
+    </van-cell-group>
 
-      <van-cell-group v-if="deviceInfo" inset title="设备信息">
-        <van-cell title="设备型号" :value="deviceInfo.product_name" />
-        <van-cell title="序列号" :value="deviceInfo.sn" />
-        <van-cell title="固件版本" :value="deviceInfo.sw_ver" />
-      </van-cell-group>
+    <van-cell-group v-if="deviceInfo" inset title="设备信息">
+      <van-cell title="设备型号" :value="deviceInfo.product_name" />
+      <van-cell title="序列号" :value="deviceInfo.sn" />
+      <van-cell title="固件版本" :value="deviceInfo.sw_ver" />
+    </van-cell-group>
 
-      <van-cell-group v-for="(module, index) in modules" :key="index" inset title="配件信息">
-        <van-cell title="配件" :value="module.product_name" />
-        <van-cell title="序列号" :value="module.sn" />
-        <van-cell title="固件版本" :value="module.sw_ver" />
-      </van-cell-group>
-    </template>
+    <van-cell-group v-for="(module, index) in modules" :key="index" inset title="配件信息">
+      <van-cell title="配件" :value="module.product_name" />
+      <van-cell title="序列号" :value="module.sn" />
+      <van-cell title="固件版本" :value="module.sw_ver" />
+    </van-cell-group>
 
     <van-cell-group inset title="关于 bambulab-p1screen">
       <van-cell title="当前版本" :value="currentVersion" />
@@ -38,12 +36,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { PrinterClient } from '../api/PrinterClient'
-import { getCurrentDevice, getDevices } from '../utils/device'
+import { getCurrentDevice } from '../utils/device'
 
 const client = PrinterClient.getInstance()
 const device = client.device
 
-const ip = computed(() => getCurrentDevice()?.ip ?? '')
+const ip = computed(() => getCurrentDevice()?.ip)
 const deviceInfo = computed(() => device.module.find(item => item.name === 'ota') ?? null)
 const modules = computed(() => device.module.filter(item => item.name.includes('ams')))
 const isConnected = computed(() => Boolean(client.mqttClient.value?.connected))

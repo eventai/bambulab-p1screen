@@ -57,11 +57,11 @@
     <van-cell-group inset>
       <van-cell
         title="保存"
+        class="save-btn"
         :clickable="canSave"
-        :class="{ 'save-cell': true, 'save-cell-disabled': !canSave }"
         @click="handleSave"
       />
-      <van-cell v-if="isEditMode" title="删除" class="delete-cell" @click="handleDelete" />
+      <van-cell v-if="isEditMode" title="删除" class="delete-btn" @click="handleDelete" />
     </van-cell-group>
   </div>
 </template>
@@ -141,15 +141,16 @@ const handleDelete = () => {
   color: var(--van-text-color-3);
 }
 
-.save-cell {
+.save-btn {
   color: var(--van-blue);
+  opacity: 0.5;
 }
 
-.save-cell-disabled {
-  color: var(--van-text-color-3);
+.save-btn.van-cell--clickable {
+  opacity: 1;
 }
 
-.delete-cell {
+.delete-btn {
   color: var(--van-red);
 }
 </style>
