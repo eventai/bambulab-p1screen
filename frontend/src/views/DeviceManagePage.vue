@@ -2,7 +2,7 @@
   <div class="device-manage-page">
     <NavHeader title="设备管理" @back="router.back" />
 
-    <van-cell-group inset title="设备信息">
+    <van-cell-group inset>
       <van-cell title="设备名称">
         <template #value>
           <input
@@ -103,10 +103,9 @@ const handleDelete = () => {
 <style scoped>
 .device-manage-page {
   display: grid;
-  grid-template-rows: auto auto auto;
-  gap: 8px;
+  gap: 10px;
   padding: 8px;
-  padding-bottom: calc(8px + env(safe-area-inset-bottom) + var(--keyboard-offset, 0px));
+  padding-bottom: calc(16px + env(safe-area-inset-bottom) + var(--keyboard-offset, 0px));
   overflow: auto;
 }
 

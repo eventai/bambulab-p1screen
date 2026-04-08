@@ -1,9 +1,5 @@
 <template>
   <div class="settings-page">
-    <van-cell-group inset title="设备管理">
-      <van-cell title="管理设备" :value="name" is-link @click="router.push('/settings/device/manage')" />
-    </van-cell-group>
-
     <template v-if="hasDeviceInStorage">
       <van-cell-group inset title="网络信息">
         <van-cell title="IP 地址" :value="ip" />
@@ -41,15 +37,12 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { PrinterClient } from '../api/PrinterClient'
 import { getDevice } from '../utils/device'
 
-const router = useRouter()
 const client = PrinterClient.getInstance()
 const device = client.device
 
-const name = computed(() => getDevice()?.name ?? '')
 const ip = computed(() => getDevice()?.ip ?? '')
 const deviceInfo = computed(() => device.module.find(item => item.name === 'ota') ?? null)
 const modules = computed(() => device.module.filter(item => item.name.includes('ams')))
@@ -64,6 +57,7 @@ const handleReconnect = () => {
 }
 
 const statusLabel = computed(() => {
+  if (client.lastError?.message === 'Connection refused: Not authorized') return '认证失败'
   const c = client.mqttClient.value
   if (!c) return '未连接'
   if (c.connected) return '已连接'

@@ -4,10 +4,15 @@
       <img class="task-thumbnail" :src="getPrintThumbnail"/>
       <span class="task-name">{{ taskName }}</span>
     </div>
-    <div class="printer-card" :style="{ backgroundImage: `url(${p1sThumbnail})`}">
+    <div class="printer-card">
+      <div id="printer-bg" :style="{ backgroundImage: `url(${p1sThumbnail})` }"></div>
       <span id="nozzle-temp">{{ nozzleTemp }} ℃</span>
       <span id="heatbed-temp">{{ heatbedTemp }} ℃</span>
       <span id="wifi-signal"><img :src="getWifiSignalIcon"/></span>
+      <button id="manage-device-btn" type="button" @click="router.push('/settings/device/manage')">
+        <span>{{computed(() => {return getDevice()?.name || '管理设备'})}}</span>
+        <i-material-symbols-settings-rounded />
+      </button>
     </div>
     <div class="progress-card">
       <div class="progress-card-left">
@@ -29,6 +34,7 @@
 </template>
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import humanizeDuration from 'humanize-duration'
 import { PrinterClient } from '../api/PrinterClient'
 import { LightType, GcodeState, CurrentStage } from '../api/enums'
@@ -46,8 +52,10 @@ import signalWeakIcon from '../assets/images/monitor_signal_weak.svg'
 import signalMiddleIcon from '../assets/images/monitor_signal_middle.svg'
 import signalStrongIcon from '../assets/images/monitor_signal_strong.svg'
 import { getProjects } from '../api/project'
+import { getDevice } from '../utils/device'
 
 const client = PrinterClient.getInstance()
+const router = useRouter()
 const device = client.device
 
 const taskName = computed(() => device.print.subtask_name || '')
@@ -192,6 +200,12 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
   grid-column: 2;
   grid-row: 1;
   width: 200px;
+  position: relative;
+}
+
+#printer-bg {
+  position: absolute;
+  inset: 4px 4px 15px 4px;
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
@@ -251,6 +265,23 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
 #wifi-signal img {
   width: 18px;
   height: 18px;
+}
+
+#manage-device-btn {
+  width: 150px;
+  height: 15px;
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  background: none;
+  color: var(--van-text-color-2);
+  font-size: 12px;
+  gap: 2px;
+  justify-content: center;
 }
 
 .progress-card {

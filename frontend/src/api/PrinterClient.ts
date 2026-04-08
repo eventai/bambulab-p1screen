@@ -12,6 +12,7 @@ import { saveProject, type Project } from './project'
 export class PrinterClient {
   private static instance: PrinterClient | null = null
   public mqttClient = shallowRef<MqttClient | null>(null)
+  public lastError: Error | null = null
   private sequenceId = 0
   private reportTopic = ''
   private requestTopic = ''
@@ -104,6 +105,7 @@ export class PrinterClient {
   }
 
   private onConnect() {
+    this.lastError = null
     console.log('[PrintClient] connected')
     const topic = this.reportTopic
     this.mqttClient.value?.subscribe(topic, (err) => {
@@ -142,7 +144,8 @@ export class PrinterClient {
     triggerRef(this.mqttClient)
   }
 
-  private onError(error: unknown) {
+  private onError(error: Error) {
+    this.lastError = error
     console.error('[PrintClient] error:', error)
     this.rejectPendingPublishes('socket error')
     triggerRef(this.mqttClient)
