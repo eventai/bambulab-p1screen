@@ -1,6 +1,6 @@
 <template>
   <div class="settings-page">
-    <template v-if="hasDeviceInStorage">
+    <template v-if="computed(() => getDevices().length > 0)">
       <van-cell-group inset title="网络信息">
         <van-cell title="IP 地址" :value="ip" />
         <van-cell title="WiFi 信号强度" :value="device.print.wifi_signal ?? '未知'" />
@@ -38,20 +38,19 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { PrinterClient } from '../api/PrinterClient'
-import { getDevice } from '../utils/device'
+import { getCurrentDevice, getDevices } from '../utils/device'
 
 const client = PrinterClient.getInstance()
 const device = client.device
 
-const ip = computed(() => getDevice()?.ip ?? '')
+const ip = computed(() => getCurrentDevice()?.ip ?? '')
 const deviceInfo = computed(() => device.module.find(item => item.name === 'ota') ?? null)
 const modules = computed(() => device.module.filter(item => item.name.includes('ams')))
 const isConnected = computed(() => Boolean(client.mqttClient.value?.connected))
 const currentVersion = computed(() => import.meta.env.APP_VERSION)
-const hasDeviceInStorage = computed(() => Boolean(getDevice()))
 
 const handleReconnect = () => {
-  const storedDevice = getDevice()
+  const storedDevice = getCurrentDevice()
   if (!storedDevice) return
   client.connect(storedDevice.ip, storedDevice.serial, storedDevice.code)
 }

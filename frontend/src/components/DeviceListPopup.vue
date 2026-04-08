@@ -1,0 +1,136 @@
+<template>
+  <BasePopup
+    :show="show"
+    title="设备列表"
+    @update:show="emit('update:show', $event)"
+  >
+    <template #header-right>
+      <van-button
+        class="header-action-btn"
+        type="primary"
+        size="normal"
+        :disabled="devices.length === 0"
+        @click="toggleMode"
+      >
+        {{ isEditMode ? '取消' : '编辑' }}
+      </van-button>
+    </template>
+
+    <div class="device-list-content">
+      <van-cell-group inset>
+        <van-cell
+          v-for="device in devices"
+          :key="device.serial"
+          class="device-cell"
+          :title="device.name || device.serial"
+          :is-link="isEditMode"
+          @click="handleCellClick(device.serial)"
+        >
+          <template v-if="!isEditMode && device.serial === currentSerial" #right-icon>
+            <i-material-symbols-check-rounded class="check-icon" />
+          </template>
+        </van-cell>
+      </van-cell-group>
+
+      <van-cell-group inset>
+        <van-cell title="添加设备" class="add-device-cell device-cell" @click="router.push('/settings/device/add')" />
+      </van-cell-group>
+    </div>
+  </BasePopup>
+</template>
+
+<script setup lang="ts">
+import { ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import BasePopup from './BasePopup.vue'
+import { getCurrentDevice, setCurrentDevice, getDevices } from '../utils/device'
+import { PrinterClient } from '../api/PrinterClient'
+import { showToast } from 'vant'
+
+const client = PrinterClient.getInstance()
+
+const props = defineProps<{
+  show: boolean
+}>()
+
+const emit = defineEmits<{
+  (event: 'update:show', value: boolean): void
+}>()
+
+const router = useRouter()
+const isEditMode = ref(false)
+const devices = ref(getDevices())
+const currentSerial = ref(getCurrentDevice()?.serial ?? '')
+
+const refresh = () => {
+  devices.value = getDevices()
+  currentSerial.value = getCurrentDevice()?.serial ?? ''
+}
+
+const toggleMode = () => {
+  isEditMode.value = !isEditMode.value
+}
+
+const handleCellClick = (serial: string) => {
+  if (isEditMode.value) {
+    router.push(`/settings/device/edit/${serial}`)
+  } else {
+    if (currentSerial.value === serial) return
+    currentSerial.value = serial
+    setCurrentDevice(serial)
+    const current = getCurrentDevice()
+    if (current) {
+      client.connect(current.ip, current.serial, current.code)
+    }
+    showToast({
+      message: '切换成功',
+      position: 'bottom',
+    })
+  }
+}
+
+watch(
+  () => props.show,
+  (visible) => {
+    if (!visible) {
+      isEditMode.value = false
+      return
+    }
+    refresh()
+  }
+)
+</script>
+
+<style scoped>
+.check-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--van-primary-color);
+  align-self: center;
+}
+
+.device-list-content {
+  display: grid;
+  gap: 8px;
+  margin-bottom: calc(12px + env(safe-area-inset-bottom));
+}
+
+.header-action-btn {
+  width: 80px;
+  height: 32px;
+  font-size: 16px;
+}
+
+.van-cell-group {
+  margin: 0;
+}
+
+.device-cell {
+  height: 44px;
+  width: 220px;
+}
+
+.add-device-cell {
+  color: var(--van-blue);
+}
+</style>

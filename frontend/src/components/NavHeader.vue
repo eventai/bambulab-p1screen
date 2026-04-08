@@ -4,35 +4,17 @@
       <i-material-symbols-arrow-back-ios-new-rounded />
     </button>
     <div class="nav-header-title">{{ title }}</div>
-    <van-button
-      v-if="showConfirm"
-      class="nav-header-confirm"
-      type="primary"
-      size="normal"
-      :disabled="confirmDisabled"
-      @click="emit('confirm')"
-    >
-      确定
-    </van-button>
+    <slot name="right"></slot>
   </div>
 </template>
 
 <script setup lang="ts">
-withDefaults(
-  defineProps<{
-    title: string
-    showConfirm?: boolean
-    confirmDisabled?: boolean
-  }>(),
-  {
-    showConfirm: false,
-    confirmDisabled: false,
-  }
-)
+defineProps<{
+  title: string
+}>()
 
 const emit = defineEmits<{
   (event: 'back'): void
-  (event: 'confirm'): void
 }>()
 </script>
 
@@ -58,11 +40,5 @@ const emit = defineEmits<{
 .nav-header-title {
   font-size: 18px;
   font-weight: 600;
-}
-
-.nav-header-confirm {
-  width: 80px;
-  height: 32px;
-  font-size: 16px;
 }
 </style>

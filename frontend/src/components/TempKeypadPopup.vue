@@ -2,11 +2,20 @@
   <BasePopup
     :show="show"
     :title="title"
-    :show-confirm="true"
-    :confirm-disabled="inputValue.length === 0"
     @update:show="emit('update:show', $event)"
-    @confirm="handleConfirm"
   >
+    <template #header-right>
+      <van-button
+        class="header-action-btn"
+        type="primary"
+        size="normal"
+        :disabled="inputValue.length === 0"
+        @click="handleConfirm"
+      >
+        确定
+      </van-button>
+    </template>
+
     <div class="temp-popup-content">
       <div class="temp-display">
         <div class="temp-value">{{ inputValue }}</div>
@@ -98,6 +107,12 @@ const handleConfirm = () => {
   max-width: 100%;
   display: grid;
   gap: 8px;
+}
+
+.header-action-btn {
+  width: 80px;
+  height: 32px;
+  font-size: 16px;
 }
 
 .temp-display {

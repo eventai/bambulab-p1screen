@@ -9,8 +9,8 @@
       <span id="nozzle-temp">{{ nozzleTemp }} ℃</span>
       <span id="heatbed-temp">{{ heatbedTemp }} ℃</span>
       <span id="wifi-signal"><img :src="getWifiSignalIcon"/></span>
-      <button id="manage-device-btn" type="button" @click="router.push('/settings/device/manage')">
-        <span>{{computed(() => {return getDevice()?.name || '管理设备'})}}</span>
+      <button id="manage-device-btn" type="button" @click="showDeviceListPopup = true">
+        <span>{{ currentDeviceName }}</span>
         <i-material-symbols-settings-rounded />
       </button>
     </div>
@@ -30,15 +30,16 @@
       </div>
     </div>
     <ControlButton class="light-button" :icon="lightState ? lightOnIcon : lightOffIcon" label="照明" @click="toggleLight" />
+    <DeviceListPopup v-model:show="showDeviceListPopup" />
   </div>
 </template>
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, ref, watch } from 'vue'
 import humanizeDuration from 'humanize-duration'
 import { PrinterClient } from '../api/PrinterClient'
 import { LightType, GcodeState, CurrentStage } from '../api/enums'
 import ControlButton from '../components/ControlButton.vue'
+import DeviceListPopup from '../components/DeviceListPopup.vue'
 
 import lightOnIcon from '../assets/images/monitor_lamp_on.svg'
 import lightOffIcon from '../assets/images/monitor_lamp_off.svg'
@@ -52,11 +53,21 @@ import signalWeakIcon from '../assets/images/monitor_signal_weak.svg'
 import signalMiddleIcon from '../assets/images/monitor_signal_middle.svg'
 import signalStrongIcon from '../assets/images/monitor_signal_strong.svg'
 import { getProjects } from '../api/project'
-import { getDevice } from '../utils/device'
+import { getCurrentDevice } from '../utils/device'
 
 const client = PrinterClient.getInstance()
-const router = useRouter()
 const device = client.device
+const showDeviceListPopup = ref(false)
+const currentDeviceName = ref(getCurrentDevice()?.name || '添加设备')
+
+watch(
+  () => showDeviceListPopup.value,
+  (visible, prevVisible) => {
+    if (prevVisible && !visible) {
+      currentDeviceName.value = getCurrentDevice()?.name || '添加设备'
+    }
+  }
+)
 
 const taskName = computed(() => device.print.subtask_name || '')
 const nozzleTemp = computed(() => Math.floor(Number(device.print.nozzle_temper ?? '0')))

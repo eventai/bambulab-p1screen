@@ -7,34 +7,31 @@
   >
     <NavHeader
       :title="title"
-      :show-confirm="showConfirm"
-      :confirm-disabled="confirmDisabled"
       @back="handleClose"
-      @confirm="handleConfirm"
-    />
+    >
+      <template v-if="slots['header-right']" #right>
+        <slot name="header-right"></slot>
+      </template>
+    </NavHeader>
 
     <slot></slot>
   </van-popup>
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref, useSlots } from 'vue'
 import NavHeader from './NavHeader.vue'
 
 withDefaults(
   defineProps<{
     show: boolean
     title: string
-    showConfirm?: boolean
-    confirmDisabled?: boolean
   }>(),
-  {
-    showConfirm: false,
-    confirmDisabled: false,
-  }
+  {}
 )
 
 const isPortrait = ref(false)
+const slots = useSlots()
 
 const updateOrientation = () => {
   isPortrait.value = window.innerHeight > window.innerWidth
@@ -51,16 +48,12 @@ onBeforeUnmount(() => {
 
 const emit = defineEmits<{
   (event: 'update:show', value: boolean): void
-  (event: 'confirm'): void
 }>()
 
 const handleClose = () => {
   emit('update:show', false)
 }
 
-const handleConfirm = () => {
-  emit('confirm')
-}
 </script>
 
 <style scoped>
@@ -70,6 +63,7 @@ const handleConfirm = () => {
   padding: 4px 12px;
   display: grid;
   gap: 8px;
+  align-content: start;
   height: 100%;
   padding-right: calc(12px + env(safe-area-inset-right));
 }

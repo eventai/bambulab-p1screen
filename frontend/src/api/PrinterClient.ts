@@ -55,6 +55,8 @@ export class PrinterClient {
     this.stopConnection('recreate connection')
     this.reportTopic = `device/${serial}/report`
     this.requestTopic = `device/${serial}/request`
+    this.device.print = {}
+    this.device.module = []
 
     try {
       const wsProtocol = location.protocol === 'https:' ? 'wss' : 'ws'
@@ -100,6 +102,8 @@ export class PrinterClient {
     this.mqttClient.value = null
     this.reportTopic = ''
     this.requestTopic = ''
+    this.device.print = {}
+    this.device.module = []
     this.rejectPendingPublishes(reason)
     triggerRef(this.mqttClient)
   }

@@ -1,6 +1,6 @@
 <template>
   <div class="device-manage-page">
-    <NavHeader title="设备管理" @back="router.back" />
+    <NavHeader :title="isEditMode ? '编辑设备' : '添加设备'" @back="router.back" />
 
     <van-cell-group inset>
       <van-cell title="设备名称">
@@ -32,6 +32,8 @@
             ref="serialInputRef"
             v-model.trim="serial"
             class="cell-input"
+            :readonly="isEditMode"
+            :class="{ 'cell-input-readonly': isEditMode }"
             placeholder="序列号"
             enterkeyhint="next"
             @keydown.enter.prevent="codeInputRef?.focus()"
@@ -59,23 +61,25 @@
         :class="{ 'save-cell': true, 'save-cell-disabled': !canSave }"
         @click="handleSave"
       />
-      <van-cell title="删除" class="delete-cell" @click="handleDelete" />
+      <van-cell v-if="isEditMode" title="删除" class="delete-cell" @click="handleDelete" />
     </van-cell-group>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { showSuccessToast } from 'vant'
-import { useRouter } from 'vue-router'
+import { showToast } from 'vant'
+import { useRoute, useRouter } from 'vue-router'
 import { PrinterClient } from '../api/PrinterClient'
 import NavHeader from '../components/NavHeader.vue'
-import { clearDevice, getDevice, setDevice } from '../utils/device'
+import { addDevice, getDevices, removeDevice, getCurrentDevice,setCurrentDevice } from '../utils/device'
 
 const client = PrinterClient.getInstance()
-
-const stored = getDevice()
+const route = useRoute()
 const router = useRouter()
+
+const isEditMode = computed(() => Boolean(route.params.serial as string | undefined))
+const stored = isEditMode.value ? getDevices().find(item => item.serial === route.params.serial as string) ?? null : null
 const name = ref(stored?.name || '')
 const ip = ref(stored?.ip || '')
 const serial = ref(stored?.serial || '')
@@ -86,16 +90,31 @@ const codeInputRef = ref<HTMLInputElement | null>(null)
 const canSave = computed(() => Boolean(name.value && ip.value && serial.value && code.value))
 
 const handleSave = () => {
-  setDevice({ name: name.value, ip: ip.value, serial: serial.value, code: code.value })
+  if (!canSave.value) return
+  addDevice({ name: name.value, ip: ip.value, serial: serial.value, code: code.value })
+  setCurrentDevice(serial.value)
   client.connect(ip.value, serial.value, code.value)
   router.back()
-  showSuccessToast('保存成功')
+  showToast({
+    message: '保存成功',
+    position: 'bottom',
+  })
 }
 
 const handleDelete = () => {
-  clearDevice()
-  client.disconnect()
+  if (!serial.value) return
+  removeDevice(serial.value)
+  const current = getCurrentDevice()
+  if (!current) {
+    client.disconnect()
+  } else {
+    client.connect(current.ip, current.serial, current.code)
+  }
   router.back()
+  showToast({
+    message: '删除成功',
+    position: 'bottom',
+  })
 }
 
 </script>
@@ -116,6 +135,10 @@ const handleDelete = () => {
   text-align: right;
   background: transparent;
   color: var(--van-text-color-2);
+}
+
+.cell-input-readonly {
+  color: var(--van-text-color-3);
 }
 
 .save-cell {
