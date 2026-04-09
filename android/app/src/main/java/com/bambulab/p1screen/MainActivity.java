@@ -1,12 +1,8 @@
 package com.bambulab.p1screen;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Intent;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.view.View;
@@ -15,13 +11,23 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
 public final class MainActivity extends Activity {
-  private static final int PERMISSION_REQUEST_CODE = 100;
+  private static final int PORT = 8888;
   private static final long EXIT_INTERVAL_MS = 2000L;
 
   private WebView webView;
+  private WebService webService;
   private long lastBackPressedAt;
-  private volatile boolean destroyed;
 
   @SuppressLint("SetJavaScriptEnabled")
   @Override
@@ -31,7 +37,7 @@ public final class MainActivity extends Activity {
     applyWindowInsets();
     applyFullscreen();
 
-    checkPermissionsAndStartService();
+    startWebService();
 
     boolean isDebuggable = (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
     WebView.setWebContentsDebuggingEnabled(isDebuggable);
@@ -47,7 +53,7 @@ public final class MainActivity extends Activity {
 
     webView.setPadding(0, 0, 0, 0);
 
-    ForegroundService.setReadyCallback(this::loadHomeUrl);
+    webView.loadUrl(getBaseUrl());
   }
 
   @Override
@@ -62,13 +68,19 @@ public final class MainActivity extends Activity {
   protected void onResume() {
     super.onResume();
     applyFullscreen();
+    startWebService();
+  }
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+    stopWebService();
   }
 
   @Override
   public void onBackPressed() {
     long now = SystemClock.elapsedRealtime();
     if (now - lastBackPressedAt < EXIT_INTERVAL_MS) {
-      stopForegroundService();
       finishAndRemoveTask();
       return;
     }
@@ -93,47 +105,55 @@ public final class MainActivity extends Activity {
     });
   }
 
-  private void loadHomeUrl() {
-    if (destroyed || webView == null) {
+  private void startWebService() {
+    if (webService != null && webService.isAlive()) {
       return;
     }
-    webView.loadUrl(ForegroundService.getBaseUrl());
-  }
-
-  private void checkPermissionsAndStartService() {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-      requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, PERMISSION_REQUEST_CODE);
-    } else {
-      startForegroundService();
+    try {
+      if (webService == null) {
+        webService = new WebService(PORT, getApplicationContext(), createInsecureTlsSocketFactory());
+      }
+      webService.start();
+    } catch (IOException | GeneralSecurityException e) {
+      throw new IllegalStateException("Failed to start local web service", e);
     }
   }
 
-  @Override
-  public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-    if (requestCode == PERMISSION_REQUEST_CODE) {
-      startForegroundService();
+  private void stopWebService() {
+    if (webService == null) {
+      return;
     }
+    webService.stop();
   }
 
-  private void startForegroundService() {
-    Intent intent = new Intent(this, ForegroundService.class);
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      startForegroundService(intent);
-    } else {
-      startService(intent);
-    }
+  private static String getBaseUrl() {
+    return "http://127.0.0.1:" + PORT + "/";
   }
 
-  private void stopForegroundService() {
-    Intent intent = new Intent(this, ForegroundService.class);
-    stopService(intent);
+  private static SSLSocketFactory createInsecureTlsSocketFactory() throws GeneralSecurityException {
+    TrustManager[] trustManagers = new TrustManager[]{new X509TrustManager() {
+      @Override
+      public void checkClientTrusted(X509Certificate[] chain, String authType) {
+      }
+
+      @Override
+      public void checkServerTrusted(X509Certificate[] chain, String authType) {
+      }
+
+      @Override
+      public X509Certificate[] getAcceptedIssuers() {
+        return new X509Certificate[0];
+      }
+    }};
+
+    SSLContext context = SSLContext.getInstance("TLS");
+    context.init(null, trustManagers, new SecureRandom());
+    return context.getSocketFactory();
   }
 
   @Override
   protected void onDestroy() {
-    destroyed = true;
-    ForegroundService.setReadyCallback(null);
+    stopWebService();
     if (webView != null) {
       ViewGroup parent = (ViewGroup) webView.getParent();
       if (parent != null) {

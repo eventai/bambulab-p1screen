@@ -1,5 +1,3 @@
 <resources>
   <string name="app_name">BambuLab Screen</string>
-  <string name="notification_channel_name">Backend Service</string>
-  <string name="notification_text">Running</string>
 </resources>
