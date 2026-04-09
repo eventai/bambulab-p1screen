@@ -383,10 +383,7 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
   }
 
   .light-button {
-    grid-column: 1;
-    grid-row: 4;
-    justify-self: start;
-    margin-left: 8px;
+    display: none;
   }
 }
 
