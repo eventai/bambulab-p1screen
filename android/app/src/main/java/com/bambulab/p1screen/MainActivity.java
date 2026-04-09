@@ -17,6 +17,7 @@ import java.io.IOException;
 
 public final class MainActivity extends Activity {
   private static final String WEB_CONSOLE_TAG = "WebConsole";
+  private static final String APP_INFO_TAG = "AppInfo";
   private static final int PORT = 8888;
   private static final long EXIT_INTERVAL_MS = 2000L;
 
@@ -44,6 +45,7 @@ public final class MainActivity extends Activity {
     settings.setAllowFileAccess(false);
     settings.setAllowContentAccess(false);
     settings.setLoadsImagesAutomatically(true);
+    logRuntimeInfo(settings);
 
     webView.setWebChromeClient(new WebChromeClient() {
       @Override
@@ -147,6 +149,16 @@ public final class MainActivity extends Activity {
 
   private static String getBaseUrl() {
     return "http://127.0.0.1:" + PORT + "/";
+  }
+
+  private void logRuntimeInfo(WebSettings settings) {
+    String appVersion = "unknown";
+    try {
+      appVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+    } catch (Exception ignored) {
+    }
+    Log.i(APP_INFO_TAG, "appVersion=" + appVersion);
+    Log.i(APP_INFO_TAG, "userAgentString=" + settings.getUserAgentString());
   }
 
   @Override
