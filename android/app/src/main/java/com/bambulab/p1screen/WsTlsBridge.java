@@ -11,21 +11,25 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 public final class WsTlsBridge extends NanoWSD.WebSocket {
   private static final String TAG = "WsTlsBridge";
-  private final SSLSocketFactory sslSocketFactory;
   private SSLSocket tlsSocket;
   private OutputStream tlsOutput;
   private volatile boolean closed;
 
-  public WsTlsBridge(NanoHTTPD.IHTTPSession handshakeRequest, SSLSocketFactory socketFactory) {
+  public WsTlsBridge(NanoHTTPD.IHTTPSession handshakeRequest) {
     super(handshakeRequest);
-    sslSocketFactory = socketFactory;
   }
 
   @Override
@@ -35,6 +39,7 @@ public final class WsTlsBridge extends NanoWSD.WebSocket {
     try {
       URI target = parseTargetUri(getHandshakeRequest());
       Log.d(TAG, "Connecting to TLS target: " + target.getHost() + ":" + target.getPort());
+      SSLSocketFactory sslSocketFactory = createInsecureTlsSocketFactory();
       tlsSocket = (SSLSocket) sslSocketFactory.createSocket(target.getHost(), target.getPort());
       tlsSocket.startHandshake();
       tlsOutput = tlsSocket.getOutputStream();
@@ -146,5 +151,26 @@ public final class WsTlsBridge extends NanoWSD.WebSocket {
       throw new URISyntaxException(raw, "missing host");
     }
     return target;
+  }
+
+  private static SSLSocketFactory createInsecureTlsSocketFactory() throws GeneralSecurityException {
+    TrustManager[] trustManagers = new TrustManager[]{new X509TrustManager() {
+      @Override
+      public void checkClientTrusted(X509Certificate[] chain, String authType) {
+      }
+
+      @Override
+      public void checkServerTrusted(X509Certificate[] chain, String authType) {
+      }
+
+      @Override
+      public X509Certificate[] getAcceptedIssuers() {
+        return new X509Certificate[0];
+      }
+    }};
+
+    SSLContext context = SSLContext.getInstance("TLS");
+    context.init(null, trustManagers, new SecureRandom());
+    return context.getSocketFactory();
   }
 }

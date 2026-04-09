@@ -12,14 +12,6 @@ import android.webkit.WebView;
 import android.widget.Toast;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 public final class MainActivity extends Activity {
   private static final int PORT = 8888;
@@ -111,10 +103,10 @@ public final class MainActivity extends Activity {
     }
     try {
       if (webService == null) {
-        webService = new WebService(PORT, getApplicationContext(), createInsecureTlsSocketFactory());
+        webService = new WebService(PORT, getApplicationContext());
       }
       webService.start();
-    } catch (IOException | GeneralSecurityException e) {
+    } catch (IOException e) {
       throw new IllegalStateException("Failed to start local web service", e);
     }
   }
@@ -128,27 +120,6 @@ public final class MainActivity extends Activity {
 
   private static String getBaseUrl() {
     return "http://127.0.0.1:" + PORT + "/";
-  }
-
-  private static SSLSocketFactory createInsecureTlsSocketFactory() throws GeneralSecurityException {
-    TrustManager[] trustManagers = new TrustManager[]{new X509TrustManager() {
-      @Override
-      public void checkClientTrusted(X509Certificate[] chain, String authType) {
-      }
-
-      @Override
-      public void checkServerTrusted(X509Certificate[] chain, String authType) {
-      }
-
-      @Override
-      public X509Certificate[] getAcceptedIssuers() {
-        return new X509Certificate[0];
-      }
-    }};
-
-    SSLContext context = SSLContext.getInstance("TLS");
-    context.init(null, trustManagers, new SecureRandom());
-    return context.getSocketFactory();
   }
 
   @Override

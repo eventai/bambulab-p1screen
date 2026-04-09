@@ -11,17 +11,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
 
-import javax.net.ssl.SSLSocketFactory;
-
 public final class WebService extends NanoWSD {
   private final Context appContext;
   private final ThumbnailHandler thumbnailHandler;
-  private final SSLSocketFactory tlsSocketFactory;
 
-  public WebService(int port, Context context, SSLSocketFactory socketFactory) {
+  public WebService(int port, Context context) {
     super(port);
     appContext = context;
-    tlsSocketFactory = socketFactory;
     thumbnailHandler = new ThumbnailHandler();
   }
 
@@ -45,7 +41,7 @@ public final class WebService extends NanoWSD {
 
   @Override
   protected WebSocket openWebSocket(IHTTPSession handshake) {
-    return new WsTlsBridge(handshake, tlsSocketFactory);
+    return new WsTlsBridge(handshake);
   }
 
   private Response serveStatic(IHTTPSession session) {
