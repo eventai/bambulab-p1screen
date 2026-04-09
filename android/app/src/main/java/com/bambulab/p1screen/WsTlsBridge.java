@@ -65,6 +65,7 @@ public final class WsTlsBridge extends NanoWSD.WebSocket {
     try {
       byte[] payload = message.getBinaryPayload();
       if (payload == null) {
+        Log.w(TAG, "onMessage getBinaryPayload failed");
         String text = message.getTextPayload();
         payload = text == null ? new byte[0] : text.getBytes(StandardCharsets.UTF_8);
       }
@@ -74,6 +75,7 @@ public final class WsTlsBridge extends NanoWSD.WebSocket {
       tlsOutput.write(payload);
       tlsOutput.flush();
     } catch (IOException e) {
+      Log.e(TAG, "onMessage exception", e);
       closeBridge(NanoWSD.WebSocketFrame.CloseCode.InternalServerError, "tls write failed");
     }
   }
