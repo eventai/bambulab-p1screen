@@ -91,7 +91,7 @@ watch(
 
 const handleColorInput = (event: Event) => {
   const value = (event.target as HTMLInputElement | null)?.value.toUpperCase() ?? '#000000'
-  console.log('[FilamentEditPage] select color:', value)
+  console.log(`[FilamentEditPage] select color: ${value}`)
   trayColor.value = value.replace('#', '').slice(0, 6) + 'FF'
 }
 
@@ -107,7 +107,7 @@ const handleConfirm = async () => {
     nozzle_temp_max: Number(nozzleTempMax.value),
   }
 
-  console.log('[FilamentEditPage] confirm', payload)
+  console.log(`[FilamentEditPage] confirm payload=${JSON.stringify(payload)}`)
 
   showLoadingToast({
     message: '保存中...',
@@ -123,8 +123,8 @@ const handleConfirm = async () => {
     closeToast()
     showSuccessToast('保存成功')
     router.back()
-  } catch (error) {
-    console.error('[FilamentEditPage] save failed', error)
+  } catch (error: any) {
+    console.error(`[FilamentEditPage] save failed: ${error.message}`)
     closeToast()
     showFailToast('保存失败')
   }

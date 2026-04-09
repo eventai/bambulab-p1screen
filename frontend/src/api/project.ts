@@ -53,8 +53,8 @@ export const getProjects = () => {
     }
     const parsedProjects = JSON.parse(rawProjects)
     return Array.isArray(parsedProjects) ? parsedProjects as Project[] : []
-  } catch (error) {
-    console.warn('[PrintClient] failed to parse projects from localStorage:', error)
+  } catch (error: any) {
+    console.warn(`[PrintClient] failed to parse projects from localStorage: ${error.message}`)
     return [] as Project[]
   }
 }

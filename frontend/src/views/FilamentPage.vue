@@ -44,7 +44,7 @@ const showSettingsPopover = ref(false)
 const settingsActions: PopoverAction[] = [{ type: 'auto-refill', text: '自动续料' }]
 
 const handleSettingsSelect = (action: PopoverAction) => {
-  console.log('[FilamentPage] settings action:', action.type)
+  console.log(`[FilamentPage] settings action: ${action.type}`)
   showSettingsPopover.value = false
   if (action.type === 'auto-refill') {
     router.push('/filament/auto-refill')

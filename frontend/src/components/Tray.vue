@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { colord } from 'colord'
-import { computed, toRaw, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { PopoverAction } from 'vant'
 import type { DeviceTray } from '../api/device'
@@ -72,7 +72,7 @@ const handleTrayClick = () => {
 }
 
 const handleSelect = (action: PopoverAction) => {
-  console.log('[Tray] type =', action.type, 'amsId = ', props.amsId, ', tray =', toRaw(props.tray))
+  console.log(`[Tray] type=${action.type}, amsId=${props.amsId}, tray=${JSON.stringify(props.tray)}`)
   showPopover.value = false
   switch (action.type) {
     case 'edit':

@@ -104,7 +104,7 @@ const openTempPopup = (type: TemperatureType) => {
 const handleTempConfirm = (type: TemperatureType | undefined, value: number) => {
   if (!type) return
 
-  console.log('[Controls] set temperature', type, value)
+  console.log(`[Controls] set temperature type=${type}, value=${value}`)
   client.setTemperature(type, value)
 }
 
@@ -150,7 +150,7 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
 // Motion
 
 const handleMove = (axis: 'home' | 'x' | 'y' | 'z' | 'e', step: -10 | -1 | 0| 1 | 10) => {
-  console.log('[XYMotion] move', axis, step)
+  console.log(`[XYMotion] move axis=${axis}, step=${step}`)
   let gcode = ''
   switch(axis) {
     case 'home':

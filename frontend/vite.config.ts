@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import legacy from '@vitejs/plugin-legacy'
 import path from 'node:path'
 import { execSync } from 'node:child_process'
 import Components from 'unplugin-vue-components/vite'
@@ -24,6 +25,9 @@ export default defineConfig({
   },
   plugins: [
     vue(),
+    legacy({
+      modernPolyfills: ['es.array.at', 'es.typed-array.at'],
+    }),
     Components({
       resolvers: [
         IconsResolver({

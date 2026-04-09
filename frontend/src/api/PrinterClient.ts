@@ -78,8 +78,8 @@ export class PrinterClient {
       mqttClient.on('error', this.onError.bind(this))
       mqttClient.on('message', this.onMessage.bind(this))
       return mqttClient
-    } catch (error) {
-      console.error('[PrintClient] connect failed:', error)
+    } catch (error: any) {
+      console.error(`[PrintClient] connect failed: ${error.message}`)
       this.stopConnection('connect failed')
       return null
     }
@@ -115,15 +115,15 @@ export class PrinterClient {
     const topic = this.reportTopic
     if (!client || !topic) return
     try {
+      console.log(`[PrintClient] subscribe topic: ${topic}`)
       await client.subscribeAsync(topic)
-      console.log('[PrintClient] subscribed:', topic)
-    } catch (err) {
-      console.error('[PrintClient] subscribe failed:', err)
+    } catch (err: any) {
+      console.error(`[PrintClient] subscribe failed: ${err.message}`)
       this.stopConnection('subscribe failed')
       return
     }
-    void this.updateAllData().catch((err) => {
-      console.warn('[PrintClient] initial data sync failed:', err)
+    void this.updateAllData().catch((err: any) => {
+      console.warn(`[PrintClient] initial data sync failed: ${err.message}`)
     })
     triggerRef(this.mqttClient)
   }
@@ -154,7 +154,7 @@ export class PrinterClient {
 
   private onError(error: Error) {
     this.lastError = error
-    console.error('[PrintClient] error:', error)
+    console.error(`[PrintClient] error: ${error.message}`)
     this.rejectPendingPublishes('socket error')
     triggerRef(this.mqttClient)
   }
@@ -167,8 +167,8 @@ export class PrinterClient {
     let data: Record<string, any> = {}
     try {
       data = JSON.parse(raw) ?? {}
-    } catch (error) {
-      console.warn('[PrintClient] message parse failed:', error)
+    } catch (error: any) {
+      console.warn(`[PrintClient] message parse failed: ${error.message}`)
       return
     }
     Object.keys(data).forEach(key => {
@@ -182,7 +182,7 @@ export class PrinterClient {
       delete params.result
       delete params.reason
       delete params.msg
-      console.debug('[PrintClient]  report: sequenceId =', sequenceId, ', command =', command, ', result =', result, ', reason =', reason, ', params =', JSON.stringify(params))
+      console.debug(`[PrintClient]  report: sequenceId=${sequenceId}, command=${command}, result=${result}, reason=${reason}, params=${JSON.stringify(params)}`)
 
       switch(command) {
         case 'print.push_status':
@@ -194,7 +194,7 @@ export class PrinterClient {
         default:
           const flag = this.resolvePublishResponse(sequenceId, result, reason, params)
           if (!flag) {
-            console.warn('[PrintClient] unhandled message: sequenceId =', sequenceId, ', command =', command, ', result =', result, ', reason =', reason, ', params =', JSON.stringify(params))
+            console.warn(`[PrintClient] unhandled message: sequenceId=${sequenceId}, command=${command}, result=${result}, reason=${reason}, params=${JSON.stringify(params)}`)
           }
           break
       }
@@ -239,7 +239,7 @@ export class PrinterClient {
     const response = new Promise<any>((resolve, reject) => {
       this.pendingPublishes.set(sequenceId, { resolve, reject })
     })
-    console.debug('[PrintClient] request: sequenceId =', sequenceId, ', command =', command, ', params =', JSON.stringify(params))
+    console.debug(`[PrintClient] request: sequenceId=${sequenceId}, command=${command}, params=${JSON.stringify(params)}`)
     try {
       await client.publishAsync(this.requestTopic, JSON.stringify(req))
     } catch (err) {
@@ -267,9 +267,9 @@ export class PrinterClient {
   }
 
   private rejectPendingPublishes(reason: string) {
-    for (const [key, pending] of this.pendingPublishes.entries()) {
+    this.pendingPublishes.forEach((pending, key) => {
       pending.reject(new Error(`[PrintClient] ${reason}: ${key}`))
-    }
+    })
     this.pendingPublishes.clear()
   }
 
