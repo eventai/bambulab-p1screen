@@ -3,6 +3,7 @@ package com.bambulab.p1screen;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoWSD;
@@ -12,6 +13,8 @@ import java.io.InputStream;
 import java.util.Locale;
 
 public final class WebService extends NanoWSD {
+  private static final String TAG = "WebService";
+
   private final Context appContext;
   private final ThumbnailHandler thumbnailHandler;
 
@@ -24,10 +27,18 @@ public final class WebService extends NanoWSD {
   @Override
   public void start() throws IOException {
     start(0, false);
+    Log.i(TAG, "started on port " + getListeningPort());
+  }
+
+  @Override
+  public void stop() {
+    super.stop();
+    Log.i(TAG, "stopped");
   }
 
   @Override
   protected Response serveHttp(IHTTPSession session) {
+    Log.d(TAG, "http " + session.getMethod() + " " + session.getUri());
     if (Method.GET != session.getMethod()) {
       return NanoHTTPD.newFixedLengthResponse(Response.Status.METHOD_NOT_ALLOWED, "text/plain", "Method Not Allowed");
     }
@@ -41,6 +52,7 @@ public final class WebService extends NanoWSD {
 
   @Override
   protected WebSocket openWebSocket(IHTTPSession handshake) {
+    Log.d(TAG, "ws handshake " + handshake.getUri());
     return new WsTlsBridge(handshake);
   }
 
@@ -55,9 +67,11 @@ public final class WebService extends NanoWSD {
 
     AssetResult asset = openAsset(uri);
     if (asset == null) {
+      Log.w(TAG, "static miss " + uri);
       return NanoHTTPD.newFixedLengthResponse(Response.Status.NOT_FOUND, "text/plain", "Not Found");
     }
 
+    Log.d(TAG, "static hit " + uri + " -> " + asset.path);
     return NanoHTTPD.newChunkedResponse(Response.Status.OK, guessMimeType(asset.path), asset.inputStream);
   }
 

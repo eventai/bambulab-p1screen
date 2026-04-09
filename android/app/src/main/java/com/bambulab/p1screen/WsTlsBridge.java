@@ -24,6 +24,8 @@ import javax.net.ssl.X509TrustManager;
 
 public final class WsTlsBridge extends NanoWSD.WebSocket {
   private static final String TAG = "WsTlsBridge";
+  private static final int DEFAULT_MQTTS_PORT = 8883;
+
   private SSLSocket tlsSocket;
   private OutputStream tlsOutput;
   private volatile boolean closed;
@@ -38,18 +40,19 @@ public final class WsTlsBridge extends NanoWSD.WebSocket {
 
     try {
       URI target = parseTargetUri(getHandshakeRequest());
-      Log.d(TAG, "Connecting to TLS target: " + target.getHost() + ":" + target.getPort());
+      int targetPort = target.getPort() > 0 ? target.getPort() : DEFAULT_MQTTS_PORT;
+      Log.d(TAG, "Connecting to TLS target: " + target.getHost() + ":" + targetPort);
       SSLSocketFactory sslSocketFactory = createInsecureTlsSocketFactory();
-      tlsSocket = (SSLSocket) sslSocketFactory.createSocket(target.getHost(), target.getPort());
+      tlsSocket = (SSLSocket) sslSocketFactory.createSocket(target.getHost(), targetPort);
       tlsSocket.startHandshake();
       tlsOutput = tlsSocket.getOutputStream();
-      Log.d(TAG, "TLS handshake successful");
+      Log.d(TAG, "TLS handshake successful, protocol=" + tlsSocket.getSession().getProtocol());
 
       Thread upstreamReader = new Thread(() -> pumpTlsToWebSocket(tlsSocket), "mqtt-tls-reader");
       upstreamReader.setDaemon(true);
       upstreamReader.start();
     } catch (Exception e) {
-      Log.e(TAG, "Failed to establish TLS bridge", e);
+      Log.e(TAG, "Failed to establish TLS bridge: " + e.getClass().getSimpleName() + ": " + e.getMessage(), e);
       closeBridge(NanoWSD.WebSocketFrame.CloseCode.InternalServerError, "connect failed");
     }
   }
@@ -169,7 +172,7 @@ public final class WsTlsBridge extends NanoWSD.WebSocket {
       }
     }};
 
-    SSLContext context = SSLContext.getInstance("TLS");
+    SSLContext context = SSLContext.getInstance("TLSv1.2");
     context.init(null, trustManagers, new SecureRandom());
     return context.getSocketFactory();
   }

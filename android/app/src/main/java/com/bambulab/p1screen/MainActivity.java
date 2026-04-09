@@ -2,11 +2,13 @@ package com.bambulab.p1screen;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.ConsoleMessage;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
@@ -14,6 +16,7 @@ import android.widget.Toast;
 import java.io.IOException;
 
 public final class MainActivity extends Activity {
+  private static final String WEB_CONSOLE_TAG = "WebConsole";
   private static final int PORT = 8888;
   private static final long EXIT_INTERVAL_MS = 2000L;
 
@@ -31,8 +34,7 @@ public final class MainActivity extends Activity {
 
     startWebService();
 
-    boolean isDebuggable = (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-    WebView.setWebContentsDebuggingEnabled(isDebuggable);
+    WebView.setWebContentsDebuggingEnabled(true);
 
     webView = findViewById(R.id.web_view);
 
@@ -42,6 +44,31 @@ public final class MainActivity extends Activity {
     settings.setAllowFileAccess(false);
     settings.setAllowContentAccess(false);
     settings.setLoadsImagesAutomatically(true);
+
+    webView.setWebChromeClient(new WebChromeClient() {
+      @Override
+      public boolean onConsoleMessage(ConsoleMessage message) {
+        switch (message.messageLevel()) {
+          case TIP:
+            Log.v(WEB_CONSOLE_TAG, message.message());
+            break;
+          case LOG:
+            Log.d(WEB_CONSOLE_TAG, message.message());
+            break;
+          case WARNING:
+            Log.w(WEB_CONSOLE_TAG, message.message());
+            break;
+          case ERROR:
+            Log.e(WEB_CONSOLE_TAG, message.message());
+            break;
+          case DEBUG:
+          default:
+            Log.i(WEB_CONSOLE_TAG, message.message());
+            break;
+        }
+        return true;
+      }
+    });
 
     webView.setPadding(0, 0, 0, 0);
 
