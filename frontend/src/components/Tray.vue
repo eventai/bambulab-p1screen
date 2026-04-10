@@ -156,13 +156,11 @@ const textColor = computed(() => {
 .tray > .icon-edit {
   height: 19px;
   margin: 0 15px;
-  -webkit-mask-image: url(/src/assets/images/rename_edit.svg);
   mask-image: url(/src/assets/images/rename_edit.svg);
 }
 .tray > .icon-view {
   height: 19px;
   margin: 0 16px;
-  -webkit-mask-image: url(/src/assets/images/ams_readonly.svg);
   mask-image: url(/src/assets/images/ams_readonly.svg);
 }
 </style>
