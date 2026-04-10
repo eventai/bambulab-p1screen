@@ -72,11 +72,6 @@ public final class WsTlsBridge extends NanoWSD.WebSocket {
 
     try {
       byte[] payload = message.getBinaryPayload();
-      if (payload == null) {
-        Log.w(TAG, "onMessage getBinaryPayload failed");
-        String text = message.getTextPayload();
-        payload = text == null ? new byte[0] : text.getBytes(StandardCharsets.UTF_8);
-      }
       if (payload.length == 0) {
         return;
       }
