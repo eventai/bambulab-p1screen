@@ -2,11 +2,14 @@ package com.bambulab.p1screen;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -29,24 +32,13 @@ public final class MainActivity extends Activity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_main);
-    applyWindowInsets();
-    applyFullscreen();
 
     startWebService();
 
-    WebView.setWebContentsDebuggingEnabled(true);
+    setContentView(R.layout.activity_main);
 
     webView = findViewById(R.id.web_view);
-
-    WebSettings settings = webView.getSettings();
-    settings.setJavaScriptEnabled(true);
-    settings.setDomStorageEnabled(true);
-    settings.setAllowFileAccess(false);
-    settings.setAllowContentAccess(false);
-    settings.setLoadsImagesAutomatically(true);
-    logRuntimeInfo(settings);
-
+    webView.setPadding(0, 0, 0, 0);
     webView.setWebChromeClient(new WebChromeClient() {
       @Override
       public boolean onConsoleMessage(ConsoleMessage message) {
@@ -72,23 +64,25 @@ public final class MainActivity extends Activity {
       }
     });
 
-    webView.setPadding(0, 0, 0, 0);
+    WebSettings settings = webView.getSettings();
+    settings.setJavaScriptEnabled(true);
+    settings.setDomStorageEnabled(true);
+    settings.setAllowFileAccess(false);
+    settings.setAllowContentAccess(false);
+    settings.setLoadsImagesAutomatically(true);
+    logRuntimeInfo(settings);
+
+    WebView.setWebContentsDebuggingEnabled(true);
+
+    applyWindowInsets();
+    applyFullscreen();
 
     webView.loadUrl(getBaseUrl());
   }
 
   @Override
-  public void onWindowFocusChanged(boolean hasFocus) {
-    super.onWindowFocusChanged(hasFocus);
-    if (hasFocus) {
-      applyFullscreen();
-    }
-  }
-
-  @Override
   protected void onResume() {
     super.onResume();
-    applyFullscreen();
     startWebService();
   }
 
@@ -96,6 +90,14 @@ public final class MainActivity extends Activity {
   protected void onPause() {
     super.onPause();
     stopWebService();
+  }
+
+  @Override
+  public void onConfigurationChanged(Configuration newConfig) {
+    super.onConfigurationChanged(newConfig);
+    applyFullscreen();
+    View decorView = getWindow().getDecorView();
+    decorView.requestApplyInsets();
   }
 
   @Override
@@ -110,19 +112,31 @@ public final class MainActivity extends Activity {
   }
 
   private void applyFullscreen() {
+    int orientation = getResources().getConfiguration().orientation;
     View decorView = getWindow().getDecorView();
-    int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-    decorView.setSystemUiVisibility(flags);
+    if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+      int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+//                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+      decorView.setSystemUiVisibility(flags);
+    } else {
+      decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+    }
   }
 
   private void applyWindowInsets() {
-    final View root = findViewById(android.R.id.content);
-    root.setOnApplyWindowInsetsListener((v, insets) -> {
-      v.setPadding(insets.getSystemWindowInsetLeft(), insets.getSystemWindowInsetTop(), insets.getSystemWindowInsetRight(), 0);
-      return insets.consumeSystemWindowInsets();
+    View decorView = getWindow().getDecorView();
+    decorView.setOnApplyWindowInsetsListener((v, insets) -> {
+      int orientation = getResources().getConfiguration().orientation;
+      if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        v.setPadding(insets.getSystemWindowInsetLeft(), insets.getSystemWindowInsetTop(), insets.getSystemWindowInsetRight(), 0);
+      } else {
+        v.setPadding(insets.getSystemWindowInsetLeft(), insets.getSystemWindowInsetTop(), insets.getSystemWindowInsetRight(), insets.getSystemWindowInsetBottom());
+      }
+        return insets.consumeSystemWindowInsets();
     });
   }
 
