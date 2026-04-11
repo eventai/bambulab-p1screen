@@ -25,8 +25,8 @@
       <div class="axis-label-inner plus1">+1</div>
       <div class="axis-label-inner minus1">-1</div>
       <div class="axis-label-inner minus10">-10</div>
-      <button class="axis-home" @click="emitMove('home', 0)"></button>
     </div>
+    <button class="axis-home" @click="emitMove('home', 0)"></button>
   </div>
 </template>
 
@@ -51,8 +51,9 @@ const emitMove = (axis: 'home' | 'x' | 'y', step: -10 | -1 | 0 | 1 | 10) => {
 
 .axis-dial {
   width: 82%;
+  height: 0;
+  padding-top: 82%;
   margin: 8px;
-  aspect-ratio: 1 / 1;
   position: relative;
   border-radius: 50%;
   display: grid;
@@ -179,7 +180,9 @@ const emitMove = (axis: 'home' | 'x' | 'y', step: -10 | -1 | 0 | 1 | 10) => {
 
 .axis-home {
   width: 22%;
-  aspect-ratio: 1 / 1;
+  height: 0;
+  padding-top: 22%;
+  position: absolute;
   border-radius: 40%;
   border-width: 0;
   display: grid;
@@ -200,9 +203,4 @@ const emitMove = (axis: 'home' | 'x' | 'y', step: -10 | -1 | 0 | 1 | 10) => {
   filter: brightness(0.9);
 }
 
-.axis-home img {
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
-}
 </style>

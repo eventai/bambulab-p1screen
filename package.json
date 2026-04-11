@@ -51,9 +51,8 @@
     "vue-tsc": "^3.2.6"
   },
   "browserslist": [
-    "android >= 5",
-    "ios >= 10",
-    "chrome >= 55",
-    "chromeandroid >= 55"
+    "defaults",
+    "chrome >= 88",
+    "ios >= 15"
   ]
 }

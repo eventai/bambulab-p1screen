@@ -73,7 +73,7 @@ const humIcon = computed(() => {
 .ams-hum {
   position: relative;
   width: 30px;
-  aspect-ratio: 1;
+  height: 30px;
   left: 248px;
   padding: 4px;
   border-radius: 12px;
