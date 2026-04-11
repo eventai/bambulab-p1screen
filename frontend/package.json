@@ -4,6 +4,7 @@
   "type": "module",
   "dependencies": {
     "colord": "^2.9.3",
+    "fflate": "^0.8.2",
     "humanize-duration": "^3.33.2",
     "mqtt": "^5.10.1",
     "vant": "^4.9.13",

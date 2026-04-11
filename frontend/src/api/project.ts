@@ -1,3 +1,5 @@
+import { unzipSync } from 'fflate'
+
 export type Project = {
   param: string
   project_id: string
@@ -34,11 +36,25 @@ export type Project = {
 
 export const PROJECTS_STORAGE_KEY = 'projects'
 
-export const saveProject = (project: Project) => {
+export const saveProject = async (project: Project) => {
   if (typeof window === 'undefined') return
 
-  project.thumbnail_url = `/api/getThumbnail?url=${encodeURIComponent(project.url)}&plate_idx=${project.plate_idx}`
-  
+  const response = await fetch(`/api/fetch?url=${encodeURIComponent(project.url)}`)
+  if (!response.ok) {
+    console.warn(`[PrintClient] failed to fetch project file for thumbnail: ${response.statusText}`)
+  }
+
+  try {
+    const arrayBuffer = await response.arrayBuffer()
+    const data = new Uint8Array(arrayBuffer)
+    const unzipped = unzipSync(data)
+    const thumbnailData = unzipped[`Metadata/plate_${project.plate_idx}.png`]
+    project.thumbnail_url = thumbnailData ? `data:image/png;base64,${btoa(String.fromCharCode(...thumbnailData))}` : undefined
+  } catch (err) {
+    console.error('[PrintClient] get3MFThumbnail error:', err)
+    return
+  }
+
   const projects = getProjects()
   projects.push(project)
   localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(projects))

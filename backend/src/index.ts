@@ -1,44 +1,40 @@
 import http from 'node:http'
 import path from 'node:path'
 import tls from 'node:tls'
+import { Readable } from 'node:stream'
 import express from 'express'
 import { WebSocketServer } from 'ws'
-import { unzipSync } from 'fflate'
 
 const WEB_PORT = Number(process.env.PORT ?? '8889')
 const WEB_ROOT = path.resolve(process.cwd(), 'dist/web')
 
 const app = express()
 
-async function get3MFThumbnail(url: string, plate_idx: string): Promise<Uint8Array | null> {
-  try {
-    const response = await fetch(url)
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
-    const arrayBuffer = await response.arrayBuffer()
-    const data = new Uint8Array(arrayBuffer)
-    const unzipped = unzipSync(data)
-    const thumbnailData = unzipped[`Metadata/plate_${plate_idx}.png`]
-    return thumbnailData || null
-  } catch (err) {
-    console.error('[server] get3MFThumbnail error:', err)
-    return null
-  }
-}
-
-app.get('/api/getThumbnail', async (req, res) => {
+app.get('/api/fetch', async (req, res) => {
   const url = req.query.url as string
-  const plate_idx = req.query.plate_idx as string
-  if (!url || !plate_idx) {
-    res.status(400).send('Missing parameter')
+  if (!url) {
+    res.status(400).send('Missing url parameter')
     return
   }
-  const data = await get3MFThumbnail(url, plate_idx)
-  if (data) {
-    res.setHeader('Content-Type', 'image/png')
-    res.setHeader('Cache-Control', 'public, max-age=2592000') // 30 days
-    res.send(Buffer.from(data))
-  } else {
-    res.status(404).send('Thumbnail not found')
+
+  try {
+    const response = await fetch(url)
+    res.status(response.status)
+    
+    const headersToForward = ['content-type', 'content-length', 'last-modified', 'cache-control']
+    headersToForward.forEach(h => {
+      const val = response.headers.get(h)
+      if (val) res.setHeader(h, val)
+    })
+
+    if (response.body) {
+      Readable.fromWeb(response.body as any).pipe(res)
+    } else {
+      res.end()
+    }
+  } catch (err) {
+    console.error('[server] proxy error:', err)
+    res.status(500).send('Internal Server Error')
   }
 })
 
