@@ -293,8 +293,11 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
   background: none;
   color: var(--van-text-color-2);
   font-size: 12px;
-  gap: 2px;
   justify-content: center;
+}
+
+#manage-device-btn > span {
+  margin-right: 2px;
 }
 
 .progress-card {
@@ -317,8 +320,8 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 8px;
   justify-content: flex-end;
+  margin-right: -8px;
 }
 
 .progress-labels {
@@ -341,6 +344,7 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
 .progress-card-buttons > .control-button {
   width: 66px;
   height: 66px;
+  margin-right: 8px;
 }
 
 .light-button {

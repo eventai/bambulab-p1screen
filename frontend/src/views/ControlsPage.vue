@@ -204,10 +204,13 @@ M211 R
   border-radius: 12px;
   padding: 8px;
   height: 100%;
-  gap: 8px;
   display: flex;
   flex-direction: column;
   flex: 1;
+}
+
+.control-list > * {
+  margin-bottom: 8px;
 }
 
 .control-list > .control-button {

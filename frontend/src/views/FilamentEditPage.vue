@@ -219,11 +219,11 @@ const handleConfirm = async () => {
 .temperature-fields {
   display: flex;
   align-items: center;
-  gap: 8px;
 }
 
 .temperature-separator {
   color: var(--van-text-color-2);
+  padding: 0 8px;
 }
 
 .temperature-input-wrap {
@@ -236,7 +236,6 @@ const handleConfirm = async () => {
   display: flex;
   align-items: center;
   padding: 0 10px;
-  gap: 6px;
 }
 
 .temperature-input {
@@ -256,12 +255,13 @@ const handleConfirm = async () => {
 .form-actions {
   justify-self: end;
   display: flex;
-  gap: 8px;
   margin-top: auto;
+  margin-right: -8px;
 }
 
 .action-btn {
   width: 80px;
   height: 32px;
+  margin-right: 8px;
 }
 </style>

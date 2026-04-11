@@ -70,7 +70,6 @@ const handleConfirm = (value: number) => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
   padding: 0 8px;
 }
 
@@ -80,6 +79,7 @@ const handleConfirm = (value: number) => {
   border-radius: 8px;
   width: 200px;
   height: 55px;
+  margin-bottom: 10px;
 }
 
 .print-speed-button-active {

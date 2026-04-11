@@ -77,12 +77,12 @@ const statusLabel = computed(() => {
 .status-cell-value {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
 }
 
 .refresh-btn {
   width: 20px;
   height: 20px;
+  margin-left: 6px;
   border: none;
   background: transparent;
   color: var(--van-text-color-2);

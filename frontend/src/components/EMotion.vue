@@ -60,7 +60,6 @@ const emitMove = (axis: 'e', step: -10 | 10) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
   border: 0;
   width: 40px;
   height: 40px;

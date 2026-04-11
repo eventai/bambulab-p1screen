@@ -70,9 +70,12 @@ const onChange = (type: FanType, value: number) => {
 .fan-speed-card div {
   display: flex;
   align-items: center;
-  gap: 6px;
   margin: 0;
   font-size: 13px;
+}
+
+.fan-speed-icon {
+  margin-right: 6px;
 }
 
 .fan-speed-card .van-slider {

@@ -52,7 +52,7 @@
   },
   "browserslist": [
     "defaults",
-    "chrome >= 88",
-    "ios >= 15"
+    "chrome >= 84",
+    "ios >= 14.1"
   ]
 }

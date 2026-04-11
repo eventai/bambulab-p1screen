@@ -36,7 +36,6 @@ const handleClick = () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
   padding: 8px;
   border-radius: 10px;
   background: var(--van-background-3);
@@ -57,9 +56,7 @@ const handleClick = () => {
 .control-button > img {
   width: 18px;
   height: 18px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  margin-bottom: 8px;
 }
 
 .control-button > span {
