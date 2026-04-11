@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
-import { Button, Slider, Progress, Popup, Popover, Dialog, Cell, CellGroup, Empty } from 'vant'
+import { Button, Slider, Progress, Popup, Popover, Dialog, Cell, CellGroup, Empty, showDialog } from 'vant'
+import Bowser from 'bowser'
 import App from './App.vue'
 import { PrinterClient } from './api/PrinterClient'
 import HomePage from './views/HomePage.vue'
@@ -14,6 +15,25 @@ import DeviceEditPage from './views/DeviceEditPage.vue'
 import { getCurrentDevice } from './utils/device'
 import 'vant/lib/index.css'
 import './styles/theme.css'
+import pkg from '../package.json'
+
+const browser = Bowser.getParser(window.navigator.userAgent)
+const requirements: Record<string, string> = {}
+pkg.browserslist.forEach((item: string) => {
+  const match = item.match(/^(\w+)\s*>=\s*([\d.]+)$/)
+  if (match) {
+    requirements[match[1].toLowerCase()] = `>=${match[2]}`
+  }
+})
+
+const isValid = browser.satisfies(requirements)
+
+if (isValid === false) {
+  showDialog({
+    title: '提示',
+    message: '你的WebView内核版本过低，会导致功能和界面异常。Android用户请升级「Android System WebView」，iOS用户请升级操作系统。',
+  })
+}
 
 const router = createRouter({
   history: createWebHashHistory(),
