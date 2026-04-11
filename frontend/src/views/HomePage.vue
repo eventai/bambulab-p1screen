@@ -122,6 +122,8 @@ const getPrintStateLabel = computed(() => {
       return '已暂停'
     case GcodeState.Finish:
       return '完成'
+    case GcodeState.Failed:
+      return '失败'
     default:
       return ''
   }
@@ -145,7 +147,7 @@ const getPrintSubStateLabel = () => {
 }
 
 const getPrintInfo = computed(() => {
-  if (device.print.gcode_state === GcodeState.Finish) return ''
+  if ([GcodeState.Finish, GcodeState.Failed].includes(device.print.gcode_state ?? GcodeState.Unknown)) return ''
 
   const remainingTimeText = humanizeDuration((device.print.mc_remaining_time || 0) * 60 * 1000, {
     units: ['h', 'm'],
@@ -156,7 +158,7 @@ const getPrintInfo = computed(() => {
 })
 
 const isPaused = computed(() => device.print.gcode_state === GcodeState.Pause)
-const showPrintActions = computed(() => ![GcodeState.Unknown, GcodeState.Idle, GcodeState.Finish].includes(device.print.gcode_state ?? GcodeState.Unknown))
+const showPrintActions = computed(() => [GcodeState.Pause, GcodeState.Running].includes(device.print.gcode_state ?? GcodeState.Unknown))
 
 const handleResume = () => {
   console.log('[Controls] resume')
