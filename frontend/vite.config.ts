@@ -6,7 +6,7 @@ import { execSync } from 'node:child_process'
 import Components from 'unplugin-vue-components/vite'
 import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
-import AutoPrefixer from 'autoprefixer'
+import postCssPresetEnv from 'postcss-preset-env'
 
 const getGitText = (command: string) => {
   try {
@@ -45,7 +45,7 @@ export default defineConfig({
   css: {
     postcss: {
       plugins: [
-        AutoPrefixer(),
+        postCssPresetEnv(),
       ]
     }
   },
