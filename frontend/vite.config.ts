@@ -27,7 +27,14 @@ export default defineConfig({
   plugins: [
     vue(),
     legacy({
-      modernPolyfills: ['es.array.at', 'es.typed-array.at', 'es/global-this'],
+      modernPolyfills: [
+        'es.array.at',
+        'es.typed-array.at',
+        'es.global-this',
+      ],
+      additionalLegacyPolyfills: [
+        'abortcontroller-polyfill/dist/abortcontroller-polyfill-only',
+      ],
     }),
     Components({
       resolvers: [

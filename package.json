@@ -36,6 +36,7 @@
     "@typescript-eslint/parser": "^8.57.1",
     "@vitejs/plugin-legacy": "^5.4.3",
     "@vitejs/plugin-vue": "^5.1.4",
+    "abortcontroller-polyfill": "^1.7.8",
     "concurrently": "^9.1.0",
     "core-js": "^3.42.0",
     "eslint": "^10.1.0",
@@ -52,7 +53,7 @@
   },
   "browserslist": [
     "defaults",
-    "chrome >= 84",
-    "ios >= 14.1"
+    "chrome >= 66",
+    "ios >= 12.2"
   ]
 }
