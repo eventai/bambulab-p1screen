@@ -1,7 +1,10 @@
 <template>
   <div class="homepage">
     <div class="task-card">
-      <img class="task-thumbnail" :src="getPrintThumbnail"/>
+      <span v-if="isRecording" class="recording"><i-material-symbols-circle />REC</span>
+      <span class="files" @click="router.push('/files')">文件 &gt;</span>
+      <img v-if="getPrintThumbnail" class="task-thumbnail" :src="getPrintThumbnail"/>
+      <img v-if="!getPrintThumbnail" class="task-thumbnail task-broken-thumbnail" :src="brokenThumbnail"/>
       <span class="task-name">{{ taskName }}</span>
     </div>
     <div class="printer-card">
@@ -9,32 +12,35 @@
       <span id="nozzle-temp">{{ nozzleTemp }} ℃</span>
       <span id="heatbed-temp">{{ heatbedTemp }} ℃</span>
       <span id="wifi-signal"><img :src="getWifiSignalIcon"/></span>
-      <button id="manage-device-btn" type="button" @click="showDeviceListPopup = true">
-        <span>{{ currentDeviceName }}</span>
+      <button id="manage-device-btn" type="button" @click="handleManageDevice">
+        <span v-if="currentDevice" >{{ currentDevice.name }}</span>
+        <span v-if="!currentDevice">添加设备</span>
         <i-material-symbols-settings-rounded />
       </button>
     </div>
     <div class="progress-card">
       <div class="progress-card-left">
         <div class="progress-labels">
-          <span>{{ getPrintPercent }} %</span>
+          <span>{{ getPrintPercent }}%</span>
           <span>{{ getPrintInfo }}</span>
         </div>
         <van-progress :percentage="getPrintPercent" :show-pivot="false" />
         <span class="progress-status">{{ getPrintStateLabel }}</span>
       </div>
-      <div v-if="showPrintActions" class="progress-card-buttons">
-        <ControlButton v-if="!isPaused" :icon="pauseIcon" label="暂停" @click="handlePause" />
-        <ControlButton v-if="isPaused" :icon="resumeIcon" label="继续" @click="handleResume" />
-        <ControlButton :icon="stopIcon" label="停止" @click="handleStop" />
+      <div class="progress-card-buttons">
+        <ControlButton :icon="skipIcon" label="跳过" font-size="10px" @click="handleSkip" :disabled="!showPrintActions" />
+        <ControlButton v-if="!isPaused" :icon="pauseIcon" label="暂停" font-size="10px" @click="handlePause" :disabled="!showPrintActions" />
+        <ControlButton v-if="isPaused" :icon="resumeIcon" label="继续" font-size="10px" @click="handleResume" :disabled="!showPrintActions" />
+        <ControlButton :icon="stopIcon" label="停止" font-size="10px" @click="handleStop" :disabled="!showPrintActions" />
       </div>
     </div>
-    <ControlButton class="light-button" :icon="lightState ? lightOnIcon : lightOffIcon" label="照明" @click="toggleLight" />
+    <ControlButton class="light-button" :icon="lightState ? lightOnIcon : lightOffIcon" label="照明" font-size="10px" @click="toggleLight" />
     <DeviceListPopup v-model:show="showDeviceListPopup" />
   </div>
 </template>
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import humanizeDuration from 'humanize-duration'
 import { PrinterClient } from '../api/PrinterClient'
 import { LightType, GcodeState, CurrentStage } from '../api/enums'
@@ -43,31 +49,42 @@ import DeviceListPopup from '../components/DeviceListPopup.vue'
 
 import lightOnIcon from '../assets/images/monitor_lamp_on.svg'
 import lightOffIcon from '../assets/images/monitor_lamp_off.svg'
+import skipIcon from '../assets/images/print_control_partskip.svg'
 import pauseIcon from '../assets/images/print_control_pause.svg'
 import resumeIcon from '../assets/images/print_control_resume.svg'
 import stopIcon from '../assets/images/print_control_stop.svg'
-import brokenThumbnail from '../assets/images/monitor_brokenimg.png'
+import brokenThumbnail from '../assets/images/dev_hms_diag_loading.svg'
 import p1sThumbnail from '../assets/images/printer_thumbnail_p1s_png.png'
 import signalNoIcon from '../assets/images/monitor_signal_no.svg'
 import signalWeakIcon from '../assets/images/monitor_signal_weak.svg'
 import signalMiddleIcon from '../assets/images/monitor_signal_middle.svg'
 import signalStrongIcon from '../assets/images/monitor_signal_strong.svg'
 import { getProjects } from '../api/project'
-import { getCurrentDevice } from '../utils/device'
+import { DeviceItem, getCurrentDevice } from '../utils/device'
+import { showToast } from 'vant'
 
+const router = useRouter()
 const client = PrinterClient.getInstance()
 const device = client.device
 const showDeviceListPopup = ref(false)
-const currentDeviceName = ref(getCurrentDevice()?.name || '添加设备')
+const currentDevice = ref<DeviceItem | null>(getCurrentDevice())
 
 watch(
   () => showDeviceListPopup.value,
   (visible, prevVisible) => {
     if (prevVisible && !visible) {
-      currentDeviceName.value = getCurrentDevice()?.name || '添加设备'
+      currentDevice.value = getCurrentDevice()
     }
   }
 )
+
+const handleManageDevice = () => {
+  if (!getCurrentDevice()) {
+    router.push('/settings/device/add')
+  } else {
+    showDeviceListPopup.value = true
+  }
+}
 
 const taskName = computed(() => device.print.subtask_name || '')
 const nozzleTemp = computed(() => Math.floor(Number(device.print.nozzle_temper ?? '0')))
@@ -100,7 +117,9 @@ const getCurrentProject = () => {
   )) ?? null
 }
 
-const getPrintThumbnail = computed(() => getCurrentProject()?.thumbnail_url || brokenThumbnail)
+const isRecording = computed(() => getCurrentProject()?.timelapse)
+
+const getPrintThumbnail = computed(() => getCurrentProject()?.thumbnail_url)
 
 const getPrintPercent = computed(() => {
   if (device.print.gcode_state === GcodeState.Prepare) {
@@ -160,13 +179,21 @@ const getPrintInfo = computed(() => {
 const isPaused = computed(() => device.print.gcode_state === GcodeState.Pause)
 const showPrintActions = computed(() => [GcodeState.Pause, GcodeState.Running].includes(device.print.gcode_state ?? GcodeState.Unknown))
 
+const handleSkip = () => {
+  console.log('[Controls] skip')
+  showToast({
+    message: '功能开发中～',
+    position: 'bottom',
+  })
+}
+
 const handleResume = () => {
   console.log('[Controls] resume')
   client.setResume()
 }
 
 const handlePause = () => {
-  console.log('[Controls] resume')
+  console.log('[Controls] pause')
   client.setPause()
 }
 
@@ -186,8 +213,8 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
   grid-template-columns: minmax(0, 1fr) 200px;
   grid-template-rows: minmax(0, 1fr) auto;
   height: 100%;
-  padding: 8px;
-  gap: 8px;
+  padding: 10px;
+  gap: 10px;
 }
 
 .task-card,
@@ -195,18 +222,78 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
 .progress-card,
 .light-button {
   background: var(--van-background-2);
-  border-radius: 12px;
+  border-radius: 8px;
 }
 
 .task-card {
   grid-column: 1;
   grid-row: 1;
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-  justify-items: center;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 22px minmax(0, 1fr) 20px;
   align-items: center;
-  padding: 8px;
   gap: 8px;
+  overflow: hidden;
+}
+
+.recording {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
+  margin-left: 8px;
+  padding: 1px 2px;
+  font-size: 6px;
+  font-weight: bold;
+  border-radius: 3px;
+  border: 1px solid var(--van-text-color);
+  color: var(--van-text-color);
+}
+
+.recording > svg {
+  font-size: 3px;
+  color: var(--van-red);
+  margin-right: 1px;
+}
+
+.files {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+  font-size: 12px;
+  color: var(--van-text-color);
+  cursor: pointer;
+  padding-right: 8px;
+}
+
+.task-thumbnail {
+  grid-column: 1 / span 2;
+  grid-row: 2;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  justify-self: center;
+}
+
+.task-broken-thumbnail {
+  filter: brightness(1.1);
+  width: 60%;
+  padding-bottom: 10%;
+}
+
+.task-name {
+  grid-column: 1 / span 2;
+  grid-row: 3;
+  width: 100%;
+  height: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  text-align: left;
+  align-content: center;
+  padding: 0 12px;
+  background-color: var(--van-background-3);
 }
 
 .printer-card {
@@ -214,35 +301,15 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
   grid-row: 1;
   width: 200px;
   position: relative;
+  overflow: hidden;
 }
 
 #printer-bg {
   position: absolute;
-  inset: 4px 4px 15px 4px;
+  inset: 4px 4px 22px 4px;
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-}
-
-.task-thumbnail {
-  display: block;
-  width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: 100%;
-  /* background-color: var(--van-background-5); */
-}
-
-.task-name {
-  width: fit-content;
-  max-width: 250px;
-  line-height: 22px;
-  height: 22px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 12px;
-  text-align: center;
 }
 
 .printer-card > span {
@@ -281,11 +348,11 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
 }
 
 #manage-device-btn {
-  width: 150px;
-  height: 15px;
+  width: 100%;
+  height: 25px;
   position: absolute;
   left: 50%;
-  bottom: 4px;
+  bottom: 0px;
   transform: translateX(-50%);
   display: inline-flex;
   align-items: center;
@@ -297,7 +364,9 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
 }
 
 #manage-device-btn > span {
-  margin-right: 2px;
+  font-size: 12px;
+  margin-right: 4px;
+  padding-left: 4px;
 }
 
 .progress-card {
@@ -308,12 +377,12 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
   font-size: 12px;
   gap: 8px;
   padding: 8px;
-  margin-right: calc(66px + 8px);
+  margin-right: calc(56px + 10px);
 }
 
 .progress-card-left {
   display: grid;
-  padding: 4px;
+  padding: 0 4px;
 }
 
 .progress-card-buttons {
@@ -331,8 +400,13 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
   font-size: 14px;
 }
 
+.progress-labels > span:first-child {
+  font-weight: 500;
+}
+
 .van-progress {
   margin: 4px 0;
+  height: 6px;
 }
 
 .progress-status {
@@ -342,17 +416,29 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
 }
 
 .progress-card-buttons > .control-button {
-  width: 66px;
-  height: 66px;
+  width: 56px;
+  height: 56px;
   margin-right: 8px;
+  border-radius: 8px;
+}
+
+:deep(.progress-card-buttons > .control-button > img) {
+  width: 20px;
+  height: 20px;
+  margin-bottom: 2px;
 }
 
 .light-button {
   grid-column: 2;
   grid-row: 2;
   justify-self: end;
-  width: 66px;
-  height: 82px;
+  width: 56px;
+  /* height: 72px; */
+}
+
+:deep(.light-button > img) {
+  width: 20px;
+  height: 20px;
 }
 
 @media (orientation: portrait) {
