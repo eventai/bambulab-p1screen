@@ -4,14 +4,15 @@ import { Button, Slider, Progress, Popup, Popover, Dialog, Cell, CellGroup, Empt
 import Bowser from 'bowser'
 import App from './App.vue'
 import { PrinterClient } from './api/PrinterClient'
-import HomePage from './views/HomePage.vue'
-import ControlsPage from './views/ControlsPage.vue'
-import FilamentPage from './views/FilamentPage.vue'
-import FilamentAutoRefillPage from './views/FilamentAutoRefillPage.vue'
-import FilamentEditPage from './views/FilamentEditPage.vue'
-import SettingsPage from './views/SettingsPage.vue'
-import FilesPage from './views/FilesPage.vue'
-import DeviceEditPage from './views/DeviceEditPage.vue'
+import HomePage from './views/home/HomePage.vue'
+import FilesPage from './views/home/FilesPage.vue'
+import DeviceEditPage from './views/home/DeviceEditPage.vue'
+import ControlsPage from './views/control/ControlPage.vue'
+import FilamentPage from './views/filament/FilamentPage.vue'
+import FilamentAutoRefillPage from './views/filament/FilamentAutoRefillPage.vue'
+import FilamentEditPage from './views/filament/FilamentEditPage.vue'
+import SettingsPage from './views/setting/SettingPage.vue'
+import MessagePage from './views/message/MessagePage.vue'
 import { getCurrentDevice } from './utils/device'
 import 'vant/lib/index.css'
 import './styles/theme.css'
@@ -40,14 +41,15 @@ const router = createRouter({
   routes: [
     { path: '/', redirect: '/home' },
     { path: '/home', component: HomePage },
-    { path: '/controls', component: ControlsPage },
+    { path: '/home/files', component: FilesPage },
+    { path: '/home/device/add', component: DeviceEditPage },
+    { path: '/home/device/edit/:serial', component: DeviceEditPage, props: true },
+    { path: '/control', component: ControlsPage },
     { path: '/filament', component: FilamentPage },
     { path: '/filament/auto-refill', component: FilamentAutoRefillPage },
     { path: '/filament/edit/:ams_id/:tray_id', component: FilamentEditPage, props: true },
-    { path: '/settings', component: SettingsPage },
-    { path: '/settings/device/add', component: DeviceEditPage },
-    { path: '/settings/device/edit/:serial', component: DeviceEditPage, props: true },
-    { path: '/files', component: FilesPage },
+    { path: '/setting', component: SettingsPage },
+    { path: '/message', component: MessagePage },
   ]
 })
 

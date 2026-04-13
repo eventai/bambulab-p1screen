@@ -26,9 +26,9 @@ import { useRoute } from 'vue-router'
 import type { Component } from 'vue'
 import IconHome from '~icons/material-symbols/home-rounded'
 import IconTune from '~icons/material-symbols/tune-rounded'
-import IconFilament from '~icons/material-symbols/database'
+import IconDatabase from '~icons/material-symbols/database'
 import IconSettings from '~icons/material-symbols/settings-rounded'
-import IconFiles from '~icons/material-symbols/folder-rounded'
+import IconSMS from '~icons/material-symbols/sms-rounded'
 
 const route = useRoute()
 
@@ -40,10 +40,10 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { key: 'home', to: '/home', icon: IconHome },
-  { key: 'controls', to: '/controls', icon: IconTune },
-  { key: 'filament', to: '/filament', icon: IconFilament },
-  { key: 'settings', to: '/settings', icon: IconSettings },
-  { key: 'files', to: '/files', icon: IconFiles },
+  { key: 'controls', to: '/control', icon: IconTune },
+  { key: 'filament', to: '/filament', icon: IconDatabase },
+  { key: 'settings', to: '/setting', icon: IconSettings },
+  { key: 'message', to: '/message', icon: IconSMS },
 ]
 
 const activeNavKey = computed(() => {

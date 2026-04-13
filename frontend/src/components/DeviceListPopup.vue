@@ -33,7 +33,7 @@
       </van-cell-group>
 
       <van-cell-group inset>
-        <van-cell title="添加设备" class="add-device-cell device-cell" @click="router.push('/settings/device/add')" />
+        <van-cell title="添加设备" class="add-device-cell device-cell" @click="router.push('/home/device/add')" />
       </van-cell-group>
     </div>
   </BasePopup>
@@ -73,7 +73,7 @@ const toggleMode = () => {
 
 const handleCellClick = (serial: string) => {
   if (isEditMode.value) {
-    router.push(`/settings/device/edit/${serial}`)
+    router.push(`/home/device/edit/${serial}`)
   } else {
     if (currentSerial.value === serial) return
     currentSerial.value = serial

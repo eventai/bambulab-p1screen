@@ -35,8 +35,8 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { getCurrentDevice } from '../utils/device'
-import { PrinterClient, PrinterEvent } from '../api/PrinterClient'
+import { getCurrentDevice } from '../../utils/device'
+import { PrinterClient, PrinterEvent } from '../../api/PrinterClient'
 
 const client = PrinterClient.getInstance()
 const device = ref(client.device.print)

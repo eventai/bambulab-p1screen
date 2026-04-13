@@ -52,8 +52,8 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { closeToast, showFailToast, showLoadingToast, showSuccessToast } from 'vant'
-import NavHeader from '../components/NavHeader.vue'
-import { PrinterClient, PrinterEvent } from '../api/PrinterClient'
+import NavHeader from '../../components/NavHeader.vue'
+import { PrinterClient, PrinterEvent } from '../../api/PrinterClient'
 
 const route = useRoute()
 const router = useRouter()

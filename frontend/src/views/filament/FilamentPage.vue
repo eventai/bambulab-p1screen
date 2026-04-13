@@ -51,13 +51,13 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 import type { PopoverAction } from 'vant'
 import { useRouter } from 'vue-router'
-import { PrinterClient, PrinterEvent } from '../api/PrinterClient'
-import humLevelIcon from '../assets/images/hum_level1_no_num_dark.svg'
-import humLevel1Icon from '../assets/images/hum_level1_dark.svg'
-import humLevel2Icon from '../assets/images/hum_level2_dark.svg'
-import humLevel3Icon from '../assets/images/hum_level3_dark.svg'
-import humLevel4Icon from '../assets/images/hum_level4_dark.svg'
-import humLevel5Icon from '../assets/images/hum_level5_dark.svg'
+import { PrinterClient, PrinterEvent } from '../../api/PrinterClient'
+import humLevelIcon from '../../assets/images/hum_level1_no_num_dark.svg'
+import humLevel1Icon from '../../assets/images/hum_level1_dark.svg'
+import humLevel2Icon from '../../assets/images/hum_level2_dark.svg'
+import humLevel3Icon from '../../assets/images/hum_level3_dark.svg'
+import humLevel4Icon from '../../assets/images/hum_level4_dark.svg'
+import humLevel5Icon from '../../assets/images/hum_level5_dark.svg'
 
 const router = useRouter()
 const client = PrinterClient.getInstance()

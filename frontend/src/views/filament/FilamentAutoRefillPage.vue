@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import NavHeader from '../components/NavHeader.vue'
+import NavHeader from '../../components/NavHeader.vue'
 
 const router = useRouter()
 </script>

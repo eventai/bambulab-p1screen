@@ -1,14 +1,16 @@
 <template>
-  <div class="files-page">
+  <div class="msg-page">
     <van-empty description="开发中" />
   </div>
 </template>
 
+<script setup lang="ts">
+</script>
+
 <style scoped>
-.files-page {
-  height: 100%;
+.msg-page {
   display: grid;
-  place-items: center;
+  height: 100%;
 }
 
 :deep(.van-empty__image) {

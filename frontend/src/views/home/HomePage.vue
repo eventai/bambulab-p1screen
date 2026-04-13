@@ -2,7 +2,7 @@
   <div class="homepage">
     <div class="task-card" ref="taskCardRef" :style="{ width : `${taskCardWidth}px` }">
       <span v-if="isRecording" class="recording"><i-material-symbols-circle />REC</span>
-      <span class="files" @click="router.push('/files')">文件 &gt;</span>
+      <span class="files" @click="router.push('/home/files')">文件 &gt;</span>
       <img v-if="getTaskThumbnail" class="task-thumbnail" :src="getTaskThumbnail"/>
       <img v-if="!getTaskThumbnail" class="task-thumbnail task-broken-thumbnail" :src="brokenThumbnail"/>
       <span class="task-name">{{ taskName }}</span>
@@ -56,32 +56,32 @@ import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
 import { showToast } from 'vant'
 import { useRouter } from 'vue-router'
 import humanizeDuration from 'humanize-duration'
-import { PrinterClient, PrinterEvent } from '../api/PrinterClient'
-import { LightType, GcodeState, CurrentStage } from '../api/enums'
-import { getCurrentProject } from '../api/project'
-import { getCurrentDevice } from '../utils/device'
-import ControlButton from '../components/ControlButton.vue'
-import DeviceListPopup from '../components/DeviceListPopup.vue'
+import { PrinterClient, PrinterEvent } from '../../api/PrinterClient'
+import { LightType, GcodeState, CurrentStage } from '../../api/enums'
+import { getCurrentProject } from '../../api/project'
+import { getCurrentDevice } from '../../utils/device'
+import ControlButton from '../../components/ControlButton.vue'
+import DeviceListPopup from '../../components/DeviceListPopup.vue'
 
-import lightOnIcon from '../assets/images/monitor_lamp_on.svg'
-import lightOffIcon from '../assets/images/monitor_lamp_off.svg'
-import skipIcon from '../assets/images/print_control_partskip.svg'
-import pauseIcon from '../assets/images/print_control_pause.svg'
-import resumeIcon from '../assets/images/print_control_resume.svg'
-import stopIcon from '../assets/images/print_control_stop.svg'
-import brokenThumbnail from '../assets/images/dev_hms_diag_loading.svg'
-import p1sThumbnail from '../assets/images/printer_thumbnail_p1s_png.png'
-import signalNoIcon from '../assets/images/monitor_signal_no.svg'
-import signalWeakIcon from '../assets/images/monitor_signal_weak.svg'
-import signalMiddleIcon from '../assets/images/monitor_signal_middle.svg'
-import signalStrongIcon from '../assets/images/monitor_signal_strong.svg'
-import bedTempIcon from '../assets/images/monitor_bed_temp.svg'
-import nozzleTempIcon from '../assets/images/monitor_nozzle_temp.svg'
-import nozzleNormalThumbnail from '../assets/images/indicator_nozzle_23.png'
-import nozzleHeatingThumbnail from '../assets/images/indicator_heat_nozzle_23.png'
-// import nozzleCoolingThumbnail from '../assets/images/indicator_nozzle_cooling_23.png'
-// import nozzleOcclusionThumbnail from '../assets/images/indicator_occlusion_filament_23.png'
-// import nozzlePurgeThumbnail from '../assets/images/indicator_purge_filament_23.png'
+import lightOnIcon from '../../assets/images/monitor_lamp_on.svg'
+import lightOffIcon from '../../assets/images/monitor_lamp_off.svg'
+import skipIcon from '../../assets/images/print_control_partskip.svg'
+import pauseIcon from '../../assets/images/print_control_pause.svg'
+import resumeIcon from '../../assets/images/print_control_resume.svg'
+import stopIcon from '../../assets/images/print_control_stop.svg'
+import brokenThumbnail from '../../assets/images/dev_hms_diag_loading.svg'
+import p1sThumbnail from '../../assets/images/printer_thumbnail_p1s_png.png'
+import signalNoIcon from '../../assets/images/monitor_signal_no.svg'
+import signalWeakIcon from '../../assets/images/monitor_signal_weak.svg'
+import signalMiddleIcon from '../../assets/images/monitor_signal_middle.svg'
+import signalStrongIcon from '../../assets/images/monitor_signal_strong.svg'
+import bedTempIcon from '../../assets/images/monitor_bed_temp.svg'
+import nozzleTempIcon from '../../assets/images/monitor_nozzle_temp.svg'
+import nozzleNormalThumbnail from '../../assets/images/indicator_nozzle_23.png'
+import nozzleHeatingThumbnail from '../../assets/images/indicator_heat_nozzle_23.png'
+// import nozzleCoolingThumbnail from '../../assets/images/indicator_nozzle_cooling_23.png'
+// import nozzleOcclusionThumbnail from '../../assets/images/indicator_occlusion_filament_23.png'
+// import nozzlePurgeThumbnail from '../../assets/images/indicator_purge_filament_23.png'
 
 
 const router = useRouter()
@@ -154,7 +154,7 @@ const onProjectFile = () => {
 
 const handleManageDevice = () => {
   if (!getCurrentDevice()) {
-    router.push('/settings/device/add')
+    router.push('/home/device/add')
   } else {
     showDeviceListPopup.value = true
   }
