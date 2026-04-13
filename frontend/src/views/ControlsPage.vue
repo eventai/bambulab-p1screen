@@ -47,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ComputedRef, ref } from 'vue'
+import { computed, ComputedRef, onMounted, onUnmounted, ref } from 'vue'
 import { showDialog } from 'vant'
 import XYMotion from '../components/XYMotion.vue'
 import ZMotion from '../components/ZMotion.vue'
@@ -56,7 +56,7 @@ import TempKeypadPopup from '../components/TempKeypadPopup.vue'
 import FanSpeedPopup from '../components/FanSpeedPopup.vue'
 import PrintSpeedPopup from '../components/PrintSpeedPopup.vue'
 import { FanType, TemperatureType, LightType, GcodeState } from '../api/enums'
-import { PrinterClient } from '../api/PrinterClient'
+import { PrinterClient, PrinterEvent } from '../api/PrinterClient'
 
 import nozzleTempIcon from '../assets/images/monitor_nozzle_temp.svg'
 import nozzleTempActiveIcon from '../assets/images/monitor_nozzle_temp_active.svg'
@@ -71,8 +71,21 @@ import lightOnIcon from '../assets/images/monitor_lamp_on.svg'
 import lightOffIcon from '../assets/images/monitor_lamp_off.svg'
 import ControlButton from '../components/ControlButton.vue'
 
+
 const client = PrinterClient.getInstance()
-const device = client.device
+const device = ref(client.device.print)
+
+onMounted(() => {
+  client.on(PrinterEvent.PRINT_PUSH_STATUS, onPushStatus)
+})
+
+onUnmounted(() => {
+  client.off(PrinterEvent.PRINT_PUSH_STATUS, onPushStatus)
+})
+
+const onPushStatus = () => {
+  device.value = client.device.print
+}
 
 // ------------------------------
 // Temperature
@@ -86,14 +99,14 @@ type TempItem = {
 }
 const temps: TempItem[] = [{
   type: TemperatureType.Nozzle,
-  icon: computed(() => (Math.floor(Number(device.print.nozzle_target_temper ?? '0')) - Math.floor(Number(device.print.nozzle_temper ?? '0')) > 2) ? nozzleTempActiveIcon : nozzleTempIcon),
-  current: computed(() => Math.floor(Number(device.print.nozzle_temper ?? '0'))),
-  target: computed(() => Math.floor(Number(device.print.nozzle_target_temper ?? '0'))),
+  icon: computed(() => (Math.floor(Number(device.value?.nozzle_target_temper ?? '0')) - Math.floor(Number(device.value?.nozzle_temper ?? '0')) > 2) ? nozzleTempActiveIcon : nozzleTempIcon),
+  current: computed(() => Math.floor(Number(device.value?.nozzle_temper ?? '0'))),
+  target: computed(() => Math.floor(Number(device.value?.nozzle_target_temper ?? '0'))),
 }, {
   type: TemperatureType.Heatbed,
-  icon: computed(() => (Math.floor(Number(device.print.bed_target_temper ?? '0')) - Math.floor(Number(device.print.bed_temper ?? '0')) > 2) ? bedTempActiveIcon : bedTempIcon),
-  current: computed(() => Math.floor(Number(device.print.bed_temper ?? '0'))),
-  target: computed(() => Math.floor(Number(device.print.bed_target_temper ?? '0'))),
+  icon: computed(() => (Math.floor(Number(device.value?.bed_target_temper ?? '0')) - Math.floor(Number(device.value?.bed_temper ?? '0')) > 2) ? bedTempActiveIcon : bedTempIcon),
+  current: computed(() => Math.floor(Number(device.value?.bed_temper ?? '0'))),
+  target: computed(() => Math.floor(Number(device.value?.bed_target_temper ?? '0'))),
 }]
 
 const openTempPopup = (type: TemperatureType) => {
@@ -129,11 +142,11 @@ const fans: { type: FanType, name: string }[] = [{
 
 const showPrintSpeedPopup = ref(false)
 
-const getPrintSpeed = computed(() => ['0%', '50%', '100%', '124%', '166%'][Number(device.print.spd_lvl ?? '')])
-const getPrintSpeedLevel = computed(() => device.print.spd_lvl)
+const getPrintSpeed = computed(() => ['0%', '50%', '100%', '124%', '166%'][Number(device.value?.spd_lvl ?? '')])
+const getPrintSpeedLevel = computed(() => device.value?.spd_lvl)
 
 const handlePrintSpeedConfirm = (speedLevel: number) => {
-  if ([GcodeState.Idle, GcodeState.Finish].includes(device.print.gcode_state ?? GcodeState.Unknown)) {
+  if ([GcodeState.Idle, GcodeState.Finish].includes(device.value?.gcode_state ?? GcodeState.Unknown)) {
     showDialog({ message: '空闲状态下调整打印速度不生效。' })
     return
   }
@@ -143,7 +156,7 @@ const handlePrintSpeedConfirm = (speedLevel: number) => {
 // ------------------------------
 // Light
 
-const lightState = computed(() => device.print.lights_report?.find(item => item.node === LightType.Chamber)?.mode === 'on')
+const lightState = computed(() => device.value?.lights_report?.find(item => item.node === LightType.Chamber)?.mode === 'on')
 const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
 
 // ------------------------------
@@ -170,7 +183,7 @@ M211 R
       client.request('print.gcode_line', { param: gcode })
       break
     case 'e':
-      if (Number(device.print.nozzle_temper ?? '0') < 170) {
+      if (Number(device.value?.nozzle_temper ?? '0') < 170) {
         showDialog({ message: '请将热端加热到170℃以上。' })
         break
       }

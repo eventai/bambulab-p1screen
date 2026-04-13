@@ -1,4 +1,5 @@
 import { unzipSync } from 'fflate'
+import { PrinterClient } from './PrinterClient'
 
 export type Project = {
   param: string
@@ -73,4 +74,17 @@ export const getProjects = () => {
     console.warn(`[PrintClient] failed to parse projects from localStorage: ${error.message}`)
     return [] as Project[]
   }
+}
+
+export const getCurrentProject = () => {
+  const client = PrinterClient.getInstance()
+  const taskId = client.device.print?.task_id
+  const subtaskId = client.device.print?.subtask_id
+  if (!taskId || !subtaskId) {
+    return null
+  }
+
+  return getProjects().find(project => (
+    project.task_id === taskId && project.subtask_id === subtaskId
+  )) ?? null
 }

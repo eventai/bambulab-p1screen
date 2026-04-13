@@ -35,7 +35,8 @@ const props = withDefaults(
   defineProps<{
     name: string
     amsId: string
-    tray?: DeviceTray
+    tray: DeviceTray
+    trayNow: string
   }>(),
   {
   }
@@ -55,16 +56,16 @@ const actions = computed<PopoverAction[]>(() => {
   return menu
 })
 
-const material = computed(() => props.tray?.tray_type || '?')
-const color = computed(() => props.tray ? `#${props.tray.tray_color}` : getComputedStyle(document.documentElement).getPropertyValue('--van-text-color').trim())
-const readonly = computed(() => props.tray?.tag_uid !== '0000000000000000')
+const material = computed(() => props.tray.tray_type)
+const color = computed(() => `#${props.tray.tray_color}`)
+const readonly = computed(() => props.tray.tag_uid !== '0000000000000000')
 const isCurrent = computed(() => {
-  const trayNow = Number(client.device.print.ams?.tray_now ?? '0')
-  const trayId = Number(props.tray?.id ?? '0')
+  const trayNow = Number(props.trayNow)
+  const trayId = Number(props.tray.id)
   return (trayNow === 254 && trayId === 254)
     || (Number(props.amsId) * 4 + trayId === trayNow)
 })
-const isExt = computed(() => Number(props.tray?.id ?? '0') === 254)
+const isExt = computed(() => Number(props.tray.id) === 254)
 
 const handleTrayClick = () => {
   if (!props.tray) return
@@ -76,16 +77,16 @@ const handleSelect = (action: PopoverAction) => {
   showPopover.value = false
   switch (action.type) {
     case 'edit':
-      router.push(`/filament/edit/${props.amsId}/${props.tray?.id}`)
+      router.push(`/filament/edit/${props.amsId}/${props.tray.id}`)
       break
     case 'load':
-      // client.request('print.ams_change_filament', { ams_id: Number(props.amsId), slot_id: Number(props.tray?.id), curr_temp: -1, tar_temp: -1, target: 0 })
+      // client.request('print.ams_change_filament', { ams_id: Number(props.amsId), slot_id: Number(props.tray.id), curr_temp: -1, tar_temp: -1, target: 0 })
       break
     case 'unload':
       // TODO
       break
     case 'reload':
-      client.request('print.ams_get_rfid', { ams_id: Number(props.amsId), slot_id: Number(props.tray?.id) })
+      client.request('print.ams_get_rfid', { ams_id: Number(props.amsId), slot_id: Number(props.tray.id) })
       break
     default:
       break

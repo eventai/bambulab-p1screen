@@ -49,24 +49,25 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { closeToast, showFailToast, showLoadingToast, showSuccessToast } from 'vant'
 import NavHeader from '../components/NavHeader.vue'
-import { PrinterClient } from '../api/PrinterClient'
+import { PrinterClient, PrinterEvent } from '../api/PrinterClient'
 
 const route = useRoute()
 const router = useRouter()
 const client = PrinterClient.getInstance()
-const device = client.device
+
+const device = ref(client.device.print)
 const amsId = route.params.ams_id as string
 const trayId = route.params.tray_id as string
 
-const ams = computed(() => device.print.ams?.ams.find((item) => item.id === amsId))
+const ams = computed(() => device.value?.ams?.ams.find((item) => item.id === amsId))
 
 const tray = computed(() => {
-  if (amsId === '255' && trayId === device.print.vt_tray?.id) {
-    return device.print.vt_tray!
+  if (amsId === '255' && trayId === device.value?.vt_tray?.id) {
+    return device.value?.vt_tray
   }
   return ams.value?.tray.find((item) => item.id === trayId)
 })
@@ -76,6 +77,18 @@ const trayColor = ref('')
 const nozzleTempMin = ref('')
 const nozzleTempMax = ref('')
 const trayColorInputValue = computed(() => `#${trayColor.value.slice(0, 6)}`)
+
+onMounted(() => {
+  client.on(PrinterEvent.PRINT_PUSH_STATUS, onPushStatus)
+})
+
+onUnmounted(() => {
+  client.off(PrinterEvent.PRINT_PUSH_STATUS, onPushStatus)
+})
+
+const onPushStatus = () => {
+  device.value = client.device.print
+}
 
 watch(
   tray,

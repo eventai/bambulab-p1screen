@@ -11,10 +11,10 @@
       <div id="printer-bg" :style="{ backgroundImage: `url(${p1sThumbnail})` }"></div>
       <span id="nozzle-temp">{{ nozzleTemp }} ℃</span>
       <span id="heatbed-temp">{{ heatbedTemp }} ℃</span>
-      <span id="wifi-signal"><img :src="getWifiSignalIcon"/></span>
+      <span id="wifi-signal"><img :src="wifiSignalIcon"/></span>
       <button id="manage-device-btn" type="button" @click="handleManageDevice">
-        <span v-if="currentDevice" >{{ currentDevice.name }}</span>
-        <span v-if="!currentDevice">添加设备</span>
+        <span v-if="deviceItem" >{{ deviceItem.name }}</span>
+        <span v-if="!deviceItem">添加设备</span>
         <i-material-symbols-settings-rounded />
       </button>
     </div>
@@ -39,10 +39,11 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
+import { showToast } from 'vant'
 import { useRouter } from 'vue-router'
 import humanizeDuration from 'humanize-duration'
-import { PrinterClient } from '../api/PrinterClient'
+import { PrinterClient, PrinterEvent } from '../api/PrinterClient'
 import { LightType, GcodeState, CurrentStage } from '../api/enums'
 import ControlButton from '../components/ControlButton.vue'
 import DeviceListPopup from '../components/DeviceListPopup.vue'
@@ -59,39 +60,14 @@ import signalNoIcon from '../assets/images/monitor_signal_no.svg'
 import signalWeakIcon from '../assets/images/monitor_signal_weak.svg'
 import signalMiddleIcon from '../assets/images/monitor_signal_middle.svg'
 import signalStrongIcon from '../assets/images/monitor_signal_strong.svg'
-import { getProjects } from '../api/project'
-import { DeviceItem, getCurrentDevice } from '../utils/device'
-import { showToast } from 'vant'
+import { getCurrentProject } from '../api/project'
+import { getCurrentDevice } from '../utils/device'
 
 const router = useRouter()
 const client = PrinterClient.getInstance()
-const device = client.device
-const showDeviceListPopup = ref(false)
-const currentDevice = ref<DeviceItem | null>(getCurrentDevice())
 
-watch(
-  () => showDeviceListPopup.value,
-  (visible, prevVisible) => {
-    if (prevVisible && !visible) {
-      currentDevice.value = getCurrentDevice()
-    }
-  }
-)
-
-const handleManageDevice = () => {
-  if (!getCurrentDevice()) {
-    router.push('/settings/device/add')
-  } else {
-    showDeviceListPopup.value = true
-  }
-}
-
-const taskName = computed(() => device.print.subtask_name || '')
-const nozzleTemp = computed(() => Math.floor(Number(device.print.nozzle_temper ?? '0')))
-const heatbedTemp = computed(() => Math.floor(Number(device.print.bed_temper ?? '0')))
-
-const getWifiSignalIcon = computed(() => {
-  if (!client.mqttClient.value?.connected) {
+const getWifiSignalIcon = () => {
+  if (!client.mqttClient?.connected) {
     return signalNoIcon
   }
 
@@ -103,37 +79,74 @@ const getWifiSignalIcon = computed(() => {
   } else {
     return signalWeakIcon
   }
+}
+
+const wifiSignalIcon = ref(getWifiSignalIcon())
+const showDeviceListPopup = ref(false)
+const deviceItem = ref(getCurrentDevice())
+const device = ref(client.device.print)
+const project = ref(getCurrentProject())
+
+onMounted(() => {
+  client.on(PrinterEvent.MQTT_STATE_CHANGE, onPushStatus)
+  client.on(PrinterEvent.PRINT_PUSH_STATUS, onPushStatus)
+  client.on(PrinterEvent.PRINT_PROJECT_FILE, onProjectFile)
 })
 
-const getCurrentProject = () => {
-  const taskId = device.print.task_id
-  const subtaskId = device.print.subtask_id
-  if (!taskId || !subtaskId) {
-    return null
-  }
+onUnmounted(() => {
+  client.off(PrinterEvent.MQTT_STATE_CHANGE, onPushStatus)
+  client.off(PrinterEvent.PRINT_PUSH_STATUS, onPushStatus)
+  client.off(PrinterEvent.PRINT_PROJECT_FILE, onProjectFile)
+})
 
-  return getProjects().find(project => (
-    project.task_id === taskId && project.subtask_id === subtaskId
-  )) ?? null
+watch(
+  () => showDeviceListPopup.value,
+  (visible, prevVisible) => {
+    if (prevVisible && !visible) {
+      deviceItem.value = getCurrentDevice()
+    }
+  }
+)
+
+const onPushStatus = () => {
+  device.value = client.device.print
+  wifiSignalIcon.value = getWifiSignalIcon()
 }
+
+const onProjectFile = () => {
+  // console.debug('[HomePage] on print.project_file')
+  project.value = getCurrentProject()
+}
+
+const handleManageDevice = () => {
+  if (!getCurrentDevice()) {
+    router.push('/settings/device/add')
+  } else {
+    showDeviceListPopup.value = true
+  }
+}
+
+const taskName = computed(() => device.value?.subtask_name || '')
+const nozzleTemp = computed(() => Math.floor(Number(device.value?.nozzle_temper ?? '0')))
+const heatbedTemp = computed(() => Math.floor(Number(device.value?.bed_temper ?? '0')))
 
 const isRecording = computed(() => getCurrentProject()?.timelapse)
 
 const getPrintThumbnail = computed(() => getCurrentProject()?.thumbnail_url)
 
 const getPrintPercent = computed(() => {
-  if (device.print.gcode_state === GcodeState.Prepare) {
+  if (device.value?.gcode_state === GcodeState.Prepare) {
     return 0
   }
-  return device.print.mc_percent || 0
+  return device.value?.mc_percent || 0
 })
 
 const getPrintStateLabel = computed(() => {
-  switch (device.print.gcode_state) {
+  switch (device.value?.gcode_state) {
     case GcodeState.Idle:
       return '空闲'
     case GcodeState.Prepare:
-      return `下载中(${device.print.gcode_file_prepare_percent}%)`
+      return `下载中(${device.value?.gcode_file_prepare_percent}%)`
     case GcodeState.Running:
       return getPrintSubStateLabel()
       // return '打印中'
@@ -149,7 +162,7 @@ const getPrintStateLabel = computed(() => {
 })
 
 const getPrintSubStateLabel = () => {
-  switch (device.print.stg_cur) {
+  switch (device.value?.stg_cur) {
     case CurrentStage.PRINTING:
       return '打印中'
     case CurrentStage.HEATBED_PREHEATING:
@@ -166,18 +179,18 @@ const getPrintSubStateLabel = () => {
 }
 
 const getPrintInfo = computed(() => {
-  if ([GcodeState.Finish, GcodeState.Failed].includes(device.print.gcode_state ?? GcodeState.Unknown)) return ''
+  if ([GcodeState.Finish, GcodeState.Failed].includes(device.value?.gcode_state ?? GcodeState.Unknown)) return ''
 
-  const remainingTimeText = humanizeDuration((device.print.mc_remaining_time || 0) * 60 * 1000, {
+  const remainingTimeText = humanizeDuration((device.value?.mc_remaining_time || 0) * 60 * 1000, {
     units: ['h', 'm'],
     round: true,
     language: 'zh_CN'
   })
-  return `${device.print.layer_num || 0} / ${device.print.total_layer_num || 0} | ${remainingTimeText}`
+  return `${device.value?.layer_num || 0} / ${device.value?.total_layer_num || 0} | ${remainingTimeText}`
 })
 
-const isPaused = computed(() => device.print.gcode_state === GcodeState.Pause)
-const showPrintActions = computed(() => [GcodeState.Pause, GcodeState.Running].includes(device.print.gcode_state ?? GcodeState.Unknown))
+const isPaused = computed(() => device.value?.gcode_state === GcodeState.Pause)
+const showPrintActions = computed(() => [GcodeState.Pause, GcodeState.Running].includes(device.value?.gcode_state ?? GcodeState.Unknown))
 
 const handleSkip = () => {
   console.log('[Controls] skip')
@@ -202,7 +215,7 @@ const handleStop = () => {
   client.setStop()
 }
 
-const lightState = computed(() => device.print.lights_report?.find(item => item.node === LightType.Chamber)?.mode === 'on')
+const lightState = computed(() => device.value?.lights_report?.find(item => item.node === LightType.Chamber)?.mode === 'on')
 const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
 
 </script>

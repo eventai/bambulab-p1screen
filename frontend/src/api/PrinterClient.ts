@@ -1,4 +1,3 @@
-import { reactive, shallowRef, triggerRef } from 'vue'
 import mqtt, { type MqttClient } from 'mqtt'
 import { type DeviceState } from './device'
 import {
@@ -9,10 +8,15 @@ import {
 } from './enums'
 import { saveProject, type Project } from './project'
 
+export enum PrinterEvent {
+  MQTT_STATE_CHANGE = 'mqtt.state_change',
+  PRINT_PUSH_STATUS = 'print.push_status',
+  PRINT_PROJECT_FILE = 'print.project_file',
+}
+
 export class PrinterClient {
   private static instance: PrinterClient | null = null
-  public mqttClient = shallowRef<MqttClient | null>(null)
-  public lastError: Error | null = null
+
   private sequenceId = 0
   private reportTopic = ''
   private requestTopic = ''
@@ -20,11 +24,11 @@ export class PrinterClient {
     resolve: (value: any) => void
     reject: (reason?: any) => void
   }>()
+  private listeners: Record<string, ((params: any) => void)[]> = {}
 
-  device = reactive<DeviceState>({
-    module: [],
-    print: {},
-  })
+  mqttClient: MqttClient | null = null
+  lastError: Error | null = null
+  device: DeviceState = {}
 
   /**
    * Returns the singleton PrinterClient instance.
@@ -35,6 +39,23 @@ export class PrinterClient {
       PrinterClient.instance = new PrinterClient()
     }
     return PrinterClient.instance
+  }
+
+  on(event: PrinterEvent, callback: (params: any) => void) {
+    if (!this.listeners[event]) {
+      this.listeners[event] = []
+    }
+    this.listeners[event].push(callback)
+  }
+
+  off(event: PrinterEvent, callback: (params: any) => void) {
+    if (!this.listeners[event]) return
+    this.listeners[event] = this.listeners[event].filter(cb => cb !== callback)
+  }
+
+  private emit(event: PrinterEvent, params: any) {
+    if (!this.listeners[event]) return
+    this.listeners[event].forEach(cb => cb(params))
   }
 
   /**
@@ -55,8 +76,8 @@ export class PrinterClient {
     this.stopConnection('recreate connection')
     this.reportTopic = `device/${serial}/report`
     this.requestTopic = `device/${serial}/request`
-    this.device.print = {}
-    this.device.module = []
+    this.device.print = undefined
+    this.device.module = undefined
 
     try {
       const wsProtocol = location.protocol === 'https:' ? 'wss' : 'ws'
@@ -69,7 +90,7 @@ export class PrinterClient {
         reconnectPeriod: 5000,
         reconnectOnConnackError: true,
       })
-      this.mqttClient.value = mqttClient
+      this.mqttClient = mqttClient
       mqttClient.on('connect', this.onConnect.bind(this))
       mqttClient.on('reconnect', this.onReconnect.bind(this))
       mqttClient.on('offline', this.onOffline.bind(this))
@@ -94,69 +115,69 @@ export class PrinterClient {
   }
 
   private stopConnection(reason: string) {
-    const client = this.mqttClient.value
-    if (client) {
-      client.removeAllListeners()
-      client.end(true)
+    if (this.mqttClient) {
+      this.mqttClient.removeAllListeners()
+      this.mqttClient.end(true)
     }
-    this.mqttClient.value = null
+    this.mqttClient = null
     this.reportTopic = ''
     this.requestTopic = ''
-    this.device.print = {}
-    this.device.module = []
+    this.device.print = undefined
+    this.device.module = undefined
     this.rejectPendingPublishes(reason)
-    triggerRef(this.mqttClient)
+    this.emit(PrinterEvent.MQTT_STATE_CHANGE, null)
   }
 
   private async onConnect() {
     this.lastError = null
     console.log('[PrintClient] connected')
-    const client = this.mqttClient.value
     const topic = this.reportTopic
-    if (!client || !topic) return
+    if (!this.mqttClient || !topic) return
     try {
       console.log(`[PrintClient] subscribe topic: ${topic}`)
-      await client.subscribeAsync(topic)
+      await this.mqttClient.subscribeAsync(topic)
     } catch (err: any) {
       console.error(`[PrintClient] subscribe failed: ${err.message}`)
       this.stopConnection('subscribe failed')
       return
     }
-    void this.updateAllData().catch((err: any) => {
+
+    this.updateAllData().catch((err: any) => {
       console.warn(`[PrintClient] initial data sync failed: ${err.message}`)
+    }).then(() => {
+      this.emit(PrinterEvent.MQTT_STATE_CHANGE, null)
     })
-    triggerRef(this.mqttClient)
   }
 
   private onClose() {
     console.log('[PrintClient] closed')
     this.rejectPendingPublishes('socket closed')
-    triggerRef(this.mqttClient)
+    this.emit(PrinterEvent.MQTT_STATE_CHANGE, null)
   }
 
   private onReconnect() {
     console.warn('[PrintClient] reconnecting...')
-    triggerRef(this.mqttClient)
+    this.emit(PrinterEvent.MQTT_STATE_CHANGE, null)
   }
 
   private onOffline() {
     console.warn('[PrintClient] offline')
-    triggerRef(this.mqttClient)
+    this.emit(PrinterEvent.MQTT_STATE_CHANGE, null)
   }
 
   private onEnd() {
     console.log('[PrintClient] ended')
-    this.mqttClient.value = null
+    this.mqttClient = null
     this.reportTopic = ''
     this.requestTopic = ''
-    triggerRef(this.mqttClient)
+    this.emit(PrinterEvent.MQTT_STATE_CHANGE, null)
   }
 
   private onError(error: Error) {
     this.lastError = error
     console.error(`[PrintClient] error: ${error.message}`)
     this.rejectPendingPublishes('socket error')
-    triggerRef(this.mqttClient)
+    this.emit(PrinterEvent.MQTT_STATE_CHANGE, null)
   }
 
   private onMessage(topic: string, payload: Uint8Array) {
@@ -187,9 +208,11 @@ export class PrinterClient {
       switch(command) {
         case 'print.push_status':
           this.handlePushStatus(params)
+          this.emit(PrinterEvent.PRINT_PUSH_STATUS, params)
           break
         case 'print.project_file':
           this.handleProjectFile(params)
+          this.emit(PrinterEvent.PRINT_PROJECT_FILE, params)
           break
         default:
           const flag = this.resolvePublishResponse(sequenceId, result, reason, params)
@@ -202,8 +225,12 @@ export class PrinterClient {
   }
 
   private handlePushStatus(printData: any) {
-    for (const key in printData) {
-      (this.device.print as any)[key] = printData[key]
+    if (!this.device.print) {
+      this.device.print = printData
+    } else {
+      for (const key in printData) {
+        (this.device.print as any)[key] = printData[key]
+      }
     }
   }
 
@@ -223,8 +250,7 @@ export class PrinterClient {
   }
 
   async request(command: string, params?: Record<string, any>) {
-    const client = this.mqttClient.value
-    if (!client || !client.connected) throw new Error('Not connected')
+    if (!this.mqttClient?.connected) throw new Error('Not connected')
 
     const [type, name] = command.split('.')
     this.sequenceId = (this.sequenceId + 1) & 0xFFFF
@@ -241,7 +267,7 @@ export class PrinterClient {
     })
     console.debug(`[PrintClient] request: sequenceId=${sequenceId}, command=${command}, params=${JSON.stringify(params)}`)
     try {
-      await client.publishAsync(this.requestTopic, JSON.stringify(req))
+      await this.mqttClient.publishAsync(this.requestTopic, JSON.stringify(req))
     } catch (err) {
       const pending = this.pendingPublishes.get(sequenceId)
       if (pending) {
@@ -279,7 +305,7 @@ export class PrinterClient {
    * @returns Fan speed value in range 0-255.
    */
   getFanSpeed(type: FanType) {
-    const fanGear = this.device.print.fan_gear ?? 0
+    const fanGear = this.device.print?.fan_gear ?? 0
     const fanBit = 8 * (type as number - 1)
     return (fanGear >> fanBit) % 256
   }
@@ -289,7 +315,7 @@ export class PrinterClient {
    * @returns Wi-Fi strength percentage in range 0-100.
    */
   getWifiSignalPercentage() {
-    const wifiSignal = this.device.print.wifi_signal
+    const wifiSignal = this.device.print?.wifi_signal
     if (!wifiSignal) return 0
     const dbm = parseInt(wifiSignal)
     if (isNaN(dbm)) return 0
@@ -310,6 +336,7 @@ export class PrinterClient {
    * @returns No return value.
    */
   async setFanSpeed(type: FanType, speed: number) {
+    if (!this.device.print) return;
     const param = `M106 P${type as number} S${speed}\n`
     const result = await this.request('print.gcode_line', { param })
     if (result.param === param) {
@@ -325,6 +352,7 @@ export class PrinterClient {
    * @returns No return value.
    */
   async setPrintSpeedLevel(level: PrintSpeedLevel) {
+    if (!this.device.print) return;
     const param = `${level}`
     const result = await this.request('print.print_speed', { param })
     if (result.param === param) {
@@ -342,6 +370,7 @@ export class PrinterClient {
       "led_node": type,
       "led_mode": on ? "on" : "off",
     })
+    if (!this.device.print) return;
     const light = this.device.print.lights_report?.find(item => item.node === result.led_node)
     if (light) light.mode = result.led_mode
   }
