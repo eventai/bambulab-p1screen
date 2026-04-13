@@ -6,7 +6,7 @@
     :actions="actions"
     :offset="[0, -32]"
     style="--van-popover-action-width: 80px;"
-    @select="handleSelect"
+    @select="handleTrayAction"
   >
     <template #reference>
       <div class="tray" @click.stop="handleTrayClick">
@@ -15,6 +15,10 @@
         <span class="material" :style="{ color: textColor }">{{ material }}</span>
         <span v-if="!readonly" class="icon-edit" :style="{ backgroundColor: textColor}"></span>
         <span v-if="readonly" class="icon-view" :style="{ backgroundColor: textColor}"></span>
+        <div v-if="isCurrent" class="arrow">
+          <div class="line" :style="{ borderColor: bgColor }" ></div>
+          <i-material-symbols-arrow-drop-down :style="{ color: bgColor }" />
+        </div>
       </div>
     </template>
   </van-popover>
@@ -23,20 +27,16 @@
 <script setup lang="ts">
 import { colord } from 'colord'
 import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import type { PopoverAction } from 'vant'
+import { type PopoverAction } from 'vant'
 import type { DeviceTray } from '../api/device'
-import { PrinterClient } from '../api/PrinterClient'
-
-const client = PrinterClient.getInstance()
-const router = useRouter()
 
 const props = withDefaults(
   defineProps<{
     name: string
-    amsId: string
+    amsId: number
     tray: DeviceTray
-    trayNow: string
+    trayNow: number
+    popoverAction?: (amsId: number, tray: DeviceTray, action: PopoverAction) => void
   }>(),
   {
   }
@@ -56,14 +56,14 @@ const actions = computed<PopoverAction[]>(() => {
   return menu
 })
 
-const material = computed(() => props.tray.tray_type)
+const material = computed(() => props.tray.tray_type || '?')
 const color = computed(() => `#${props.tray.tray_color}`)
 const readonly = computed(() => props.tray.tag_uid !== '0000000000000000')
 const isCurrent = computed(() => {
-  const trayNow = Number(props.trayNow)
+  const trayNow = props.trayNow
   const trayId = Number(props.tray.id)
   return (trayNow === 254 && trayId === 254)
-    || (Number(props.amsId) * 4 + trayId === trayNow)
+    || (props.amsId * 4 + trayId === trayNow)
 })
 const isExt = computed(() => Number(props.tray.id) === 254)
 
@@ -72,25 +72,9 @@ const handleTrayClick = () => {
   showPopover.value = !showPopover.value
 }
 
-const handleSelect = (action: PopoverAction) => {
-  console.log(`[Tray] type=${action.type}, amsId=${props.amsId}, tray=${JSON.stringify(props.tray)}`)
+const handleTrayAction = (action: PopoverAction) => {
   showPopover.value = false
-  switch (action.type) {
-    case 'edit':
-      router.push(`/filament/edit/${props.amsId}/${props.tray.id}`)
-      break
-    case 'load':
-      // client.request('print.ams_change_filament', { ams_id: Number(props.amsId), slot_id: Number(props.tray.id), curr_temp: -1, tar_temp: -1, target: 0 })
-      break
-    case 'unload':
-      // TODO
-      break
-    case 'reload':
-      client.request('print.ams_get_rfid', { ams_id: Number(props.amsId), slot_id: Number(props.tray.id) })
-      break
-    default:
-      break
-  }
+  if (props.popoverAction) props.popoverAction(props.amsId, props.tray, action)
 }
 
 const bgColor = computed(() => {
@@ -112,6 +96,7 @@ const textColor = computed(() => {
   width: 48px;
   height: 64px;
   margin: 8px;
+  margin-left: 6px;
 }
 .filament {
   width: 48px;
@@ -148,20 +133,33 @@ const textColor = computed(() => {
   font-weight: 600;
   text-align: center;
 }
-.tray > .name {
+.name {
   font-size: 11px;
 }
-.tray > .material {
+.material {
   font-size: 12px;
 }
-.tray > .icon-edit {
+.icon-edit {
   height: 19px;
   margin: 0 15px;
   mask-image: url(/src/assets/images/rename_edit.svg);
 }
-.tray > .icon-view {
+.icon-view {
   height: 19px;
   margin: 0 16px;
   mask-image: url(/src/assets/images/ams_readonly.svg);
+}
+.arrow {
+  position: relative;
+  top: -53px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.line {
+  width: 4px;
+  height: 15px;
+  border: 2px dashed;
+  margin-bottom: -8px;
 }
 </style>

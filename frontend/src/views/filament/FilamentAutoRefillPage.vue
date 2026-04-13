@@ -29,4 +29,8 @@ const router = useRouter()
   display: grid;
   place-items: center;
 }
+
+:deep(.van-empty__image) {
+  opacity: 0.5;
+}
 </style>

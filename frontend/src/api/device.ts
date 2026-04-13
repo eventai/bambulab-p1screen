@@ -55,7 +55,7 @@ export type DevicePrint = {
 }
 
 export type DeviceAMSInfo = {
-  ams: DeviceAMS[]
+  ams?: DeviceAMS[]
   tray_now: string // 254 if external spool / vt_tray, otherwise is ((ams_id * 4) + tray_id) for current tray (ams 2 tray 2 would be (1*4)+1 = 5)
   tray_pre: string
   tray_tar: string
