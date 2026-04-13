@@ -1,22 +1,36 @@
 <template>
   <div class="homepage">
-    <div class="task-card">
+    <div class="task-card" ref="taskCardRef" :style="{ width : `${taskCardWidth}px` }">
       <span v-if="isRecording" class="recording"><i-material-symbols-circle />REC</span>
       <span class="files" @click="router.push('/files')">文件 &gt;</span>
-      <img v-if="getPrintThumbnail" class="task-thumbnail" :src="getPrintThumbnail"/>
-      <img v-if="!getPrintThumbnail" class="task-thumbnail task-broken-thumbnail" :src="brokenThumbnail"/>
+      <img v-if="getTaskThumbnail" class="task-thumbnail" :src="getTaskThumbnail"/>
+      <img v-if="!getTaskThumbnail" class="task-thumbnail task-broken-thumbnail" :src="brokenThumbnail"/>
       <span class="task-name">{{ taskName }}</span>
     </div>
     <div class="printer-card">
-      <div id="printer-bg" :style="{ backgroundImage: `url(${p1sThumbnail})` }"></div>
-      <span id="nozzle-temp">{{ nozzleTemp }} ℃</span>
-      <span id="heatbed-temp">{{ heatbedTemp }} ℃</span>
-      <span id="wifi-signal"><img :src="wifiSignalIcon"/></span>
-      <button id="manage-device-btn" type="button" @click="handleManageDevice">
-        <span v-if="deviceItem" >{{ deviceItem.name }}</span>
-        <span v-if="!deviceItem">添加设备</span>
-        <i-material-symbols-settings-rounded />
-      </button>
+      <div class="printer-content">
+        <img :src="p1sThumbnail" />
+        <span class="heatbed-temp">
+          <img class="temp-icon" :src="bedTempIcon" />
+          {{ heatbedTemp }}
+          <span class="temp-unit">℃</span>
+        </span>
+        <span class="wifi-signal"><img :src="wifiSignalIcon"/></span>
+        <button id="manage-device-btn" type="button" @click="handleManageDevice">
+          <span v-if="deviceItem" >{{ deviceItem.name }}</span>
+          <span v-if="!deviceItem">添加设备</span>
+          <i-material-symbols-settings-rounded />
+        </button>
+        <DeviceListPopup v-model:show="showDeviceListPopup" />
+      </div>
+      <div class="nozzle-content">
+        <img :src="nozzleThumbnail" />
+        <span class="nozzle-temp">
+          <img class="temp-icon" :src="nozzleTempIcon" />
+          {{ nozzleTemp }}
+          <span class="temp-unit">℃</span>
+        </span>
+      </div>
     </div>
     <div class="progress-card">
       <div class="progress-card-left">
@@ -35,7 +49,6 @@
       </div>
     </div>
     <ControlButton class="light-button" :icon="lightState ? lightOnIcon : lightOffIcon" label="照明" font-size="10px" @click="toggleLight" />
-    <DeviceListPopup v-model:show="showDeviceListPopup" />
   </div>
 </template>
 <script setup lang="ts">
@@ -45,6 +58,8 @@ import { useRouter } from 'vue-router'
 import humanizeDuration from 'humanize-duration'
 import { PrinterClient, PrinterEvent } from '../api/PrinterClient'
 import { LightType, GcodeState, CurrentStage } from '../api/enums'
+import { getCurrentProject } from '../api/project'
+import { getCurrentDevice } from '../utils/device'
 import ControlButton from '../components/ControlButton.vue'
 import DeviceListPopup from '../components/DeviceListPopup.vue'
 
@@ -60,8 +75,14 @@ import signalNoIcon from '../assets/images/monitor_signal_no.svg'
 import signalWeakIcon from '../assets/images/monitor_signal_weak.svg'
 import signalMiddleIcon from '../assets/images/monitor_signal_middle.svg'
 import signalStrongIcon from '../assets/images/monitor_signal_strong.svg'
-import { getCurrentProject } from '../api/project'
-import { getCurrentDevice } from '../utils/device'
+import bedTempIcon from '../assets/images/monitor_bed_temp.svg'
+import nozzleTempIcon from '../assets/images/monitor_nozzle_temp.svg'
+import nozzleNormalThumbnail from '../assets/images/indicator_nozzle_23.png'
+import nozzleHeatingThumbnail from '../assets/images/indicator_heat_nozzle_23.png'
+// import nozzleCoolingThumbnail from '../assets/images/indicator_nozzle_cooling_23.png'
+// import nozzleOcclusionThumbnail from '../assets/images/indicator_occlusion_filament_23.png'
+// import nozzlePurgeThumbnail from '../assets/images/indicator_purge_filament_23.png'
+
 
 const router = useRouter()
 const client = PrinterClient.getInstance()
@@ -81,6 +102,8 @@ const getWifiSignalIcon = () => {
   }
 }
 
+const taskCardRef = ref<HTMLElement | null>(null)
+const taskCardWidth = ref(0)
 const wifiSignalIcon = ref(getWifiSignalIcon())
 const showDeviceListPopup = ref(false)
 const deviceItem = ref(getCurrentDevice())
@@ -88,12 +111,16 @@ const device = ref(client.device.print)
 const project = ref(getCurrentProject())
 
 onMounted(() => {
+  window.addEventListener('resize', handleResize)
+  handleResize()
+
   client.on(PrinterEvent.MQTT_STATE_CHANGE, onPushStatus)
   client.on(PrinterEvent.PRINT_PUSH_STATUS, onPushStatus)
   client.on(PrinterEvent.PRINT_PROJECT_FILE, onProjectFile)
 })
 
 onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
   client.off(PrinterEvent.MQTT_STATE_CHANGE, onPushStatus)
   client.off(PrinterEvent.PRINT_PUSH_STATUS, onPushStatus)
   client.off(PrinterEvent.PRINT_PROJECT_FILE, onProjectFile)
@@ -108,9 +135,16 @@ watch(
   }
 )
 
+const handleResize = () => {
+  if (taskCardRef.value) {
+    taskCardWidth.value = taskCardRef.value.clientHeight
+  }
+}
+
 const onPushStatus = () => {
   device.value = client.device.print
   wifiSignalIcon.value = getWifiSignalIcon()
+  nozzleThumbnail.value = getNozzleThumbnail()
 }
 
 const onProjectFile = () => {
@@ -132,7 +166,7 @@ const heatbedTemp = computed(() => Math.floor(Number(device.value?.bed_temper ??
 
 const isRecording = computed(() => getCurrentProject()?.timelapse)
 
-const getPrintThumbnail = computed(() => getCurrentProject()?.thumbnail_url)
+const getTaskThumbnail = computed(() => getCurrentProject()?.thumbnail_url)
 
 const getPrintPercent = computed(() => {
   if (device.value?.gcode_state === GcodeState.Prepare) {
@@ -177,6 +211,16 @@ const getPrintSubStateLabel = () => {
       return ''
   }
 }
+
+const getNozzleThumbnail = () => {
+  if (!device.value) return nozzleNormalThumbnail
+  if (device.value.nozzle_target_temper - device.value.nozzle_temper > 2) {
+    return nozzleHeatingThumbnail
+  }
+  // TODO
+  return nozzleNormalThumbnail
+}
+const nozzleThumbnail = ref(getNozzleThumbnail())
 
 const getPrintInfo = computed(() => {
   if ([GcodeState.Finish, GcodeState.Failed].includes(device.value?.gcode_state ?? GcodeState.Unknown)) return ''
@@ -223,8 +267,8 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
 <style scoped>
 .homepage {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 200px;
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 1fr auto;
   height: 100%;
   padding: 10px;
   gap: 10px;
@@ -310,52 +354,65 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
 }
 
 .printer-card {
-  grid-column: 2;
-  grid-row: 1;
-  width: 200px;
+  display: grid;
+  grid-template-columns: 0.625fr 0.375fr;
+}
+
+.printer-card > div {
   position: relative;
   overflow: hidden;
+  height: 100%;
 }
 
-#printer-bg {
+.printer-card .temp-unit {
+  font-size: 10px;
+  padding-left: 4px;
+  color: var(--van-text-color-2);
+}
+
+.printer-card .temp-icon {
+  top: 3px;
+  position: relative;
+}
+
+.printer-content > img {
   position: absolute;
-  inset: 4px 4px 22px 4px;
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); 
+  width: 90%;
+  padding: 4px;
 }
 
-.printer-card > span {
+.printer-card > div > span {
+  display: block;
+  position: absolute;
+  transform: translate(-50%, -50%); 
+
   font-size: 14px;
   font-weight: 500;
-  display: block;
-  position: relative;
   background: rgba(0, 0, 0, 0.55);
-  border-radius: 8px;
-  padding: 4px 8px;
-  width: fit-content;
+  border-radius: 14px;
+  width: max-content;
+  padding: 0px 8px;
+  line-height: 20px;
 }
 
-#nozzle-temp {
-  left: 60%;
-  top: calc(50% - 100px + 45px);
+.heatbed-temp {
+  left: 40%;
+  top: 60%;
 }
 
-#heatbed-temp {
+.wifi-signal {
   left: 25%;
-  top: calc(50% - 100px + 90px);
-}
-
-#wifi-signal {
-  left: 15%;
-  top: calc(50% - 100px - 50px);
+  top: 25%;
   border-radius: 50%;
   width: 34px;
   height: 34px;
-  padding: 8px;
+  padding: 8px !important;
 }
 
-#wifi-signal img {
+.wifi-signal img {
   width: 18px;
   height: 18px;
 }
@@ -380,6 +437,29 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
   font-size: 12px;
   margin-right: 4px;
   padding-left: 4px;
+}
+
+.nozzle-content::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10%;
+  height: 80%;
+  width: 0.5px;
+  background: var(--van-background-5);
+}
+
+.nozzle-content > img {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%); 
+  width: 90%;
+}
+
+.nozzle-temp {
+  top: 75%;
+  left: 50%;
 }
 
 .progress-card {
@@ -457,15 +537,15 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
 @media (orientation: portrait) {
   .homepage {
     grid-template-columns: 1fr;
-    grid-template-rows: 250px 200px auto auto;
+    grid-template-rows: 200px 200px auto auto;
     height: auto;
-    padding-bottom: 8px;
   }
 
   .task-card {
     grid-column: 1;
     grid-row: 1;
-    height: 250px;
+    height: 200px;
+    width: 100% !important;
   }
 
   .printer-card {
@@ -491,5 +571,4 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
     display: none;
   }
 }
-
 </style>
