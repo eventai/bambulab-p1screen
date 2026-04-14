@@ -111,6 +111,7 @@ watch(
 .device-list-content {
   display: grid;
   gap: 8px;
+  margin-bottom: 12px;
   margin-bottom: calc(12px + env(safe-area-inset-bottom));
 }
 

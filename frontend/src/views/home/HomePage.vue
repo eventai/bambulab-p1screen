@@ -2,7 +2,7 @@
   <div class="homepage">
     <div class="task-card" ref="taskCardRef" :style="{ width : `${taskCardWidth}px` }">
       <span v-if="isRecording" class="recording"><i-material-symbols-circle />REC</span>
-      <span class="files" @click="router.push('/home/files')">文件 &gt;</span>
+      <span class="files" @click="router.push('/home/files')">{{ '文件 >' }}</span>
       <img v-if="getTaskThumbnail" class="task-thumbnail" :src="getTaskThumbnail"/>
       <img v-if="!getTaskThumbnail" class="task-thumbnail task-broken-thumbnail" :src="brokenThumbnail"/>
       <span class="task-name">{{ taskName }}</span>
@@ -287,7 +287,7 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
   grid-row: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 22px minmax(0, 1fr) 20px;
+  grid-template-rows: 25px minmax(0, 1fr) 20px;
   align-items: center;
   gap: 8px;
   overflow: hidden;
@@ -318,8 +318,7 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
   justify-self: end;
   font-size: 12px;
   color: var(--van-text-color);
-  cursor: pointer;
-  padding-right: 8px;
+  padding: 0 8px;
 }
 
 .task-thumbnail {
@@ -537,14 +536,14 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
 @media (orientation: portrait) {
   .homepage {
     grid-template-columns: 1fr;
-    grid-template-rows: 200px 200px auto auto;
+    grid-template-rows: 250px 250px auto auto;
     height: auto;
   }
 
   .task-card {
     grid-column: 1;
     grid-row: 1;
-    height: 200px;
+    height: 250px;
     width: 100% !important;
   }
 
@@ -552,7 +551,7 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
     grid-column: 1;
     grid-row: 2;
     width: 100%;
-    height: 200px;
+    height: 250px;
   }
 
   .progress-card {

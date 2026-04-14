@@ -54,8 +54,8 @@ const emitMove = (axis: 'home' | 'x' | 'y', step: -10 | -1 | 0 | 1 | 10) => {
   height: 0;
   padding-top: 82%;
   margin: 8px;
-  position: relative;
   border-radius: 50%;
+  position: relative;
   display: grid;
   place-items: center;
 }
@@ -179,21 +179,21 @@ const emitMove = (axis: 'home' | 'x' | 'y', step: -10 | -1 | 0 | 1 | 10) => {
 }
 
 .axis-home {
-  width: 22%;
+  width: 20%;
   height: 0;
-  padding-top: 22%;
+  padding-top: 20%;
   position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
   border-radius: 40%;
   border-width: 0;
-  display: grid;
-  place-items: center;
   z-index: 3;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   overflow: hidden;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
   color: var(--van-primary-color);
-  background: var(--van-background-4);
+  background-color: var(--van-background-4);
   background-image: url(../assets/images/monitor_axis_home.svg);
   background-repeat: no-repeat;
   background-position: center;

@@ -225,6 +225,10 @@ M211 R
   flex-direction: row;
 }
 
+:deep(.control-list > .control-button > img) {
+  margin-bottom: 0;
+}
+
 .control-row {
   display: grid;
   gap: 8px;

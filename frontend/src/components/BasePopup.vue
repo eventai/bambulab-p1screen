@@ -72,11 +72,13 @@ const handleClose = () => {
   height: auto;
   max-height: 100%;
   padding-right: 12px;
+  padding-bottom: 12px;
   padding-bottom: calc(12px + env(safe-area-inset-bottom));
 }
 
 @media (orientation: portrait) {
   .popup {
+    padding-bottom: 4px;
     padding-bottom: calc(4px + env(safe-area-inset-bottom));
   }
 }

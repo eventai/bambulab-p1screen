@@ -27,7 +27,7 @@
           {{ key }}
         </button>
         <button class="temp-key temp-key--zero" type="button" @click="handleKey('0')">0</button>
-        <button class="temp-key temp-key--back" type="button" @click="handleBackspace">
+        <button class="temp-key" type="button" @click="handleKey('<')">
           <i-material-symbols-backspace-rounded />
         </button>
       </div>
@@ -81,16 +81,17 @@ watch(
 )
 
 const handleKey = (key: string) => {
-  if (inputValue.value.length >= 3) return
-  if (inputValue.value === '0') {
-    inputValue.value = key
+  if (key === '<') {
+    inputValue.value = inputValue.value.slice(0, -1)
     return
   }
-  inputValue.value += key
-}
-
-const handleBackspace = () => {
-  inputValue.value = inputValue.value.slice(0, -1)
+  if (inputValue.value.length >= 3) {
+    return
+  } else if (inputValue.value === '0') {
+    inputValue.value = key
+  } else {
+    inputValue.value += key
+  }
 }
 
 const handleConfirm = () => {
@@ -144,9 +145,13 @@ const handleConfirm = () => {
 }
 
 .temp-key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   background: var(--van-background-5);
   border: 0;
-  border-radius: 8px;
+  border-radius: 4px;
   width: 100%;
   min-width: 0;
   height: 44px;
@@ -155,11 +160,6 @@ const handleConfirm = () => {
 
 .temp-key--zero {
   grid-column: 2 / 3;
-}
-
-.temp-key--back {
-  display: grid;
-  place-items: center;
 }
 
 @media (orientation: portrait) {

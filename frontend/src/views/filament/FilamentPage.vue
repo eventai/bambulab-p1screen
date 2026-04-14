@@ -156,6 +156,7 @@ const handleSettingsSelect = (action: PopoverAction) => {
   height: 100%;
   position: relative;
   padding: 16px;
+  padding-bottom: calc(30px + 16px);
   padding-bottom: calc(30px + 16px + env(safe-area-inset-bottom));
 
   display: grid;
@@ -233,6 +234,7 @@ const handleSettingsSelect = (action: PopoverAction) => {
 .setting {
   position: fixed;
   right: 16px;
+  bottom: 16px;
   bottom: calc(16px + env(safe-area-inset-bottom));
 }
 
@@ -241,8 +243,9 @@ const handleSettingsSelect = (action: PopoverAction) => {
   height: 36px;
   border: none;
   border-radius: 8px;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: var(--van-background-3);
   color: var(--van-text-color);
 }
@@ -254,9 +257,10 @@ const handleSettingsSelect = (action: PopoverAction) => {
     align-content: unset;
   }
   .ams-card, .ext-card {
-    grid-row: unset;
+    grid-row: auto;
   }
   .setting {
+    bottom: calc(64px + 16px);
     bottom: calc(64px + 16px + env(safe-area-inset-bottom));
   }
 }

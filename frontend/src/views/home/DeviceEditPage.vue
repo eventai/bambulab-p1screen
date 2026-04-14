@@ -123,7 +123,8 @@ const handleDelete = () => {
   display: grid;
   gap: 10px;
   padding: 8px;
-  padding-bottom: calc(16px + env(safe-area-inset-bottom) + var(--keyboard-offset, 0px));
+  padding-bottom: 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
   overflow: auto;
 }
 
