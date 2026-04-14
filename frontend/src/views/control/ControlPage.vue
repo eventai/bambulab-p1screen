@@ -49,12 +49,6 @@
 <script setup lang="ts">
 import { computed, ComputedRef, onMounted, onUnmounted, ref } from 'vue'
 import { showDialog } from 'vant'
-import XYMotion from '../../components/XYMotion.vue'
-import ZMotion from '../../components/ZMotion.vue'
-import EMotion from '../../components/EMotion.vue'
-import TempKeypadPopup from '../../components/TempKeypadPopup.vue'
-import FanSpeedPopup from '../../components/FanSpeedPopup.vue'
-import PrintSpeedPopup from '../../components/PrintSpeedPopup.vue'
 import { FanType, TemperatureType, LightType, GcodeState } from '../../api/enums'
 import { PrinterClient, PrinterEvent } from '../../api/PrinterClient'
 

@@ -52,7 +52,6 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { closeToast, showFailToast, showLoadingToast, showSuccessToast } from 'vant'
-import NavHeader from '../../components/NavHeader.vue'
 import { PrinterClient, PrinterEvent } from '../../api/PrinterClient'
 
 const route = useRoute()
@@ -63,7 +62,7 @@ const device = ref(client.device.print)
 const amsId = route.params.ams_id as string
 const trayId = route.params.tray_id as string
 
-const ams = computed(() => device.value?.ams?.ams.find((item) => item.id === amsId))
+const ams = computed(() => device.value?.ams.ams?.find((item) => item.id === amsId))
 
 const tray = computed(() => {
   if (amsId === '255' && trayId === device.value?.vt_tray?.id) {

@@ -1,5 +1,5 @@
 import mqtt, { type MqttClient } from 'mqtt'
-import { DevicePrint, type DeviceState } from './device'
+import { type DeviceState } from './device'
 import {
   FanType,
   TemperatureType,

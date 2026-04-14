@@ -71,7 +71,6 @@ import { computed, ref } from 'vue'
 import { showToast } from 'vant'
 import { useRoute, useRouter } from 'vue-router'
 import { PrinterClient } from '../../api/PrinterClient'
-import NavHeader from '../../components/NavHeader.vue'
 import { addDevice, getDevices, removeDevice, getCurrentDevice,setCurrentDevice } from '../../utils/device'
 
 const client = PrinterClient.getInstance()

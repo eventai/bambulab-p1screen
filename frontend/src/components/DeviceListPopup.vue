@@ -42,7 +42,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import BasePopup from './BasePopup.vue'
 import { getCurrentDevice, setCurrentDevice, getDevices } from '../utils/device'
 import { PrinterClient } from '../api/PrinterClient'
 import { showToast } from 'vant'

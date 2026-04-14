@@ -38,7 +38,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { TemperatureType } from '../api/enums'
-import BasePopup from './BasePopup.vue'
 
 const props = withDefaults(
   defineProps<{

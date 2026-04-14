@@ -60,8 +60,6 @@ import { PrinterClient, PrinterEvent } from '../../api/PrinterClient'
 import { LightType, GcodeState, CurrentStage } from '../../api/enums'
 import { getCurrentProject } from '../../api/project'
 import { getCurrentDevice } from '../../utils/device'
-import ControlButton from '../../components/ControlButton.vue'
-import DeviceListPopup from '../../components/DeviceListPopup.vue'
 
 import lightOnIcon from '../../assets/images/monitor_lamp_on.svg'
 import lightOffIcon from '../../assets/images/monitor_lamp_off.svg'

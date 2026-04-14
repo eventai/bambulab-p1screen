@@ -20,7 +20,6 @@
 
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, useSlots } from 'vue'
-import NavHeader from './NavHeader.vue'
 
 withDefaults(
   defineProps<{
