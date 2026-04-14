@@ -1,5 +1,5 @@
 import mqtt, { type MqttClient } from 'mqtt'
-import { type DeviceState } from './device'
+import { DevicePrint, type DeviceState } from './device'
 import {
   FanType,
   TemperatureType,
@@ -228,9 +228,11 @@ export class PrinterClient {
     if (!this.device.print) {
       this.device.print = printData
     } else {
+      const print: any = Object.assign({}, this.device.print)
       for (const key in printData) {
-        (this.device.print as any)[key] = printData[key]
+        print[key] = printData[key]
       }
+      this.device.print = print
     }
   }
 
