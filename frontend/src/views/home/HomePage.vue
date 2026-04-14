@@ -77,7 +77,7 @@ import bedTempIcon from '../../assets/images/monitor_bed_temp.svg'
 import nozzleTempIcon from '../../assets/images/monitor_nozzle_temp.svg'
 import nozzleNormalThumbnail from '../../assets/images/indicator_nozzle_23.png'
 import nozzleHeatingThumbnail from '../../assets/images/indicator_heat_nozzle_23.png'
-// import nozzleCoolingThumbnail from '../../assets/images/indicator_nozzle_cooling_23.png'
+import nozzleCoolingThumbnail from '../../assets/images/indicator_nozzle_cooling_23.png'
 // import nozzleOcclusionThumbnail from '../../assets/images/indicator_occlusion_filament_23.png'
 // import nozzlePurgeThumbnail from '../../assets/images/indicator_purge_filament_23.png'
 
@@ -214,6 +214,8 @@ const getNozzleThumbnail = () => {
   if (!device.value) return nozzleNormalThumbnail
   if (device.value.nozzle_target_temper - device.value.nozzle_temper > 2) {
     return nozzleHeatingThumbnail
+  } else if (device.value.nozzle_target_temper === 0 && device.value.nozzle_temper > 50) {
+    return nozzleCoolingThumbnail
   }
   // TODO
   return nozzleNormalThumbnail
