@@ -36,6 +36,8 @@ const props = withDefaults(
     amsId: number
     tray: DeviceTray
     trayNow: number
+    trayTar: number
+    trayPrev: number
     popoverAction?: (amsId: number, tray: DeviceTray, action: PopoverAction) => void
   }>(),
   {
@@ -47,8 +49,19 @@ const showPopover = ref(false)
 const actions = computed<PopoverAction[]>(() => {
   const menu: PopoverAction[] = [
     { type: 'edit', text: readonly.value ? '查看' : '编辑' },
-    isCurrent.value ? { type: 'unload', text: '退料' } : { type: 'load', text: '进料' },
   ]
+
+  if (isLoading.value) { // 换料中
+    if (props.trayTar !== 255 && isTarget.value) {
+      menu.push({ type: 'load', text: '进料中', disabled: true })
+    } else if (props.trayTar === 255 && isPrev.value) {
+      menu.push({ type: 'load', text: '退料中', disabled: true })
+    } else {
+      menu.push({ type: 'load', text: '进料', disabled: true })
+    }
+  } else {
+    menu.push(isCurrent.value ? { type: 'unload', text: '退料' } : { type: 'load', text: '进料' })
+  }
 
   if (!isExt.value) {
     menu.push({ type: 'reload', text: '重读' })
@@ -59,13 +72,13 @@ const actions = computed<PopoverAction[]>(() => {
 const material = computed(() => props.tray.tray_type || '?')
 const color = computed(() => `#${props.tray.tray_color}`)
 const readonly = computed(() => props.tray.tag_uid !== '0000000000000000')
-const isCurrent = computed(() => {
-  const trayNow = props.trayNow
-  const trayId = Number(props.tray.id)
-  return (trayNow === 254 && trayId === 254)
-    || (props.amsId * 4 + trayId === trayNow)
-})
-const isExt = computed(() => Number(props.tray.id) === 254)
+const isLoading = computed(() => props.trayNow !== props.trayTar)
+const isCurrent = computed(() => trayEqual(props.trayNow))
+const isTarget = computed(() => trayEqual(props.trayTar))
+const isPrev = computed(() => trayEqual(props.trayPrev))
+const isExt = computed(() => trayEqual(254))
+
+const trayEqual = (target: number) => (target === 254 && Number(props.tray.id) === 254) || (props.amsId * 4 + Number(props.tray.id) === target)
 
 const handleTrayClick = () => {
   if (!props.tray) return

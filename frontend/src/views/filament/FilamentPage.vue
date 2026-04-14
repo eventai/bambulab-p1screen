@@ -1,6 +1,6 @@
 <template>
   <div class="filament-page">
-    <van-tabs v-if="device?.ams.ams && device.ams.ams.length > 1" class="ams-tab" @click-tab="handleClickTab">
+    <van-tabs v-if="device && device.ams.ams.length > 1" class="ams-tab" @click-tab="handleClickTab">
       <van-tab
         v-for="i in device.ams.ams.length"
         :key="i"
@@ -16,6 +16,8 @@
         :amsId="Number(currentAms.id)"
         :tray="currentAms.tray[slot - 1]"
         :trayNow="Number(device?.ams.tray_now) ?? -1"
+        :trayTar="Number(device?.ams.tray_tar) ?? -1"
+        :trayPrev="Number(device?.ams.tray_pre) ?? -1"
         :popoverAction="handleTrayAction"
       />
       <span class="ams-name" >AMS-{{ amsPrefix(currentAms.id) }}</span>
@@ -27,6 +29,8 @@
         :amsId="255"
         :tray="device?.vt_tray"
         :trayNow="Number(device?.ams.tray_now) ?? 0"
+        :trayTar="Number(device?.ams.tray_tar) ?? -1"
+        :trayPrev="Number(device?.ams.tray_pre) ?? -1"
         :popoverAction="handleTrayAction"
       />
       <span class="ext-name" >外挂料盘</span>
@@ -69,8 +73,8 @@ const router = useRouter()
 const client = PrinterClient.getInstance()
 
 const device = ref(client.device.print)
-const currentAmsId = ref<string | undefined>(device.value?.ams.ams?.[0].id)
-const currentAms = computed(() => device.value?.ams.ams?.filter(ams => ams.id === currentAmsId.value)[0])
+const currentAmsId = ref<string | undefined>(device.value?.ams.ams[0].id)
+const currentAms = computed(() => device.value?.ams.ams.filter(ams => ams.id === currentAmsId.value)[0])
 const showSettingsPopover = ref(false)
 const settingsActions: PopoverAction[] = [{ type: 'auto-refill', text: '自动续料' }]
 
@@ -87,7 +91,7 @@ onUnmounted(() => {
 
 const onPushStatus = () => {
   device.value = client.device.print
-  if (!currentAmsId.value && device.value?.ams.ams && device.value.ams.ams.length > 0) {
+  if (!currentAmsId.value && device.value && device.value.ams.ams.length > 0) {
     currentAmsId.value = device.value.ams.ams[0].id
   }
 }

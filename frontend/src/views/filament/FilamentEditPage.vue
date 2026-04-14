@@ -62,7 +62,7 @@ const device = ref(client.device.print)
 const amsId = route.params.ams_id as string
 const trayId = route.params.tray_id as string
 
-const ams = computed(() => device.value?.ams.ams?.find((item) => item.id === amsId))
+const ams = computed(() => device.value?.ams.ams.find((item) => item.id === amsId))
 
 const tray = computed(() => {
   if (amsId === '255' && trayId === device.value?.vt_tray?.id) {
