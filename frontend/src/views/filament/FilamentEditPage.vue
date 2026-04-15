@@ -1,57 +1,64 @@
 <template>
   <BaseSubPage title="编辑耗材">
     <div class="filament-edit-card">
-      <div class="form-row">
+      <div class="form-row form-filament">
         <label class="form-label">耗材</label>
-        <button class="filament-select" type="button" disabled>
-          <span>{{ trayType }}</span>
-          <i-material-symbols-arrow-drop-down-rounded />
-        </button>
+        <select class="manufacturer" v-model="manufacturer" :disabled="isReadonly || isCustomFilament" @change="onManufacturerChange">
+          <option v-for="item in manufacturerList" :key="item" :value="item">{{ item }}</option>
+          <option v-if="isCustomFilament" value="Custom">自定义</option>
+        </select>
+        <select class="filament" v-model="filamentId" :disabled="isReadonly || isCustomFilament">
+          <option v-for="item in getFilamentListOf(manufacturer)" :key="item.filament_id" :value="item.filament_id">{{ item.filament_name }}</option>
+          <option v-if="manufacturer === 'Custom' && isCustomFilament" :value="tray?.tray_info_idx">{{ tray?.tray_type }}</option>
+        </select>
       </div>
 
-      <div class="form-row">
+      <div class="form-row form-color">
         <label class="form-label">颜色</label>
-        <button class="color-field" type="button">
-          <span class="color-swatch" :style="{ background: `#${trayColor}` }"></span>
-          <i-material-symbols-edit-outline-rounded class="color-edit-icon" />
+        <div class="color-field">
+          <div class="color-swatch" :style="{ backgroundColor: trayDisplayColor }"></div>
+          <span v-if="!isReadonly" class="icon-edit" ></span>
           <input
+            v-if="!isReadonly"
             class="native-color-input"
             type="color"
-            :value="trayColorInputValue"
             @input="handleColorInput"
             aria-label="选择颜色"
           />
-        </button>
+        </div>
       </div>
 
-      <div class="form-row">
+      <div class="form-row form-temperature">
         <label class="form-label">喷嘴温度</label>
-        <div class="temperature-fields">
-          <div class="temperature-input-wrap">
-            <input v-model="nozzleTempMin" class="temperature-input" inputmode="numeric" maxlength="3" />
-            <span class="temperature-unit">℃</span>
-          </div>
-          <span class="temperature-separator">-</span>
-          <div class="temperature-input-wrap">
-            <input v-model="nozzleTempMax" class="temperature-input" inputmode="numeric" maxlength="3" />
-            <span class="temperature-unit">℃</span>
-          </div>
+        <div class="temperature-field">
+          最低
+          <span>{{ isCustomFilament ? tray?.nozzle_temp_min : getSelectedFilament()?.min_temperature || 0 }}</span>
+          ℃
+        </div>
+        <div class="temperature-field">
+          最高
+          <span>{{ isCustomFilament ? tray?.nozzle_temp_max : getSelectedFilament()?.max_temperature || 0 }}</span>
+          ℃
         </div>
       </div>
 
       <div class="form-actions">
-        <van-button class="action-btn" plain type="default" @click="router.back">取消</van-button>
-        <van-button class="action-btn" type="primary" @click="handleConfirm">确定</van-button>
+        <van-button class="action-btn" plain type="default" @click="handleReset" :disabled="!tray">重置</van-button>
+        <van-button class="action-btn" type="primary" @click="handleConfirm" :disabled="!(tray && filamentId && filamentId.length > 0)">确认</van-button>
       </div>
     </div>
   </BaseSubPage>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, Ref, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { closeToast, showFailToast, showLoadingToast, showSuccessToast } from 'vant'
+import { showToast, showConfirmDialog } from 'vant'
 import { PrinterClient, PrinterEvent } from '../../api/PrinterClient'
+import filamentList from '../../assets/filament.json'
+import { colord } from 'colord'
+
+const manufacturerList = [...new Set(filamentList.map(item => item.manufacturer))]
 
 const route = useRoute()
 const router = useRouter()
@@ -69,12 +76,35 @@ const tray = computed(() => {
   }
   return ams.value?.tray.find((item) => item.id === trayId)
 })
+const isReadonly = computed(() => tray.value && tray.value?.tag_uid.length > 0 && tray.value?.tag_uid !== '0000000000000000')
 
-const trayType = ref('?')
+type FilamentVendor = { filament_id: string, filament_name: string, manufacturer: string, material: string, min_temperature: number, max_temperature: number }
+
+const getCurrentFilament = () => {
+  const result = filamentList.filter(item => item.filament_id === tray.value?.tray_info_idx)
+  if (result.length > 0) {
+    return result[0] as FilamentVendor
+  }
+  return null
+}
+const getSelectedFilament = () => {
+  const result = filamentList.filter(item => item.filament_id === filamentId.value)
+  if (result.length > 0) {
+    return result[0] as FilamentVendor
+  }
+  return null
+}
+const getFilamentListOf = (manufacturer: string) => filamentList.filter(item => item.manufacturer === manufacturer) as FilamentVendor[]
+const isCustomFilament = computed(() => getCurrentFilament() === null)
+
+const currentFilament: Ref<FilamentVendor | null> = ref(getCurrentFilament())
+const manufacturer = ref(currentFilament.value?.manufacturer || 'Custom')
+const filamentId = ref(tray.value?.tray_info_idx)
 const trayColor = ref('')
-const nozzleTempMin = ref('')
-const nozzleTempMax = ref('')
-const trayColorInputValue = computed(() => `#${trayColor.value.slice(0, 6)}`)
+const trayDisplayColor = computed(() => {
+  const parsedColor = colord(`#${trayColor.value.slice(0,6)}`)
+  return parsedColor.toRgbString() // for compatible
+})
 
 onMounted(() => {
   client.on(PrinterEvent.PRINT_PUSH_STATUS, onPushStatus)
@@ -86,19 +116,32 @@ onUnmounted(() => {
 
 const onPushStatus = () => {
   device.value = client.device.print
+  if (!filamentId.value) {
+    currentFilament.value = getCurrentFilament()
+    manufacturer.value = currentFilament.value?.manufacturer || 'Custom'
+    filamentId.value = tray.value?.tray_info_idx
+  }
 }
 
 watch(
   tray,
   (nextTray) => {
     if (!nextTray) return
-    trayType.value = nextTray.tray_type
     trayColor.value = nextTray.tray_color
-    nozzleTempMin.value = nextTray.nozzle_temp_min
-    nozzleTempMax.value = nextTray.nozzle_temp_max
   },
   { immediate: true }
 )
+
+const onManufacturerChange = () => {
+  if (manufacturer.value === 'Custom') {
+    filamentId.value = isCustomFilament.value ? tray.value?.tray_info_idx : ''
+    return
+  }
+  const list = getFilamentListOf(manufacturer.value)
+  if (list.length > 0) {
+    filamentId.value = list[0].filament_id
+  }
+}
 
 const handleColorInput = (event: Event) => {
   const value = (event.target as HTMLInputElement | null)?.value.toUpperCase() ?? '#000000'
@@ -106,38 +149,77 @@ const handleColorInput = (event: Event) => {
   trayColor.value = value.replace('#', '').slice(0, 6) + 'FF'
 }
 
-const handleConfirm = async () => {
+const handleReset = async () => {
   if (!tray.value) return
-  const payload = {
-    ams_id: Number(amsId), // TODO: Ext Tray?
-    tray_id: Number(trayId),
-    tray_info_idx: tray.value?.tray_info_idx,
-    tray_color: trayColor.value,
-    tray_type: trayType.value,
-    nozzle_temp_min: Number(nozzleTempMin.value),
-    nozzle_temp_max: Number(nozzleTempMax.value),
+
+  try {
+    await showConfirmDialog({ title: '提示', message: '您确定要清除耗材丝信息吗？' })
+  } catch {
+    return
   }
 
-  console.log(`[FilamentEditPage] confirm payload=${JSON.stringify(payload)}`)
+  const payload = {
+    ams_id: Number(amsId),
+    tray_id: Number(trayId),
+    tray_info_idx: '',
+    tray_type: '',
+    nozzle_temp_min: 0,
+    nozzle_temp_max: 0,
+    tray_color: 'FFFFFF00',
+  }
 
-  showLoadingToast({
-    message: '保存中...',
-    duration: 0,
-    forbidClick: true,
-  })
   try {
+    // TODO: disable button while requesting
     await client.request('print.ams_filament_setting', payload)
-    tray.value.tray_color = trayColor.value
-    tray.value.tray_type = trayType.value
-    tray.value.nozzle_temp_min = nozzleTempMin.value
-    tray.value.nozzle_temp_max = nozzleTempMax.value
-    closeToast()
-    showSuccessToast('保存成功')
+    tray.value.tray_info_idx = payload.tray_info_idx
+    tray.value.tray_type = payload.tray_type
+    tray.value.nozzle_temp_min = String(payload.nozzle_temp_min)
+    tray.value.nozzle_temp_max = String(payload.nozzle_temp_max)
+    tray.value.tray_color = payload.tray_color
+    router.back()
+  } catch (error: any) {
+    console.error(`[FilamentEditPage] reset failed: ${error.message}`)
+    showToast({
+      message: `重置失败：${error.message}`,
+      position: 'bottom',
+    })
+  }
+}
+
+const handleConfirm = async () => {
+  if (!tray.value) return
+  const filament = getSelectedFilament() || {
+    filament_id: tray.value.tray_info_idx,
+    material: tray.value.tray_type,
+    min_temperature: Number(tray.value.nozzle_temp_min),
+    max_temperature: Number(tray.value.nozzle_temp_max),
+  } as FilamentVendor
+
+  const payload = {
+    ams_id: Number(amsId),
+    tray_id: Number(trayId),
+    tray_info_idx: filament.filament_id,
+    tray_type: filament.material,
+    nozzle_temp_min: filament.min_temperature,
+    nozzle_temp_max: filament.max_temperature,
+    tray_color: trayColor.value,
+  }
+
+  try {
+    // TODO: disable button while requesting
+    await client.request('print.ams_filament_setting', payload)
+    tray.value.tray_info_idx = payload.tray_info_idx
+    tray.value.tray_type = payload.tray_type
+    tray.value.nozzle_temp_min = String(payload.nozzle_temp_min)
+    tray.value.nozzle_temp_max = String(payload.nozzle_temp_max)
+    tray.value.tray_color = payload.tray_color
     router.back()
   } catch (error: any) {
     console.error(`[FilamentEditPage] save failed: ${error.message}`)
-    closeToast()
-    showFailToast('保存失败')
+    showToast({
+      message: `保存失败：${error.message}`,
+      position: 'bottom',
+    })
   }
 }
 </script>
@@ -147,7 +229,7 @@ const handleConfirm = async () => {
   height: calc(100% - 16px);
   margin: 0 8px;
   display: grid;
-  grid-template-rows: auto auto auto 1fr auto;
+  grid-template-rows: repeat(3, auto) 1fr auto;
   gap: 8px;
   padding: 12px 18px;
   border-radius: 8px;
@@ -157,7 +239,7 @@ const handleConfirm = async () => {
 .form-row {
   min-height: 44px;
   display: grid;
-  grid-template-columns: 150px minmax(0, 180px);
+  grid-template-columns: repeat(3, 150px);
   justify-content: start;
   align-items: center;
 }
@@ -167,34 +249,25 @@ const handleConfirm = async () => {
   font-size: 14px;
 }
 
-.filament-select {
+.form-filament select {
+  width: 135px;
   height: 36px;
+  padding: 8px;
   border-radius: 8px;
-  border: 1px solid var(--van-background-5);
-  background: var(--van-background-2);
+  border-width: 0;
+  background: var(--van-background-3);
   color: var(--van-text-color);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 10px;
-}
-
-.filament-select-icon {
-  width: 18px;
-  height: 18px;
 }
 
 .color-field {
   position: relative;
-  height: 36px;
-  width: 72px;
-  border-radius: 8px;
-  border: 1px solid var(--van-background-5);
-  background: var(--van-background-2);
+  width: 60px;
+  border: 0;
+  background-color: transparent;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 10px;
+  padding: 0;
 }
 
 .native-color-input {
@@ -209,16 +282,17 @@ const handleConfirm = async () => {
 }
 
 .color-swatch {
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   border-radius: 6px;
   border: 1px solid var(--van-background-5);
 }
 
-.color-edit-icon {
-  width: 18px;
-  height: 18px;
-  color: var(--van-text-color-2);
+.icon-edit {
+  width: 19px;
+  height: 19px;
+  mask-image: url(/src/assets/images/rename_edit.svg);
+  background-color: var(--van-text-color-2);
 }
 
 .temperature-fields {
@@ -226,42 +300,21 @@ const handleConfirm = async () => {
   align-items: center;
 }
 
-.temperature-separator {
+.temperature-field {
   color: var(--van-text-color-2);
-  padding: 0 8px;
+  font-size: 13px;
 }
 
-.temperature-input-wrap {
-  flex: 1;
-  min-width: 0;
-  height: 36px;
-  border-radius: 8px;
-  border: 1px solid var(--van-background-5);
-  background: var(--van-background-2);
-  display: flex;
-  align-items: center;
-  padding: 0 10px;
-}
-
-.temperature-input {
-  width: 100%;
-  border: none;
-  outline: none;
-  background: transparent;
+.temperature-field > span {
   color: var(--van-text-color);
-  font-size: 14px;
-}
-
-.temperature-unit {
-  color: var(--van-text-color-2);
-  font-size: 12px;
+  font-weight: 500;
+  padding-left: 40px;
 }
 
 .form-actions {
   justify-self: end;
   display: flex;
   margin-top: auto;
-  margin-right: -8px;
 }
 
 .action-btn {
@@ -269,4 +322,27 @@ const handleConfirm = async () => {
   height: 32px;
   margin-right: 8px;
 }
+
+@media (orientation: portrait) {
+  .filament-edit-card {
+    grid-template-rows: repeat(5, auto) 1fr auto;
+  }
+  .form-row {
+    grid-template-columns: 120px 150px;
+  }
+  .form-filament select:last-child, .temperature-field:last-child {
+    grid-column: 2;
+    margin: 8px 0;
+  }
+  .form-color {
+    grid-row: 3;
+  }
+  .form-temperature {
+    grid-row: 4;
+  }
+  .form-actions {
+    grid-row: 6;
+  }
+}
+
 </style>

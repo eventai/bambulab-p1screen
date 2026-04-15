@@ -1,13 +1,15 @@
 <template>
   <div class="filament-page">
-    <van-tabs v-if="device && device.ams.ams.length > 1" class="ams-tab" @click-tab="handleClickTab">
-      <van-tab
-        v-for="i in device.ams.ams.length"
-        :key="i"
-        :title="`AMS-${amsPrefix(device.ams.ams[i-1].id)}`"
-        :name="device.ams.ams[i-1].id"
-      />
-    </van-tabs>
+    <div>
+      <van-tabs v-if="device && device.ams.ams.length > 1" class="ams-tab" @click-tab="handleClickTab">
+        <van-tab
+          v-for="i in device.ams.ams.length"
+          :key="i"
+          :title="`AMS-${amsPrefix(device.ams.ams[i-1].id)}`"
+          :name="device.ams.ams[i-1].id"
+        />
+      </van-tabs>
+    </div>
     <div v-if="device && currentAms" class="ams-card">
       <Tray
         v-for="slot in 4"
@@ -254,7 +256,7 @@ const handleSettingsSelect = (action: PopoverAction) => {
   .filament-page {
     grid-template-rows: 40px 150px 150px;
     grid-template-columns: auto;
-    align-content: unset;
+    align-content: initial;
   }
   .ams-card, .ext-card {
     grid-row: auto;

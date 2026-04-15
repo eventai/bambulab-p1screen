@@ -230,7 +230,8 @@ export class PrinterClient {
     } else {
       const print: any = Object.assign({}, this.device.print)
       for (const key in printData) {
-        if (key === 'ams') { // incomplete data
+        if (['ams', 'vt_tray'].includes(key)) { // incomplete data
+          print[key] = Object.assign({}, print[key])
           for (const key2 in printData[key]) {
             print[key][key2] = printData[key][key2]
           }
