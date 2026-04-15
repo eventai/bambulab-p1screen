@@ -129,10 +129,10 @@ M211 R
 .motion-card {
   height: calc(100% - 16px);
   margin: 0 8px;
-  padding: 8px;
   display: grid;
   grid-template-columns: repeat(2, auto);
   gap: 8px;
+  padding: 8px;
   border-radius: 8px;
   background: var(--van-background-2);
 }
