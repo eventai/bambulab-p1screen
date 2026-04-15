@@ -383,6 +383,20 @@ export class PrinterClient {
     if (light) light.mode = result.led_mode
   }
 
+  private setTemperatureSupport() {
+    const module = this.device.module?.filter(item => item.name === 'ota')
+    if (module?.length !== 1) return false
+
+    const sw_ver = Number(module[0].sw_ver.split('.').slice(0,2).join('.')) 
+    if (['Bambu Lab P1P', 'Bambu Lab P1S', 'Bambu Lab X1E', 'Bambu Lab X1C'].includes(module[0].product_name) && sw_ver< 1.06) {
+      return true
+    } else if (['Bambu Lab A1', 'Bambu Lab A1 Mini'].includes(module[0].product_name) && sw_ver< 1.04) {
+      return true
+    }
+
+    return false
+  }
+
   /**
    * Sets a target temperature.
    * @param type Target heater: `nozzle` or `heatbed`.
@@ -390,19 +404,24 @@ export class PrinterClient {
    * @returns No return value.
    */
   setTemperature(type: TemperatureType, temperature: number) {
-    let gcode = ''
+    let param = ''
     switch (type) {
       case TemperatureType.Nozzle:
-        gcode = `M104 S${temperature.toFixed(0)}\n`
+        // https://github.com/BambuTools/bambulabs_api/blob/5bd1e84a9b0c21ab7cdfdccac9dab43994319b0d/bambulabs_api/mqtt_client.py#L854
+        if (this.setTemperatureSupport()) {
+          param = `M104 S${temperature.toFixed(0)}\n`
+        } else {
+          param = `M109 S${temperature.toFixed(0)}\n`
+        }
         break
       case TemperatureType.Heatbed:
-        gcode = `M140 S${temperature.toFixed(0)}\n`
+        param = `M140 S${temperature.toFixed(0)}\n`
         break
       case TemperatureType.Chamber:
         // not implemented
         return
     }
-    this.request('print.gcode_line', { 'param': gcode })
+    this.request('print.gcode_line', { param })
   }
 
   /**
