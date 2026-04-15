@@ -96,7 +96,8 @@ import lightOffIcon from '../../assets/images/monitor_lamp_off.svg'
 const router = useRouter()
 const client = PrinterClient.getInstance()
 const device = ref(client.device.print)
-const lightSwitchValue = ref(false)
+const lightState = computed(() => device.value?.lights_report?.find(item => item.node === LightType.Chamber)?.mode === 'on')
+const lightSwitchValue = ref(lightState.value)
 
 onMounted(() => {
   client.on(PrinterEvent.PRINT_PUSH_STATUS, onPushStatus)
@@ -106,9 +107,11 @@ onUnmounted(() => {
   client.off(PrinterEvent.PRINT_PUSH_STATUS, onPushStatus)
 })
 
-const onPushStatus = () => {
+const onPushStatus = (params: any) => {
   device.value = client.device.print
-  lightSwitchValue.value = lightState.value
+  if (params?.lights_report) {
+    lightSwitchValue.value = lightState.value
+  }
 }
 
 const showTempPopup = ref(false)
@@ -134,9 +137,6 @@ const handlePrintSpeedConfirm = (speedLevel: number) => {
   }
   client.setPrintSpeedLevel(speedLevel)
 }
-
-const lightState = computed(() => device.value?.lights_report?.find(item => item.node === LightType.Chamber)?.mode === 'on')
-lightSwitchValue.value = lightState.value
 
 const handleLightSwitch = (value: boolean) => {
   lightSwitchValue.value = value

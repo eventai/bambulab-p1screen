@@ -48,7 +48,7 @@
         <ControlButton :icon="stopIcon" label="停止" font-size="10px" @click="handleStop" :disabled="!showPrintActions" />
       </div>
     </div>
-    <ControlButton class="light-button" :icon="lightState ? lightOnIcon : lightOffIcon" label="照明" font-size="10px" @click="toggleLight" />
+    <ControlButton class="light-button" :icon="lightSwitchValue ? lightOnIcon : lightOffIcon" label="照明" font-size="10px" @click="toggleLight" />
   </div>
 </template>
 <script setup lang="ts">
@@ -139,10 +139,13 @@ const handleResize = () => {
   }
 }
 
-const onPushStatus = () => {
+const onPushStatus = (params: any) => {
   device.value = client.device.print
   wifiSignalIcon.value = getWifiSignalIcon()
   nozzleThumbnail.value = getNozzleThumbnail()
+  if (params?.lights_report) {
+    lightSwitchValue.value = lightState.value
+  }
 }
 
 const onProjectFile = () => {
@@ -258,7 +261,12 @@ const handleStop = () => {
 }
 
 const lightState = computed(() => device.value?.lights_report?.find(item => item.node === LightType.Chamber)?.mode === 'on')
-const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
+const lightSwitchValue = ref(lightState.value)
+const toggleLight = () => {
+  const value = !lightSwitchValue.value
+  lightSwitchValue.value = value
+  client.setLight(LightType.Chamber, value)
+}
 
 </script>
 
@@ -370,6 +378,8 @@ const toggleLight = () => client.setLight(LightType.Chamber, !lightState.value)
 .printer-card .temp-icon {
   top: 3px;
   position: relative;
+  width: 16px;
+  height: 16px;
 }
 
 .printer-content > img {
