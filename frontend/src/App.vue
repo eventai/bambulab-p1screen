@@ -96,7 +96,7 @@ const activeNavKey = computed(() => {
 }
 
 .main {
-  min-height: 0;
+  min-height: 320px;
   padding-right: env(safe-area-inset-right);
   overflow: auto;
 }

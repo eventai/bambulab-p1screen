@@ -127,8 +127,8 @@ M211 R
 
 <style scoped>
 .motion-card {
-  height: auto;
-  margin: 0 12px;
+  height: calc(100% - 16px);
+  margin: 0 8px;
   padding: 8px;
   display: grid;
   grid-template-columns: repeat(2, auto);
@@ -325,7 +325,7 @@ M211 R
 .heatbed-btn {
   max-width: 250px;
   max-height: 75px;
-  height: stretch;
+  flex: 1;
   border-radius: 0;
   border: 0;
   font-size: 14px;
