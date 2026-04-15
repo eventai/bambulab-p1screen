@@ -25,6 +25,8 @@
   --van-dialog-background: var(--van-background);
 
   --van-progress-background: var(--van-background-4);
+  --van-stepper-button-disabled-color: var(--van-background-4);
+  --van-stepper-background: var(--van-background-5);
 }
 
 * {

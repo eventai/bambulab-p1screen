@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
-import { Button, Slider, Progress, Popup, Popover, Dialog, Cell, CellGroup, Empty, Tab, Tabs, Switch, showDialog } from 'vant'
+import { Button, Slider, Progress, Popup, Popover, Dialog, Cell, CellGroup, Empty, Tab, Tabs, Switch, Stepper, showDialog } from 'vant'
 import Bowser from 'bowser'
 import App from './App.vue'
 import { PrinterClient } from './api/PrinterClient'
@@ -71,6 +71,7 @@ createApp(App)
   .use(Tab)
   .use(Tabs)
   .use(Switch)
+  .use(Stepper)
   .mount('#app')
 
 window.addEventListener('contextmenu', (event) => {

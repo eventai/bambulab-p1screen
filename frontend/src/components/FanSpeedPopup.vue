@@ -4,22 +4,103 @@
     title="风扇"
     @update:show="emit('update:show', $event)"
   >
-    <div class="fan-speed-card" v-for="item in fans" :key="item.type">
-      <div>
-        <img class="fan-speed-icon" :src="client.getFanSpeed(item.type) !== 0 ? fanOnIcon : fanOffIcon" />
-        <span class="fan-speed-name">{{ item.name }} {{ (client.getFanSpeed(item.type) / 255 * 100).toFixed(0) }}%</span>
+    <div class="fan-speed-card">
+      <div class="fan-title-group">
+        <span class="fan-speed-name">部件</span>
+        <img class="fan-speed-icon" :src="fanPartSpeed > 0 ? fanOnIcon : fanOffIcon" />
       </div>
-      <van-slider v-model="fanSpeeds[item.type].value" @change="(value) => onChange(item.type, value)"/>
+      <van-switch
+        :model-value="fanPartSpeed > 0"
+        @update:model-value="(val) => onSwitchChange(FanType.Part, val)"
+        size="20px"
+      />
+      <van-stepper
+        v-model="fanPartSpeed"
+        @plus="() => onStepperChange(FanType.Part, Math.min(fanPartSpeed + 10, 100))"
+        @minus="() => onStepperChange(FanType.Part, Math.max(fanPartSpeed - 10, 0))"
+        :min="0"
+        :max="100"
+        :step="10"
+        button-size="24px"
+        input-width="36px"
+        disable-input
+      />
+    </div>
+
+    <div class="fan-speed-card">
+      <div class="fan-title-group">
+        <span class="fan-speed-name">辅助</span>
+        <img class="fan-speed-icon" :src="fanAuxSpeed > 0 ? fanOnIcon : fanOffIcon" />
+      </div>
+      <van-switch
+        :model-value="fanAuxSpeed > 0"
+        @update:model-value="(val) => onSwitchChange(FanType.Aux, val)"
+        size="20px"
+      />
+      <van-stepper
+        v-model="fanAuxSpeed"
+        @plus="() => onStepperChange(FanType.Aux, Math.min(fanAuxSpeed + 10, 100))"
+        @minus="() => onStepperChange(FanType.Aux, Math.max(fanAuxSpeed - 10, 0))"
+        :min="0"
+        :max="100"
+        :step="10"
+        button-size="24px"
+        input-width="36px"
+        disable-input
+      />
+    </div>
+
+    <div class="fan-speed-card">
+      <div class="fan-title-group">
+        <span class="fan-speed-name">机箱</span>
+        <img class="fan-speed-icon" :src="fanChamberSpeed > 0 ? fanOnIcon : fanOffIcon" />
+      </div>
+      <van-switch
+        :model-value="fanChamberSpeed > 0"
+        @update:model-value="(val) => onSwitchChange(FanType.Chamber, val)"
+        size="20px"
+      />
+      <van-stepper
+        v-model="fanChamberSpeed"
+        @plus="() => onStepperChange(FanType.Chamber, Math.min(fanChamberSpeed + 10, 100))"
+        @minus="() => onStepperChange(FanType.Chamber, Math.max(fanChamberSpeed - 10, 0))"
+        :min="0"
+        :max="100"
+        :step="10"
+        button-size="24px"
+        input-width="36px"
+        disable-input
+      />
     </div>
   </BasePopup>
 </template>
 
 <script setup lang="ts">
-import { ref, type Ref } from 'vue'
+import { onMounted, onUnmounted, ref} from 'vue'
 import { FanType } from '../api/enums'
-import { PrinterClient } from '../api/PrinterClient'
+import { PrinterClient, PrinterEvent } from '../api/PrinterClient'
 import fanOnIcon from '../assets/images/monitor_fan_on.svg'
 import fanOffIcon from '../assets/images/monitor_fan_off.svg'
+
+const client = PrinterClient.getInstance()
+const device = ref(client.device.print)
+
+onMounted(() => {
+  client.on(PrinterEvent.PRINT_PUSH_STATUS, onPushStatus)
+})
+
+onUnmounted(() => {
+  client.off(PrinterEvent.PRINT_PUSH_STATUS, onPushStatus)
+})
+
+const getFanSpeedPercent = (type: FanType) => Math.round(client.getFanSpeed(type) / 255 * 10) * 10
+
+const onPushStatus = () => {
+  device.value = client.device.print
+  fanPartSpeed.value = getFanSpeedPercent(FanType.Part)
+  fanAuxSpeed.value = getFanSpeedPercent(FanType.Aux)
+  fanChamberSpeed.value = getFanSpeedPercent(FanType.Chamber)
+}
 
 defineProps<{
   show: boolean
@@ -29,28 +110,21 @@ const emit = defineEmits<{
   (event: 'update:show', value: boolean): void
 }>()
 
-const client = PrinterClient.getInstance()
+const fanPartSpeed = ref(getFanSpeedPercent(FanType.Part))
+const fanAuxSpeed = ref(getFanSpeedPercent(FanType.Aux))
+const fanChamberSpeed = ref(getFanSpeedPercent(FanType.Chamber))
 
-const fans: { type: FanType, name: string }[] = [{
-  type: FanType.Part,
-  name: '部件'
-}, {
-  type: FanType.Aux,
-  name: '辅助'
-}, {
-  type: FanType.Chamber,
-  name: '机箱'
-}]
-
-const fanSpeeds: Record<FanType, Ref<number>> = {
-  [FanType.Part]: ref(client.getFanSpeed(FanType.Part)),
-  [FanType.Aux]: ref(client.getFanSpeed(FanType.Aux)),
-  [FanType.Chamber]: ref(client.getFanSpeed(FanType.Chamber))
+const onSwitchChange = (type: FanType, checked: boolean) => {
+  const percentage = checked ? 100 : 0
+  const speed = Math.round(percentage / 100 * 255)
+  console.log(`[Controls] setFanSpeed (switch): type=${type}, speed=${speed}`)
+  client.setFanSpeed(type, speed)
 }
 
-const onChange = (type: FanType, value: number) => {
-  let speed = Math.floor(Number(value) / 100 * 255)
-  console.log(`[Controls] setFanSpeed: type=${type}, speed=${speed}`)
+const onStepperChange = (type: FanType, value: number) => {
+  const percentage = Number(value)
+  const speed = Math.round(percentage / 100 * 255)
+  console.log(`[Controls] setFanSpeed (stepper): type=${type}, speed=${speed}`)
   client.setFanSpeed(type, speed)
 }
 
@@ -58,29 +132,50 @@ const onChange = (type: FanType, value: number) => {
 
 <style scoped>
 .fan-speed-card {
-  background: var(--van-background-5);
+  background: var(--van-background-4);
   border-radius: 10px;
   width: 250px;
   max-width: 100%;
-  max-height: 100px;
-  padding: 8px 22px 14px;
+  padding: 12px 16px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  align-items: center;
 }
 
-.fan-speed-card div {
+.fan-title-group {
+  grid-column: 1;
+  grid-row: 1;
   display: flex;
   align-items: center;
-  margin: 0;
-  font-size: 13px;
 }
 
 .fan-speed-icon {
-  margin-right: 6px;
+  width: 16px;
+  height: 16px;
+  margin-left: 4px;
 }
 
-.fan-speed-card .van-slider {
-  height: 4px;
-  width: 100%;
-  margin: 22px 0 0;
+.fan-speed-name {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.fan-speed-card :deep(.van-switch) {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+}
+
+.fan-speed-card .van-stepper {
+  grid-column: 2;
+  grid-row: 2;
+  margin-top: 8px;
+  justify-self: end;
+}
+
+:deep(.van-stepper__minus--disabled, .van-stepper__plus--disabled) {
+  filter: brightness(1.08);
 }
 
 @media (orientation: portrait) {
