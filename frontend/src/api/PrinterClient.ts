@@ -383,6 +383,7 @@ export class PrinterClient {
     if (light) light.mode = result.led_mode
   }
 
+  // https://github.com/BambuTools/bambulabs_api/blob/5bd1e84a9b0c21ab7cdfdccac9dab43994319b0d/bambulabs_api/mqtt_client.py#L25
   private setTemperatureSupport() {
     const module = this.device.module?.filter(item => item.name === 'ota')
     if (module?.length !== 1) return false
@@ -407,7 +408,6 @@ export class PrinterClient {
     let param = ''
     switch (type) {
       case TemperatureType.Nozzle:
-        // https://github.com/BambuTools/bambulabs_api/blob/5bd1e84a9b0c21ab7cdfdccac9dab43994319b0d/bambulabs_api/mqtt_client.py#L854
         if (this.setTemperatureSupport()) {
           param = `M104 S${temperature.toFixed(0)}\n`
         } else {
@@ -415,7 +415,11 @@ export class PrinterClient {
         }
         break
       case TemperatureType.Heatbed:
-        param = `M140 S${temperature.toFixed(0)}\n`
+        if (this.setTemperatureSupport()) {
+          param = `M140 S${temperature.toFixed(0)}\n`
+        } else {
+          param = `M190 S${temperature.toFixed(0)}\n`
+        }
         break
       case TemperatureType.Chamber:
         // not implemented
