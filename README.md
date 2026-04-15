@@ -109,3 +109,4 @@ Any full-screen web launch method is acceptable. More ideas are welcome.
 - [LAN Control Protocol Docs (OpenBambuAPI)](https://github.com/Doridian/OpenBambuAPI/)
 - [LAN Control Protocol Implementation (bambulabs_api)](https://github.com/BambuTools/bambulabs_api)
 - [Print State Constants (ha-bambulab)](https://github.com/greghesp/ha-bambulab/blob/main/custom_components/bambu_lab/pybambu/const.py)
+- [bambu-printer-manager > docs](https://github.com/synman/bambu-printer-manager/tree/main/docs)

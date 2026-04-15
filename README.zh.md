@@ -110,3 +110,4 @@ docker compose up -d
 - [局域网控制协议文档（OpenBambuAPI）](https://github.com/Doridian/OpenBambuAPI/)
 - [局域网控制协议实现（bambulabs_api）](https://github.com/BambuTools/bambulabs_api)
 - [打印状态码参考（ha-bambulab）](https://github.com/greghesp/ha-bambulab/blob/main/custom_components/bambu_lab/pybambu/const.py)
+- [bambu-printer-manager > docs](https://github.com/synman/bambu-printer-manager/tree/main/docs)

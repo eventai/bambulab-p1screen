@@ -28,7 +28,7 @@
         name="Ext"
         :amsId="255"
         :tray="device?.vt_tray"
-        :trayNow="Number(device?.ams.tray_now) ?? 0"
+        :trayNow="Number(device?.ams.tray_now) ?? -1"
         :trayTar="Number(device?.ams.tray_tar) ?? -1"
         :trayPrev="Number(device?.ams.tray_pre) ?? -1"
         :popoverAction="handleTrayAction"

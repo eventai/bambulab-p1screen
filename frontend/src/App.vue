@@ -40,9 +40,9 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { key: 'home', to: '/home', icon: IconHome },
-  { key: 'controls', to: '/control', icon: IconTune },
+  { key: 'control', to: '/control', icon: IconTune },
   { key: 'filament', to: '/filament', icon: IconDatabase },
-  { key: 'settings', to: '/setting', icon: IconSettings },
+  { key: 'setting', to: '/setting', icon: IconSettings },
   { key: 'message', to: '/message', icon: IconSMS },
 ]
 
