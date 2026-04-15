@@ -15,6 +15,10 @@
 ## 预览图
 <img src="./screenshoot/home.png" alt="主页" width="50%" />
 <img src="./screenshoot/controls.png" alt="控制页" width="50%" />
+<img src="./screenshoot/printspeed.png" alt="打印速度" width="50%" />
+<img src="./screenshoot/motion.png" alt="运动" width="50%" />
+<img src="./screenshoot/nozzle.png" alt="喷嘴和挤出机" width="50%" />
+<img src="./screenshoot/headbed.png" alt="热床" width="50%" />
 <img src="./screenshoot/filament.png" alt="耗材页" width="50%" />
 <img src="./screenshoot/settings.png" alt="设置页" width="50%" />
 
@@ -98,10 +102,11 @@ docker compose up -d
 - [P1S 屏幕改装 - iPhone7/Plus版](https://makerworld.com.cn/zh/models/1945893)
 
 ## TODOs
-- 耗材页
-  - 耗材编辑、进退料、设置、引导
 - 文件页
   - 获取文件列表
+- 耗材页
+  - 耗材编辑、AMS设置
+- 设置页
 - 多语言
 
 ## 参考内容

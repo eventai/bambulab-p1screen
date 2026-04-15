@@ -15,6 +15,10 @@ Status: In development
 ## Screenshots
 <img src="./screenshoot/home.png" alt="Home" width="50%" />
 <img src="./screenshoot/controls.png" alt="Controls" width="50%" />
+<img src="./screenshoot/printspeed.png" alt="PrintSpeed" width="50%" />
+<img src="./screenshoot/motion.png" alt="Motion" width="50%" />
+<img src="./screenshoot/nozzle.png" alt="Nozzle" width="50%" />
+<img src="./screenshoot/headbed.png" alt="Heatbed" width="50%" />
 <img src="./screenshoot/filament.png" alt="Filament" width="50%" />
 <img src="./screenshoot/settings.png" alt="Settings" width="50%" />
 
@@ -97,10 +101,11 @@ Any full-screen web launch method is acceptable. More ideas are welcome.
 - [P1S Screen Mod - iPhone 7/Plus Version](https://makerworld.com.cn/zh/models/1945893)
 
 ## TODOs
-- Filament
-  - Filament edit, load/unload, settings, guidance
 - Files
   - Fetch file list
+- Filament
+  - Filament edit, AMS setting
+- Setting
 - Multi languages
 
 ## References
