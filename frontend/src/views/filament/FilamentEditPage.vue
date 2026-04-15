@@ -1,6 +1,5 @@
 <template>
-  <div class="filament-edit-page">
-    <NavHeader title="编辑耗材" @back="router.back" />
+  <BaseSubPage title="编辑耗材">
     <div class="filament-edit-card">
       <div class="form-row">
         <label class="form-label">耗材</label>
@@ -45,7 +44,7 @@
         <van-button class="action-btn" type="primary" @click="handleConfirm">确定</van-button>
       </div>
     </div>
-  </div>
+  </BaseSubPage>
 </template>
 
 <script setup lang="ts">
@@ -144,12 +143,6 @@ const handleConfirm = async () => {
 </script>
 
 <style scoped>
-.filament-edit-page {
-  height: 100%;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-}
-
 .filament-edit-card {
   min-height: 0;
   margin: 8px;
@@ -158,7 +151,7 @@ const handleConfirm = async () => {
   gap: 8px;
   padding: 12px 18px;
   border-radius: 8px;
-  background: var(--van-background-3);
+  background: var(--van-background-2);
 }
 
 .form-row {

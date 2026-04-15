@@ -212,10 +212,8 @@ const getPrintSubStateLabel = () => {
 
 const getNozzleThumbnail = () => {
   if (!device.value) return nozzleNormalThumbnail
-  if (device.value.nozzle_target_temper - device.value.nozzle_temper > 2) {
-    return nozzleHeatingThumbnail
-  } else if (device.value.nozzle_target_temper === 0 && device.value.nozzle_temper > 50) {
-    return nozzleCoolingThumbnail
+  if (device.value.nozzle_temper > 50) {
+    return (device.value.nozzle_target_temper === 0) ? nozzleCoolingThumbnail : nozzleHeatingThumbnail
   }
   // TODO
   return nozzleNormalThumbnail

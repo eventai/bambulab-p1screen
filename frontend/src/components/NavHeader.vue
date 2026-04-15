@@ -24,7 +24,7 @@ const emit = defineEmits<{
   grid-template-columns: 32px 1fr auto;
   gap: 12px;
   align-items: center;
-  height: 40px;
+  height: 47px;
 }
 
 .nav-header-back {

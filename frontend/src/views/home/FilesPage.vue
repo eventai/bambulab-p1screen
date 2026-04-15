@@ -1,20 +1,10 @@
 <template>
-  <div class="files-page">
-    <NavHeader title="文件列表" @back="router.back" />
+  <BaseSubPage title="文件列表">
     <van-empty description="开发中" />
-  </div>
+  </BaseSubPage>
 </template>
 
-<script setup lang="ts">
-import { useRouter } from 'vue-router'
-const router = useRouter()
-</script>
-
 <style scoped>
-.files-page {
-  display: grid;
-}
-
 :deep(.van-empty__image) {
   opacity: 0.5;
 }

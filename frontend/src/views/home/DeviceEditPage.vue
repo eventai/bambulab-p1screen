@@ -1,7 +1,6 @@
 <template>
+  <BaseSubPage :title="isEditMode ? '编辑设备' : '添加设备'">
   <div class="device-manage-page">
-    <NavHeader :title="isEditMode ? '编辑设备' : '添加设备'" @back="router.back" />
-
     <van-cell-group inset>
       <van-cell title="设备名称">
         <template #value>
@@ -64,6 +63,7 @@
       <van-cell v-if="isEditMode" title="删除" class="delete-btn" @click="handleDelete" />
     </van-cell-group>
   </div>
+  </BaseSubPage>
 </template>
 
 <script setup lang="ts">
@@ -122,7 +122,6 @@ const handleDelete = () => {
 .device-manage-page {
   display: grid;
   gap: 10px;
-  padding: 8px;
   padding-bottom: 16px;
   padding-bottom: calc(16px + env(safe-area-inset-bottom));
   overflow: auto;

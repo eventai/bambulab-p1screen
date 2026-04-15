@@ -56,6 +56,9 @@ const handleClose = () => {
 </script>
 
 <style scoped>
+.nav-header {
+  height: 40px;
+}
 
 .popup {
   background: var(--van-background-3);
