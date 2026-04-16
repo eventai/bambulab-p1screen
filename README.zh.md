@@ -20,6 +20,7 @@
 <img src="./screenshoot/nozzle.png" alt="喷嘴和挤出机" width="50%" />
 <img src="./screenshoot/headbed.png" alt="热床" width="50%" />
 <img src="./screenshoot/filament.png" alt="耗材页" width="50%" />
+<img src="./screenshoot/filament-edit.png" alt="耗材编辑页" width="50%" />
 <img src="./screenshoot/settings.png" alt="设置页" width="50%" />
 
 ## 功能列表
