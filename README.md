@@ -101,11 +101,13 @@ Any full-screen web launch method is acceptable. More ideas are welcome.
 - [P1S Screen Mod - iPhone 7/Plus Version](https://makerworld.com.cn/zh/models/1945893)
 
 ## TODOs
-- Files
-  - Fetch file list
+- Homepage
+  - Idle State
+  - File list
 - Filament
-  - Filament edit, AMS setting
+  - AMS setting
 - Setting
+- Message
 - Multi languages
 
 ## References

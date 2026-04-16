@@ -102,11 +102,13 @@ docker compose up -d
 - [P1S 屏幕改装 - iPhone7/Plus版](https://makerworld.com.cn/zh/models/1945893)
 
 ## TODOs
-- 文件页
-  - 获取文件列表
+- 首页
+  - 空闲状态
+  - 文件列表
 - 耗材页
-  - 耗材编辑、AMS设置
+  - AMS设置
 - 设置页
+- 消息页
 - 多语言
 
 ## 参考内容

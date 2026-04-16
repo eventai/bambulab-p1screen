@@ -1,5 +1,6 @@
 <template>
   <div class="control-page">
+    <img src="../../assets/images/printer-inside.png" class="background-image" />
     <div class="control-grid">
       <div class="panel panel-main panel-air" @click="showFanSpeedPopup = true">
         <div class="panel-icon">
@@ -185,7 +186,19 @@ const bedTempText = computed(() => device.value ? `${Math.floor(Number(device.va
   overflow: hidden;
 }
 
+.background-image {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  height: calc(100% - 40px);
+  width: auto;
+  object-fit: contain;
+  opacity: 0.7;
+}
+
 .control-grid {
+  position: relative;
+  z-index: 1;
   width: 100%;
   height: 100%;
   display: grid;
@@ -202,7 +215,7 @@ const bedTempText = computed(() => device.value ? `${Math.floor(Number(device.va
 .panel {
   border: 0;
   border-radius: 8px;
-  background: var(--van-background-2);
+  background-color: var(--van-background-2);
   padding: 10px 12px;
   text-align: left;
 }
@@ -373,6 +386,11 @@ const bedTempText = computed(() => device.value ? `${Math.floor(Number(device.va
 }
 
 @media (orientation: portrait) {
+  .background-image {
+    width: calc(100% - 40px);
+    height: auto;
+  }
+
   .control-grid {
     grid-template-columns: 60% 40%;
     grid-template-rows: 60px 60px 90px;
