@@ -13,7 +13,7 @@
         <span class="heatbed-temp">
           <img class="temp-icon" :src="bedTempIcon" />
           {{ heatbedTemp }}
-          <span class="temp-unit">℃</span>
+          <span class="temp-unit">°C</span>
         </span>
         <span class="wifi-signal"><img :src="wifiSignalIcon"/></span>
         <button id="manage-device-btn" type="button" @click="handleManageDevice">
@@ -28,7 +28,7 @@
         <span class="nozzle-temp">
           <img class="temp-icon" :src="nozzleTempIcon" />
           {{ nozzleTemp }}
-          <span class="temp-unit">℃</span>
+          <span class="temp-unit">°C</span>
         </span>
       </div>
     </div>

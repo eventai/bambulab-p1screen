@@ -14,7 +14,7 @@
       <div>
         <label class="nozzle-label">喷嘴</label>
         <label class="nozzle-temp" v-on:click="openTempPopup">
-          <span>{{ Math.floor(Number(device?.nozzle_temper ?? '0')) }}</span> / {{ Math.floor(Number(device?.nozzle_target_temper ?? '0')) }} ℃
+          <span>{{ Math.floor(Number(device?.nozzle_temper ?? '0')) }}</span> / {{ Math.floor(Number(device?.nozzle_target_temper ?? '0')) }} °C
         </label>
         <div class="nozzle-types">
           <label class="nozzle-type">标准</label>
@@ -62,7 +62,7 @@ const onPushStatus = () => {
 const handleMove = (axis: 'e', step: -10 | -1 | 0| 1 | 10) => {
   console.log(`[NozzlePage] move axis=e, step=${step}`)
   if (Number(device.value?.nozzle_temper ?? '0') < 170) {
-    showDialog({ message: '请将热端加热到170℃以上。' })
+    showDialog({ message: '请将热端加热到170°C以上。' })
     return
   }
 

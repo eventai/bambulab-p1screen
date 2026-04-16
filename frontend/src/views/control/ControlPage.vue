@@ -4,20 +4,21 @@
     <div class="control-grid">
       <div class="panel panel-main panel-air" @click="showFanSpeedPopup = true">
         <div class="panel-icon">
-          <img class="panel-icon-image" src="../../assets/images/monitor_fan_off.svg" />
+          <img src="../../assets/images/monitor_fan_off.svg" />
         </div>
         <div class="panel-title">风扇</div>
-        <i-material-symbols-chevron-right-rounded class="panel-arrow" />
         <div class="panel-value">{{ fanStatusText }}</div>
+        <i-material-symbols-chevron-right-rounded class="panel-arrow" />
       </div>
 
       <div class="panel panel-main panel-speed" @click="showPrintSpeedPopup = true">
         <div class="panel-icon">
           <i-material-symbols-speed-rounded />
+          <!-- <img src="../../assets/images/monitor_speed.svg" /> -->
         </div>
         <div class="panel-title">速度</div>
-        <i-material-symbols-chevron-right-rounded class="panel-arrow" />
         <div class="panel-value">{{ speedText }}</div>
+        <i-material-symbols-chevron-right-rounded class="panel-arrow" />
       </div>
 
       <div class="panel panel-main panel-motion" @click="router.push('/control/motion')">
@@ -25,14 +26,14 @@
           <i-material-symbols-open-with-rounded />
         </div>
         <div class="panel-title">运动</div>
-        <i-material-symbols-chevron-right-rounded class="panel-arrow" />
         <div class="panel-value">XYZ</div>
+        <i-material-symbols-chevron-right-rounded class="panel-arrow" />
       </div>
 
       <div class="panel panel-nozzle" @click="router.push('/control/nozzle')">
         <div class="panel-head">
           <div class="panel-icon">
-            <img class="panel-icon-image" src="../../assets/images/monitor_nozzle_temp.svg" />
+            <img src="../../assets/images/monitor_nozzle_temp.svg" />
           </div>
           <div class="panel-title">喷嘴和挤出机</div>
           <i-material-symbols-chevron-right-rounded class="panel-arrow" />
@@ -45,11 +46,11 @@
 
       <div class="panel panel-main panel-bed" @click="openTempPopup">
         <div class="panel-icon">
-          <img class="panel-icon-image" src="../../assets/images/monitor_bed_temp.svg" />
+          <img src="../../assets/images/monitor_bed_temp.svg" />
         </div>
         <div class="panel-title">热床</div>
-        <i-material-symbols-chevron-right-rounded class="panel-arrow" />
         <div class="panel-value">{{ bedTempText }}</div>
+        <i-material-symbols-chevron-right-rounded class="panel-arrow" />
       </div>
 
     </div>
@@ -171,8 +172,8 @@ const fanStatusText = computed(() => {
   return activeCount === 0 ? '无风扇开启' : `${activeCount}风扇开启`
 })
 
-const nozzleTempText = computed(() => device.value ? `${Math.floor(Number(device.value.nozzle_temper ?? '0'))}℃/${Math.floor(Number(device.value.nozzle_target_temper ?? '0'))}℃` : '')
-const bedTempText = computed(() => device.value ? `${Math.floor(Number(device.value.bed_temper ?? '0'))}℃/${Math.floor(Number(device.value.bed_target_temper ?? '0'))}℃` : '')
+const nozzleTempText = computed(() => device.value ? `${Math.floor(Number(device.value.nozzle_temper ?? '0'))}°C/${Math.floor(Number(device.value.nozzle_target_temper ?? '0'))}°C` : '')
+const bedTempText = computed(() => device.value ? `${Math.floor(Number(device.value.bed_temper ?? '0'))}°C/${Math.floor(Number(device.value.bed_target_temper ?? '0'))}°C` : '')
 </script>
 
 <style scoped>
@@ -249,7 +250,7 @@ const bedTempText = computed(() => device.value ? `${Math.floor(Number(device.va
   line-height: 18px;
 }
 
-.panel-icon-image {
+.panel-icon > img {
   width: 20px;
   height: 20px;
   object-fit: contain;

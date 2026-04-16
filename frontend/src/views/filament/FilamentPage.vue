@@ -23,7 +23,12 @@
         :popoverAction="handleTrayAction"
       />
       <span class="ams-name" >AMS-{{ amsPrefix(currentAms.id) }}</span>
-      <img class="ams-hum" :src="humIcon(currentAms.humidity)"/>
+      <div class="ams-info">
+        <img :src="humIcon(currentAms.humidity)"/>
+        <span>{{ currentAms.humidity_raw }}%</span>
+        <span>{{ Math.round(Number(currentAms.temp)).toFixed(0) }}°C</span>
+      </div>
+      
     </div>
     <div v-if="device?.vt_tray" class="ext-card">
       <Tray
@@ -63,12 +68,11 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { PopoverAction } from 'vant'
 import { useRouter } from 'vue-router'
 import { PrinterClient, PrinterEvent } from '../../api/PrinterClient'
-import humLevelIcon from '../../assets/images/hum_level1_no_num_dark.svg'
-import humLevel1Icon from '../../assets/images/hum_level1_dark.svg'
-import humLevel2Icon from '../../assets/images/hum_level2_dark.svg'
-import humLevel3Icon from '../../assets/images/hum_level3_dark.svg'
-import humLevel4Icon from '../../assets/images/hum_level4_dark.svg'
-import humLevel5Icon from '../../assets/images/hum_level5_dark.svg'
+import humLevel1Icon from '../../assets/images/hum_level1_no_num_dark.svg'
+import humLevel2Icon from '../../assets/images/hum_level2_no_num_dark.svg'
+import humLevel3Icon from '../../assets/images/hum_level3_no_num_dark.svg'
+import humLevel4Icon from '../../assets/images/hum_level4_no_num_dark.svg'
+import humLevel5Icon from '../../assets/images/hum_level5_no_num_dark.svg'
 import { DeviceTray } from '../../api/device'
 
 const router = useRouter()
@@ -81,7 +85,7 @@ const showSettingsPopover = ref(false)
 const settingsActions: PopoverAction[] = [{ type: 'auto-refill', text: '自动续料' }]
 
 const amsPrefix = (amsId: string) => String.fromCharCode('A'.charCodeAt(0) + Number(amsId ?? '0'))
-const humIcon = (humidity: string) => [humLevelIcon, humLevel1Icon, humLevel2Icon, humLevel3Icon, humLevel4Icon, humLevel5Icon][Number(humidity)]
+const humIcon = (humidity: string) => [humLevel1Icon, humLevel1Icon, humLevel2Icon, humLevel3Icon, humLevel4Icon, humLevel5Icon][Number(humidity)]
 
 onMounted(() => {
   client.on(PrinterEvent.PRINT_PUSH_STATUS, onPushStatus)
@@ -221,16 +225,36 @@ const handleSettingsSelect = (action: PopoverAction) => {
   overflow: hidden;
 }
 
-.ams-hum {
+.ams-info {
   position: relative;
-  width: 30px;
-  height: 30px;
-  left: 234px;
-  bottom: 20px;
-  padding: 4px;
-  border-radius: 12px;
+  width: 32px;
+  height: 64px;
+  left: 236px;
+  bottom: 44px;
+  border-radius: 16px;
   border: var(--van-background-3) 1px solid;
   background-color: var(--van-background);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.ams-info > img {
+  width: 20px;
+  height: 20px;
+}
+.ams-info > span {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 20px;
+  text-align: center;
+}
+.ams-info > span:last-child {
+  font-size: 9px;
+  font-weight: normal;
+  line-height: 10px;
+  color: var(--van-text-color-2);
 }
 
 .setting {

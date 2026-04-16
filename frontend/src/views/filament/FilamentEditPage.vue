@@ -33,12 +33,12 @@
         <div class="temperature-field">
           最低
           <span>{{ isCustomFilament ? tray?.nozzle_temp_min : getSelectedFilament()?.min_temperature || 0 }}</span>
-          ℃
+          °C
         </div>
         <div class="temperature-field">
           最高
           <span>{{ isCustomFilament ? tray?.nozzle_temp_max : getSelectedFilament()?.max_temperature || 0 }}</span>
-          ℃
+          °C
         </div>
       </div>
 
