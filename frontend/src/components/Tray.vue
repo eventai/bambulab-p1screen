@@ -153,9 +153,10 @@ const textColor = computed(() => {
   font-size: 12px;
 }
 .icon-edit {
-  height: 19px;
-  margin: 0 15px;
-  mask-image: url(/src/assets/images/rename_edit.svg);
+  width: 13px;
+  height: 15px;
+  margin: 0 17px;
+  mask-image: url(/src/assets/images/ams_editable.svg);
 }
 .icon-view {
   height: 19px;

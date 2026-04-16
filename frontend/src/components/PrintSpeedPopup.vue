@@ -8,8 +8,9 @@
       <van-button
         v-for="item in buttons"
         :key="item.value"
-        :class="{ 'print-speed-button': true, 'print-speed-button-active': item.value === value }"
-        type="primary"
+        class="print-speed-button"
+        :plain="(item.value !== value)"
+        :type="(item.value === value) ? 'primary' : 'default'"
         size="large"
         @click="handleConfirm(item.value)"
       >
@@ -73,16 +74,9 @@ const handleConfirm = (value: number) => {
 }
 
 .print-speed-button {
-  background: var(--van-background-5);
-  border: 0;
   border-radius: 8px;
   width: 200px;
-  height: 55px;
   margin-bottom: 10px;
-}
-
-.print-speed-button-active {
-  background: var(--van-primary-color);
 }
 
 </style>

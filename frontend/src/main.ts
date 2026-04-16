@@ -20,6 +20,8 @@ import 'vant/lib/index.css'
 import './styles/theme.css'
 import pkg from '../package.json'
 
+window.client = PrinterClient.getInstance()
+
 const browser = Bowser.getParser(window.navigator.userAgent)
 const requirements: Record<string, string> = {}
 pkg.browserslist.forEach((item: string) => {
@@ -90,5 +92,5 @@ window.addEventListener('resize', syncAppSize)
 
 const storedDevice = getCurrentDevice()
 if (storedDevice) {
-  PrinterClient.getInstance().connect(storedDevice.ip, storedDevice.serial, storedDevice.code)
+  window.client.connect(storedDevice.ip, storedDevice.serial, storedDevice.code)
 }

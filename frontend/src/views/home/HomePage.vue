@@ -4,7 +4,7 @@
       <span v-if="isRecording" class="recording"><i-material-symbols-circle />REC</span>
       <span class="files" @click="router.push('/home/files')">{{ '文件 >' }}</span>
       <img v-if="getTaskThumbnail" class="task-thumbnail" :src="getTaskThumbnail"/>
-      <img v-if="!getTaskThumbnail" class="task-thumbnail task-broken-thumbnail" :src="brokenThumbnail"/>
+      <img v-if="!getTaskThumbnail" class="task-thumbnail task-loading-thumbnail" :src="loadingThumbnail"/>
       <span class="task-name">{{ taskName }}</span>
     </div>
     <div class="printer-card">
@@ -67,7 +67,7 @@ import skipIcon from '../../assets/images/print_control_partskip.svg'
 import pauseIcon from '../../assets/images/print_control_pause.svg'
 import resumeIcon from '../../assets/images/print_control_resume.svg'
 import stopIcon from '../../assets/images/print_control_stop.svg'
-import brokenThumbnail from '../../assets/images/dev_hms_diag_loading.svg'
+import loadingThumbnail from '../../assets/images/dev_hms_diag_loading_dark.svg'
 import p1sThumbnail from '../../assets/images/object_22.png'
 import signalNoIcon from '../../assets/images/monitor_signal_no.svg'
 import signalWeakIcon from '../../assets/images/monitor_signal_weak.svg'
@@ -337,7 +337,7 @@ const toggleLight = () => {
   justify-self: center;
 }
 
-.task-broken-thumbnail {
+.task-loading-thumbnail {
   filter: brightness(1.1);
   width: 60%;
   padding-bottom: 10%;

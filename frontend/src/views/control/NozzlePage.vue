@@ -171,9 +171,9 @@ label {
   top: 36px;
   left: 80px;
   background-color: var(--van-text-color-2);
-  mask-image: url(/src/assets/images/rename_edit.svg);
-  width: 18px;
-  height: 18px;
+  mask-image: url(/src/assets/images/ams_editable.svg);
+  width: 13px;
+  height: 15px;
 }
 
 @media (orientation: portrait) {

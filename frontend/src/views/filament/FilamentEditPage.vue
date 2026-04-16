@@ -289,9 +289,9 @@ const handleConfirm = async () => {
 }
 
 .icon-edit {
-  width: 19px;
-  height: 19px;
-  mask-image: url(/src/assets/images/rename_edit.svg);
+  width: 13px;
+  height: 15px;
+  mask-image: url(/src/assets/images/ams_editable.svg);
   background-color: var(--van-text-color-2);
 }
 

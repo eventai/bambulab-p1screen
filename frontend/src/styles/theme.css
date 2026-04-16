@@ -1,5 +1,5 @@
 :root {
-  --van-primary-color: #4FA34F;
+  --van-primary-color: #C0F473;
   --van-background: #141414;
   --van-background-2: #242424;
   --van-background-3: #333333;
@@ -17,7 +17,7 @@
   --van-button-default-background: var(--van-background);
   --van-button-default-border-color: var(--van-background-4);
   --van-button-plain-background: var(--van-background-4);
-  --van-button-primary-color: var(--van-text-color);
+  --van-button-primary-color: var(--van-background);
   --van-button-primary-background: var(--van-primary-color);
   
   --van-cell-group-inset-title-padding: 8px;
