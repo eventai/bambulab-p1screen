@@ -18,7 +18,7 @@ Status: In development
 <img src="./screenshoot/printspeed.png" alt="PrintSpeed" width="50%" />
 <img src="./screenshoot/motion.png" alt="Motion" width="50%" />
 <img src="./screenshoot/nozzle.png" alt="Nozzle" width="50%" />
-<img src="./screenshoot/headbed.png" alt="Heatbed" width="50%" />
+<img src="./screenshoot/heatbed.png" alt="Heatbed" width="50%" />
 <img src="./screenshoot/filament.png" alt="Filament" width="50%" />
 <img src="./screenshoot/filament-edit.png" alt="FilamentEdit" width="50%" />
 <img src="./screenshoot/settings.png" alt="Settings" width="50%" />
