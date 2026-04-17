@@ -14,6 +14,7 @@ import FilamentPage from './views/filament/FilamentPage.vue'
 import FilamentAutoRefillPage from './views/filament/FilamentAutoRefillPage.vue'
 import FilamentEditPage from './views/filament/FilamentEditPage.vue'
 import SettingPage from './views/setting/SettingPage.vue'
+import SettingHomePage from './views/setting/SettingHomePage.vue'
 import MessagePage from './views/message/MessagePage.vue'
 import { getCurrentDevice } from './utils/device'
 import 'vant/lib/index.css'
@@ -54,7 +55,8 @@ const router = createRouter({
     { path: '/filament', component: FilamentPage },
     { path: '/filament/auto-refill', component: FilamentAutoRefillPage },
     { path: '/filament/edit/:ams_id/:tray_id', component: FilamentEditPage, props: true },
-    { path: '/setting', component: SettingPage },
+    { path: '/setting', component: SettingHomePage },
+    { path: '/setting/setting', component: SettingPage },
     { path: '/message', component: MessagePage },
   ]
 })
