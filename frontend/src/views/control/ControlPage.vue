@@ -4,7 +4,7 @@
     <div class="control-grid">
       <div class="panel panel-main panel-air" @click="showFanSpeedPopup = true">
         <div class="panel-icon">
-          <img src="../../assets/images/monitor_fan_off.svg" />
+          <img :src="activeFanCount() > 0 ? fanOnIcon : fanOffIcon" />
         </div>
         <div class="panel-title">风扇</div>
         <div class="panel-value">{{ fanStatusText }}</div>
@@ -33,7 +33,7 @@
       <div class="panel panel-nozzle" @click="router.push('/control/nozzle')">
         <div class="panel-head">
           <div class="panel-icon">
-            <img src="../../assets/images/monitor_nozzle_temp.svg" />
+            <img :src="nozzleHeating ? nozzleOnIcon : nozzleOffIcon" />
           </div>
           <div class="panel-title">喷嘴和挤出机</div>
           <i-material-symbols-chevron-right-rounded class="panel-arrow" />
@@ -46,7 +46,7 @@
 
       <div class="panel panel-main panel-bed" @click="openTempPopup">
         <div class="panel-icon">
-          <img src="../../assets/images/monitor_bed_temp.svg" />
+          <img :src="bedHeating ? bedOnIcon : bedOffIcon" />
         </div>
         <div class="panel-title">热床</div>
         <div class="panel-value">{{ bedTempText }}</div>
@@ -92,6 +92,13 @@ import { useRouter } from 'vue-router'
 import { showDialog } from 'vant'
 import { FanType, GcodeState, LightType, PrintSpeedLevel, TemperatureType } from '../../api/enums'
 import { PrinterClient, PrinterEvent } from '../../api/PrinterClient'
+
+import fanOnIcon from '../../assets/images/monitor_fan_on.svg'
+import fanOffIcon from '../../assets/images/monitor_fan_off.svg'
+import nozzleOnIcon from '../../assets/images/monitor_nozzle_temp_active.svg'
+import nozzleOffIcon from '../../assets/images/monitor_nozzle_temp.svg'
+import bedOnIcon from '../../assets/images/monitor_bed_temp_active.svg'
+import bedOffIcon from '../../assets/images/monitor_bed_temp.svg'
 import lightOnIcon from '../../assets/images/monitor_lamp_on.svg'
 import lightOffIcon from '../../assets/images/monitor_lamp_off.svg'
 
@@ -162,17 +169,17 @@ const speedText = computed(() => {
   return (speed.length > 0) ? speed[0].label : ''
 })
 
+const activeFanCount = () => [FanType.Part, FanType.Aux, FanType.Chamber].filter(type => client.getFanSpeed(type) > 0).length
 const fanStatusText = computed(() => {
   if (!device.value) return ''
-
-  const activeCount = [FanType.Part, FanType.Aux, FanType.Chamber]
-    .filter(type => client.getFanSpeed(type) > 0)
-    .length
-
-  return activeCount === 0 ? '无风扇开启' : `${activeCount}风扇开启`
+  const count = activeFanCount()
+  return count === 0 ? '无风扇开启' : `${count}风扇开启`
 })
 
+const nozzleHeating = computed(() => device.value && (device.value.nozzle_target_temper - 2 > device.value.nozzle_temper))
 const nozzleTempText = computed(() => device.value ? `${Math.floor(Number(device.value.nozzle_temper ?? '0'))}°C/${Math.floor(Number(device.value.nozzle_target_temper ?? '0'))}°C` : '')
+
+const bedHeating = computed(() => device.value && (device.value.bed_target_temper - 2 > device.value.bed_temper))
 const bedTempText = computed(() => device.value ? `${Math.floor(Number(device.value.bed_temper ?? '0'))}°C/${Math.floor(Number(device.value.bed_target_temper ?? '0'))}°C` : '')
 </script>
 

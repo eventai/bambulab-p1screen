@@ -11,7 +11,7 @@
       <div class="printer-content">
         <img :src="p1sThumbnail" />
         <span class="heatbed-temp">
-          <img class="temp-icon" :src="bedTempIcon" />
+          <img class="temp-icon" :src="bedHeating ? bedOnIcon : bedOffIcon" />
           {{ heatbedTemp }}
           <span class="temp-unit">°C</span>
         </span>
@@ -26,7 +26,7 @@
       <div class="nozzle-content">
         <img :src="nozzleThumbnail" />
         <span class="nozzle-temp">
-          <img class="temp-icon" :src="nozzleTempIcon" />
+          <img class="temp-icon" :src="nozzleHeating ? nozzleOnIcon : nozzleOffIcon" />
           {{ nozzleTemp }}
           <span class="temp-unit">°C</span>
         </span>
@@ -73,8 +73,10 @@ import signalNoIcon from '../../assets/images/monitor_signal_no.svg'
 import signalWeakIcon from '../../assets/images/monitor_signal_weak.svg'
 import signalMiddleIcon from '../../assets/images/monitor_signal_middle.svg'
 import signalStrongIcon from '../../assets/images/monitor_signal_strong.svg'
-import bedTempIcon from '../../assets/images/monitor_bed_temp.svg'
-import nozzleTempIcon from '../../assets/images/monitor_nozzle_temp.svg'
+import nozzleOnIcon from '../../assets/images/monitor_nozzle_temp_active.svg'
+import nozzleOffIcon from '../../assets/images/monitor_nozzle_temp.svg'
+import bedOnIcon from '../../assets/images/monitor_bed_temp_active.svg'
+import bedOffIcon from '../../assets/images/monitor_bed_temp.svg'
 import nozzleNormalThumbnail from '../../assets/images/indicator_nozzle_23.png'
 import nozzleHeatingThumbnail from '../../assets/images/indicator_heat_nozzle_23.png'
 import nozzleCoolingThumbnail from '../../assets/images/indicator_nozzle_cooling_23.png'
@@ -161,13 +163,15 @@ const handleManageDevice = () => {
   }
 }
 
-const taskName = computed(() => device.value?.subtask_name || '')
-const nozzleTemp = computed(() => Math.floor(Number(device.value?.nozzle_temper ?? '0')))
-const heatbedTemp = computed(() => Math.floor(Number(device.value?.bed_temper ?? '0')))
-
 const isRecording = computed(() => getCurrentProject()?.timelapse)
-
 const getTaskThumbnail = computed(() => getCurrentProject()?.thumbnail_url)
+const taskName = computed(() => device.value?.subtask_name || '')
+
+const nozzleHeating = computed(() => device.value && (device.value.nozzle_target_temper - 2 > device.value.nozzle_temper))
+const nozzleTemp = computed(() => Math.floor(Number(device.value?.nozzle_temper ?? '0')))
+
+const bedHeating = computed(() => device.value && (device.value.bed_target_temper - 2 > device.value.bed_temper))
+const heatbedTemp = computed(() => Math.floor(Number(device.value?.bed_temper ?? '0')))
 
 const getPrintPercent = computed(() => {
   if (device.value?.gcode_state === GcodeState.Prepare) {
