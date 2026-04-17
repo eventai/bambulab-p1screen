@@ -15,16 +15,9 @@
 
       <div class="form-row form-color">
         <label class="form-label">颜色</label>
-        <div class="color-field">
-          <div class="color-swatch" :style="{ backgroundColor: trayDisplayColor }"></div>
+        <div class="color-field" @click="showColorPicker = true">
+          <div class="color-swatch" :style="{ backgroundColor: hextoRGB(trayColor) }"></div>
           <span v-if="!isReadonly" class="icon-edit" ></span>
-          <input
-            v-if="!isReadonly"
-            class="native-color-input"
-            type="color"
-            @input="handleColorInput"
-            aria-label="选择颜色"
-          />
         </div>
       </div>
 
@@ -47,6 +40,25 @@
         <van-button class="action-btn" type="primary" @click="handleConfirm" :disabled="!(tray && filamentId && filamentId.length > 0)">确认</van-button>
       </div>
     </div>
+
+    <van-overlay :show="showColorPicker" @click="showColorPicker = false">
+      <div class="color-picker-wrapper">
+        <div @click.stop >
+          <span>其他颜色</span>
+          <i-material-symbols-close-rounded @click="showColorPicker = false" />
+          <div class="color-grids">
+            <div
+              v-for="item in filamentColorList"
+              :key="item.value"
+              class="color-grid"
+              :style="{ backgroundColor: hextoRGB(item.value) }"
+              @click="handleColorInput(item.value)"
+            >
+            </div>
+          </div>
+        </div>
+      </div>
+    </van-overlay>
   </BaseSubPage>
 </template>
 
@@ -56,6 +68,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { showToast, showConfirmDialog } from 'vant'
 import { PrinterClient, PrinterEvent } from '../../api/PrinterClient'
 import filamentList from '../../assets/filament.json'
+import filamentColorList from '../../assets/colors.json'
 import { colord } from 'colord'
 
 const manufacturerList = [...new Set(filamentList.map(item => item.manufacturer))]
@@ -101,10 +114,12 @@ const currentFilament: Ref<FilamentVendor | null> = ref(getCurrentFilament())
 const manufacturer = ref(currentFilament.value?.manufacturer || 'Custom')
 const filamentId = ref(tray.value?.tray_info_idx)
 const trayColor = ref('')
-const trayDisplayColor = computed(() => {
-  const parsedColor = colord(`#${trayColor.value.slice(0,6)}`)
+const showColorPicker = ref(false)
+
+const hextoRGB = (color: string) => {
+  const parsedColor = colord(`#${color.replace('#', '').slice(0,6)}`)
   return parsedColor.toRgbString() // for compatible
-})
+}
 
 onMounted(() => {
   client.on(PrinterEvent.PRINT_PUSH_STATUS, onPushStatus)
@@ -143,10 +158,10 @@ const onManufacturerChange = () => {
   }
 }
 
-const handleColorInput = (event: Event) => {
-  const value = (event.target as HTMLInputElement | null)?.value.toUpperCase() ?? '#000000'
-  console.log(`[FilamentEditPage] select color: ${value}`)
-  trayColor.value = value.replace('#', '').slice(0, 6) + 'FF'
+const handleColorInput = (color: string) => {
+  console.log(`[FilamentEditPage] select color: ${color}`)
+  trayColor.value = color.replace('#', '').slice(0, 6) + 'FF'
+  showColorPicker.value = false
 }
 
 const handleReset = async () => {
@@ -270,17 +285,6 @@ const handleConfirm = async () => {
   padding: 0;
 }
 
-.native-color-input {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  cursor: pointer;
-  border: none;
-  padding: 0;
-}
-
 .color-swatch {
   width: 36px;
   height: 36px;
@@ -293,6 +297,56 @@ const handleConfirm = async () => {
   height: 15px;
   mask-image: url(/src/assets/images/ams_editable.svg);
   background-color: var(--van-text-color-2);
+}
+
+.color-picker-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.color-picker-wrapper > div {
+  width: 320px;
+  padding: 0 8px;
+  padding-bottom: 16px;
+  background-color: var(--van-background-2);
+  border-radius: 8px;
+
+  display: grid;
+  grid-template-columns: 80px 1fr 40px;
+  grid-template-rows: 40px 1fr;
+  align-items: center;
+  justify-items: center;
+}
+
+.color-picker-wrapper > div > span {
+  font-size: 14px;
+  font-weight: 500;
+  grid-column: 1 / span 2;
+  justify-self: start; 
+  padding-left: 8px;
+}
+
+.color-picker-wrapper > div > svg {
+  grid-column: 3;
+}
+
+.color-grids {
+  grid-column: 1 / -1;
+
+  display: grid;
+  grid-template-columns: repeat(6, 32px);
+  grid-template-rows: repeat(4, 32px);
+  align-items: center;
+  justify-items: center;
+  gap: 8px;
+}
+
+.color-grid {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
 }
 
 .temperature-fields {
@@ -342,6 +396,15 @@ const handleConfirm = async () => {
   }
   .form-actions {
     grid-row: 6;
+  }
+
+  .color-picker-wrapper > div {
+    width: 280px;
+  }
+
+  .color-grids {
+    grid-template-columns: repeat(5, 32px);
+    grid-template-rows: repeat(5, 32px);
   }
 }
 

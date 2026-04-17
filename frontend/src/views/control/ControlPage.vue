@@ -13,7 +13,7 @@
 
       <div class="panel panel-main panel-speed" @click="showPrintSpeedPopup = true">
         <div class="panel-icon">
-          <i-material-symbols-speed-rounded />
+          <i-material-symbols-swap-driving-apps-wheel />
           <!-- <img src="../../assets/images/monitor_speed.svg" /> -->
         </div>
         <div class="panel-title">速度</div>
@@ -205,7 +205,7 @@ const bedTempText = computed(() => device.value ? `${Math.floor(Number(device.va
   display: grid;
   gap: 8px;
   grid-template-columns: minmax(0, 4fr) minmax(0, 3fr) minmax(0, 3fr);
-  grid-template-rows: 60px 90px 60px 1fr;
+  grid-template-rows: 60px 100px 60px 1fr;
   grid-template-areas:
     'air speed motion'
     'nozzle . .'
@@ -240,7 +240,6 @@ const bedTempText = computed(() => device.value ? `${Math.floor(Number(device.va
   background: var(--van-background-4);
   display: grid;
   place-items: center;
-  color: var(--van-text-color-2);
   font-size: 20px;
 }
 
@@ -255,6 +254,10 @@ const bedTempText = computed(() => device.value ? `${Math.floor(Number(device.va
   height: 20px;
   object-fit: contain;
   opacity: 0.8;
+}
+
+.panel-icon > svg {
+  color: var(--van-text-color-3);
 }
 
 .panel-arrow {
@@ -394,7 +397,7 @@ const bedTempText = computed(() => device.value ? `${Math.floor(Number(device.va
 
   .control-grid {
     grid-template-columns: 60% 40%;
-    grid-template-rows: 60px 60px 90px;
+    grid-template-rows: 60px 60px 100px;
     grid-template-areas:
       'air speed'
       'bed motion'

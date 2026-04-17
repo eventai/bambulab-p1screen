@@ -122,3 +122,12 @@ export enum GCODE_STATE_OPTIONS {
   Slicing = 'slicing',
   Unknown = 'unknown',
 }
+
+export enum HomeFlagBit {
+  // print.print_option
+  auto_recovery = 4,
+  auto_switch_filament = 10,
+
+  // print.ams_user_setting
+  calibrate_remain_flag = 7,
+}
