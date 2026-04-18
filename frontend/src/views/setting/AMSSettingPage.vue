@@ -5,25 +5,25 @@
         title="插入耗材时读取"
         label="插入耗材后，AMS 会自动读取耗材信息。需要花费大约20秒。"
         :selected="tray_read_option"
-        @click="(selected) => onChangeUserSetting('tray_read_option', selected)"
+        @click="onChangeUserSetting('tray_read_option', $event)"
       />
       <SettingCell
         title="开机时读取"
         label="每次开机时，AMS 将会自动读取其所插入的耗材信息。需要花费大约1分钟。"
         :selected="startup_read_option"
-        @click="(selected) => onChangeUserSetting('startup_read_option', selected)"
+        @click="onChangeUserSetting('startup_read_option', $event)"
       />
       <SettingCell
         title="剩余容量估计"
         label="AMS 将会尝试估算Bambulab官方耗材的剩余容量。"
         :selected="calibrate_remain_flag"
-        @click="(selected) => onChangeUserSetting('calibrate_remain_flag', selected)"
+        @click="onChangeUserSetting('calibrate_remain_flag', $event)"
       />
       <SettingCell
         title="AMS自动续料"
         label="AMS 将在当前耗材用尽后，自动使用与该耗材品牌、类型和颜色完全相同的其他耗材继续打印。"
         :selected="auto_switch_filament"
-        @click="(selected) => onChangePrintOption('auto_switch_filament', selected)"
+        @click="onChangePrintOption('auto_switch_filament', $event)"
       />
     </div>
   </BaseSubPage>
