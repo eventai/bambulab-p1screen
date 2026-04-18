@@ -77,7 +77,6 @@ Any full-screen web launch method is acceptable. More ideas are welcome.
 - Filament
   - AMS setting
 - Setting
-  - Calibration
   - Toolbox
 - Message
 - Other

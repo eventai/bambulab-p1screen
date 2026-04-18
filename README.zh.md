@@ -78,7 +78,6 @@ docker compose up -d
 - 耗材页
   - AMS设置
 - 设置页
-  - 校准
   - 工具箱
 - 消息页
 - 其他
