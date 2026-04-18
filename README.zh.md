@@ -14,14 +14,14 @@
 
 ## 预览图
 <img src="./screenshoot/home.png" alt="主页" width="50%" />
-<img src="./screenshoot/controls.png" alt="控制页" width="50%" />
+<img src="./screenshoot/control.png" alt="控制页" width="50%" />
 <img src="./screenshoot/printspeed.png" alt="打印速度" width="50%" />
 <img src="./screenshoot/motion.png" alt="运动" width="50%" />
 <img src="./screenshoot/nozzle.png" alt="喷嘴和挤出机" width="50%" />
 <img src="./screenshoot/heatbed.png" alt="热床" width="50%" />
 <img src="./screenshoot/filament.png" alt="耗材页" width="50%" />
 <img src="./screenshoot/filament-edit.png" alt="耗材编辑页" width="50%" />
-<img src="./screenshoot/settings.png" alt="设置页" width="50%" />
+<img src="./screenshoot/setting.png" alt="设置页" width="50%" />
 
 ## 功能列表
 - 主页
