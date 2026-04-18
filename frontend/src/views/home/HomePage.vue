@@ -16,11 +16,6 @@
           <span class="temp-unit">°C</span>
         </span>
         <span class="wifi-signal"><img :src="wifiSignalIcon"/></span>
-        <button id="manage-device-btn" type="button" @click="handleManageDevice">
-          <span v-if="deviceItem" >{{ deviceItem.name }}</span>
-          <span v-if="!deviceItem">添加设备</span>
-          <i-material-symbols-settings-rounded />
-        </button>
         <DeviceListPopup v-model:show="showDeviceListPopup" />
       </div>
       <div class="nozzle-content">
@@ -153,14 +148,6 @@ const onPushStatus = (params: any) => {
 const onProjectFile = () => {
   // console.debug('[HomePage] on print.project_file')
   project.value = getCurrentProject()
-}
-
-const handleManageDevice = () => {
-  if (!getCurrentDevice()) {
-    router.push('/home/device/add')
-  } else {
-    showDeviceListPopup.value = true
-  }
 }
 
 const isRecording = computed(() => getCurrentProject()?.timelapse)
@@ -426,28 +413,6 @@ const toggleLight = () => {
 .wifi-signal img {
   width: 18px;
   height: 18px;
-}
-
-#manage-device-btn {
-  width: 100%;
-  height: 25px;
-  position: absolute;
-  left: 50%;
-  bottom: 0px;
-  transform: translateX(-50%);
-  display: inline-flex;
-  align-items: center;
-  border: none;
-  background: none;
-  color: var(--van-text-color-2);
-  font-size: 12px;
-  justify-content: center;
-}
-
-#manage-device-btn > span {
-  font-size: 12px;
-  margin-right: 4px;
-  padding-left: 4px;
 }
 
 .nozzle-content::before {
