@@ -52,6 +52,8 @@ export type DevicePrint = {
   task_id: string
   subtask_id: string
   subtask_name: string
+
+  home_flag: number
 }
 
 export type DeviceAMSInfo = {

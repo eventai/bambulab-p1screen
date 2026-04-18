@@ -108,8 +108,11 @@ Any full-screen web launch method is acceptable. More ideas are welcome.
 - Filament
   - AMS setting
 - Setting
+  - Calibration
+  - Toolbox
 - Message
-- Multi languages
+- Other
+  - Multi languages
 
 ## References
 - [P1 Screen Operation Guide](https://wiki.bambulab.com/en/p1/manual/screen-operation)

@@ -72,7 +72,7 @@ const toggleMode = () => {
 
 const handleCellClick = (serial: string) => {
   if (isEditMode.value) {
-    router.push(`/home/device/edit/${serial}`)
+    router.push(`/setting/device/edit/${serial}`)
   } else {
     if (currentSerial.value === serial) return
     currentSerial.value = serial

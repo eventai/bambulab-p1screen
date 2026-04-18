@@ -18,10 +18,11 @@
       </div>
     </div>
 
-    <div class="card list-item usb-card">
+    <div class="card list-item usb-card" @click="router.push('/home/files')">
       <span class="item-label">SD 卡存储</span>
       <div v-if="device" class="item-value">
         {{ device?.sdcard ? '已挂载' : '未挂载' }}
+        <i-material-symbols-chevron-right-rounded />
       </div>
     </div>
 
@@ -106,7 +107,7 @@ const onPushStatus = () => {
 
 const handleManageDevice = () => {
   if (!getCurrentDevice()) {
-    router.push('/home/device/add')
+    router.push('/setting/device/add')
   } else {
     showDeviceListPopup.value = true
   }

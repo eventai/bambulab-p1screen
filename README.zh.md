@@ -109,8 +109,11 @@ docker compose up -d
 - 耗材页
   - AMS设置
 - 设置页
+  - 校准
+  - 工具箱
 - 消息页
-- 多语言
+- 其他
+  - 多语言
 
 ## 参考内容
 - [P1 系列屏幕操作指南](https://wiki.bambulab.com/en/p1/manual/screen-operation)

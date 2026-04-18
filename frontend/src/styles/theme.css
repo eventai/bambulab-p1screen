@@ -27,6 +27,12 @@
   --van-progress-background: var(--van-background-4);
   --van-stepper-button-disabled-color: var(--van-background-4);
   --van-stepper-background: var(--van-background-5);
+
+  --van-checkbox-size: 18px;
+}
+
+.van-checkbox__icon--checked .van-icon {
+  color: var(--van-background);
 }
 
 * {
