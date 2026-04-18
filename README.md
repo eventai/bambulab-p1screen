@@ -8,9 +8,7 @@
 [![GHCR](https://img.shields.io/badge/GHCR-ghcr.io%2F0x5e%2Fbambulab--p1screen-2496ED?logo=docker&logoColor=white)](https://github.com/0x5e/bambulab-p1screen/pkgs/container/bambulab-p1screen)
 [![Build](https://github.com/0x5e/bambulab-p1screen/actions/workflows/npm-build.yml/badge.svg)](https://github.com/0x5e/bambulab-p1screen/actions/workflows/npm-build.yml)
 
-Control screen software for the Bambu Lab P1 series upgrade kit.
-
-Status: In development
+Control screen software for the Bambu Lab P1 series.
 
 ## Screenshots
 <img src="./screenshoot/home.png" alt="Home" width="50%" />
@@ -23,39 +21,10 @@ Status: In development
 <img src="./screenshoot/filament-edit.png" alt="FilamentEdit" width="50%" />
 <img src="./screenshoot/setting.png" alt="Settings" width="50%" />
 
-## Feature List
-- Home
-  - Print progress
-- Controls
-  - Nozzle temperature
-  - Bed temperature
-  - Fan speed
-  - Print speed
-  - Light
-  - XY motion (X/Y)
-  - Bed lift (Z)
-  - Extruder (E)
-- Filament
-  - AMS trays
-  - External tray
-  - Tools
-  - Guide
-- Settings
-  - Network info
-  - Device info
-  - Accessory info
-  - Calibration
-- Files
-  - File list
-
-## Highlights
-- Minimum supported resolution: 568x320 (iPhone 5 size)
-- Lower runtime overhead (compared to Home Assistant Web/App), suitable for older devices (Redmi 2 runs smoothly)
-
-## Other Options
-- Bambu Handy: Official app does not support landscape well; performance on older devices is untested.
-- 3D Apollo: Feature-rich and works well on older devices. Overall UI style (white/yellow) does not match the printer style very well.
-- Home Assistant Web/App: High performance overhead (for unknown reasons). Redmi 2 is unusable and may freeze.
+## System Requirements
+- Display: >= 568x320 (iPhone 5 resolution)
+- Browser/System version: Chrome >= 57，iOS >= 10.3
+- Printer firmware version: P1S <= 01.08.01.00 (above this version, MQTT control protocol was encrypted, not available anymore)
 
 ## Usage
 ### Android App

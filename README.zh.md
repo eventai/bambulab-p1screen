@@ -8,9 +8,7 @@
 [![GHCR](https://img.shields.io/badge/GHCR-ghcr.io%2F0x5e%2Fbambulab--p1screen-2496ED?logo=docker&logoColor=white)](https://github.com/0x5e/bambulab-p1screen/pkgs/container/bambulab-p1screen)
 [![Build](https://github.com/0x5e/bambulab-p1screen/actions/workflows/npm-build.yml/badge.svg)](https://github.com/0x5e/bambulab-p1screen/actions/workflows/npm-build.yml)
 
-拓竹 P1 系列升级套件之控制屏软件。
-
-目前：开发中
+拓竹 P1 系列控制屏软件。
 
 ## 预览图
 <img src="./screenshoot/home.png" alt="主页" width="50%" />
@@ -23,39 +21,10 @@
 <img src="./screenshoot/filament-edit.png" alt="耗材编辑页" width="50%" />
 <img src="./screenshoot/setting.png" alt="设置页" width="50%" />
 
-## 功能列表
-- 主页
-  - 打印进度
-- 控制
-  - 喷嘴温度
-  - 热床温度
-  - 风扇速度
-  - 打印速度
-  - 照明
-  - XY 轴控制（X/Y）
-  - 热床升降（Z）
-  - 挤出机（E）
-- 耗材
-  - AMS 料盘
-  - 外挂料盘
-  - 工具
-  - 指南
-- 设置
-  - 网络信息
-  - 设备信息
-  - 配件信息
-  - 校准
-- 文件夹
-  - 文件列表
-
-## 特性
-- 分辨率最低适配到 568x320（iPhone 5 尺寸）
-- 性能开销低（相对 Home Assistant 网页端 & App 端），支持老旧设备（红米 2 可流畅运行）
-
-## 其他可选方案
-- Bambu Handy：官方应用不支持横屏，老旧设备运行流畅度未测试。
-- 3D Apollo：功能完善，老旧设备运行良好。UI 整体风格为白黄色，与打印机整体风格不是很搭。
-- Home Assistant 网页版 & App 版：性能开销大（不知何故），红米 2 无法正常使用，卡到死机很多次。
+## 系统要求
+- 分辨率：>= 568x320（iPhone 5 尺寸）
+- 浏览器/系统版本：Chrome >= 57，iOS >= 10.3
+- 打印机固件版本：P1S <= 01.08.01.00（高于此版本的固件对MQTT控制协议进行了加密，无法控制）
 
 ## 使用步骤
 ### Android 版
