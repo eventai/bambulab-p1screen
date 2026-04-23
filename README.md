@@ -75,7 +75,7 @@ Any full-screen web launch method is acceptable. More ideas are welcome.
   - Idle State
   - File list
 - Filament
-  - AMS setting
+  - Auto Refill
 - Setting
   - Toolbox
 - Message
