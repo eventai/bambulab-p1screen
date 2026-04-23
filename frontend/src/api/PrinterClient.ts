@@ -6,7 +6,6 @@ import {
   LightType,
   PrintSpeedLevel,
 } from './enums'
-import { saveProject, type Project } from './project'
 
 export enum PrinterEvent {
   MQTT_STATE_CHANGE = 'mqtt.state_change',
@@ -208,10 +207,8 @@ export class PrinterClient {
       switch(command) {
         case 'print.push_status':
           this.handlePushStatus(params)
-          this.emit(PrinterEvent.PRINT_PUSH_STATUS, params)
           break
         case 'print.project_file':
-          this.handleProjectFile(params)
           this.emit(PrinterEvent.PRINT_PROJECT_FILE, params)
           break
         default:
@@ -241,10 +238,7 @@ export class PrinterClient {
       }
       this.device.print = print
     }
-  }
-
-  private handleProjectFile(projectData: any) {
-    saveProject(projectData as Project)
+    this.emit(PrinterEvent.PRINT_PUSH_STATUS, printData)
   }
 
   /**

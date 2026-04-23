@@ -51,9 +51,11 @@ import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
 import { showToast } from 'vant'
 import { useRouter } from 'vue-router'
 import humanizeDuration from 'humanize-duration'
+import { unzipSync } from 'fflate'
 import { PrinterClient, PrinterEvent } from '../../api/PrinterClient'
 import { LightType, GcodeState, CurrentStage } from '../../api/enums'
-import { getCurrentProject } from '../../api/project'
+import type { Project } from '../../api/project'
+import { getCurrentProject, saveProject } from '../../utils/project'
 import { getCurrentDevice } from '../../utils/device'
 
 import lightOnIcon from '../../assets/images/monitor_lamp_on.svg'
@@ -63,6 +65,7 @@ import pauseIcon from '../../assets/images/print_control_pause.svg'
 import resumeIcon from '../../assets/images/print_control_resume.svg'
 import stopIcon from '../../assets/images/print_control_stop.svg'
 import loadingThumbnail from '../../assets/images/dev_hms_diag_loading_dark.svg'
+import brokenThumbnail from '../../assets/images/monitor_brokenimg.png'
 import p1sThumbnail from '../../assets/images/object_22.png'
 import signalNoIcon from '../../assets/images/monitor_signal_no.svg'
 import signalWeakIcon from '../../assets/images/monitor_signal_weak.svg'
@@ -108,6 +111,9 @@ const project = ref(getCurrentProject())
 onMounted(() => {
   window.addEventListener('resize', handleResize)
   handleResize()
+  if (device.value) {
+    loadProjectThumbnail()
+  }
 
   client.on(PrinterEvent.MQTT_STATE_CHANGE, onPushStatus)
   client.on(PrinterEvent.PRINT_PUSH_STATUS, onPushStatus)
@@ -143,15 +149,45 @@ const onPushStatus = (params: any) => {
   if (params?.lights_report) {
     lightSwitchValue.value = lightState.value
   }
+  if (!project.value) {
+    project.value = getCurrentProject()
+    loadProjectThumbnail()
+  }
 }
 
-const onProjectFile = () => {
-  // console.debug('[HomePage] on print.project_file')
-  project.value = getCurrentProject()
+const onProjectFile = (projectData: Project) => {
+  saveProject(projectData)
+  project.value = projectData
+  loadProjectThumbnail()
 }
 
-const isRecording = computed(() => getCurrentProject()?.timelapse)
-const getTaskThumbnail = computed(() => getCurrentProject()?.thumbnail_url)
+const loadProjectThumbnail = async () => {
+  if (!project.value) return
+  if ((project.value.thumbnail_url || '').length > 0) return
+
+  try {
+    console.log('[HomePage] fetching project file from oss')
+    const response = await fetch(`/api/fetch?url=${encodeURIComponent(project.value.url)}`)
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
+    }
+    const arrayBuffer = await response.arrayBuffer()
+    const data = new Uint8Array(arrayBuffer)
+    const unzipped = unzipSync(data)
+    const thumbnailData = unzipped[`Metadata/plate_${project.value.plate_idx}.png`]
+    project.value.thumbnail_url = thumbnailData ? `data:image/png;base64,${btoa(String.fromCharCode(...thumbnailData))}` : undefined
+    saveProject(project.value)
+    console.log('[HomePage] extract project thumbnail from .3mf')
+  } catch (err) {
+    console.error('[HomePage] loadProjectThumbnail error:', err)
+    project.value.thumbnail_url = brokenThumbnail
+  }
+
+  project.value = Object.assign({}, project.value)
+}
+
+const isRecording = computed(() => project.value?.timelapse)
+const getTaskThumbnail = computed(() => project.value?.thumbnail_url)
 const taskName = computed(() => device.value?.subtask_name || '')
 
 const nozzleHeating = computed(() => device.value && (device.value.nozzle_target_temper - 2 > device.value.nozzle_temper))
