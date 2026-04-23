@@ -168,7 +168,7 @@ const handleReset = async () => {
   if (!tray.value) return
 
   try {
-    await showConfirmDialog({ title: '提示', message: '您确定要清除耗材丝信息吗？' })
+    await showConfirmDialog({ message: '您确定要清除耗材丝信息吗？' })
   } catch {
     return
   }

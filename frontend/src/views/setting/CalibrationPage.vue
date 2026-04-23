@@ -33,9 +33,12 @@
 </template>
 
 <script setup lang="tsx">
-import { PrinterClient } from '../../api/PrinterClient'
 import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { showConfirmDialog } from 'vant'
+import { PrinterClient } from '../../api/PrinterClient'
 
+const router = useRouter()
 const client = PrinterClient.getInstance()
 
 const bedLevelling = ref(true)
@@ -49,8 +52,20 @@ const option = computed(() => {
   return bitmask
 })
 
-const handleConfirm = () => {
-  client.request('print.calibration', { option })
+const handleConfirm = async () => {
+  try {
+    await showConfirmDialog({
+      message: '机器校准过程需要一段时间，且机器会产生轻微震动，在此过程中，不可操作机器，确定要开始校准吗？',
+      confirmButtonText: '开始校准',
+      messageAlign: 'left',
+    })
+  } catch {
+    return
+  }
+
+  await client.request('print.calibration', { option: option.value })
+  router.push('/home')
+
 }
 </script>
 

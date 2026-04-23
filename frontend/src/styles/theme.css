@@ -23,6 +23,7 @@
   --van-cell-group-inset-title-padding: 8px;
 
   --van-dialog-background: var(--van-background);
+  --van-dialog-confirm-button-text-color: var(--van-text-color);
 
   --van-progress-background: var(--van-background-4);
   --van-stepper-button-disabled-color: var(--van-background-4);
@@ -33,6 +34,16 @@
 
 .van-checkbox__icon--checked .van-icon {
   color: var(--van-background);
+}
+
+.van-dialog__message {
+  color: var(--van-text-color-2);
+}
+.van-dialog .van-button {
+  font-size: 14px;
+}
+.van-dialog__cancel {
+  color: var(--van-text-color-3);
 }
 
 * {
