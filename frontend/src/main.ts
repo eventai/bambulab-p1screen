@@ -42,8 +42,8 @@ const isValid = browser.satisfies(requirements)
 
 if (isValid === false) {
   showDialog({
-    title: '提示',
-    message: '你的WebView内核版本过低，会导致功能和界面异常。Android用户请升级「Android System WebView」，iOS用户请升级操作系统。',
+    message: '你的WebView内核版本过低，会导致功能和界面异常。Android用户请升级浏览器内核组件（Android System WebView），iOS用户请升级操作系统。',
+    messageAlign: 'left',
   })
 }
 
