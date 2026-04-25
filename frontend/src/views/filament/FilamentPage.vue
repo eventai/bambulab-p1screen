@@ -67,6 +67,7 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { PopoverAction } from 'vant'
 import { useRouter } from 'vue-router'
+import { ROUTE_NAME } from '../../router/routes'
 import { PrinterClient, PrinterEvent } from '../../api/PrinterClient'
 import humLevel1Icon from '../../assets/images/hum_level1_no_num_dark.svg'
 import humLevel2Icon from '../../assets/images/hum_level2_no_num_dark.svg'
@@ -106,7 +107,7 @@ const handleTrayAction = (amsId: number, tray: DeviceTray, action: PopoverAction
   console.log(`[Tray] type=${action.type}, amsId=${amsId}, tray=${JSON.stringify(tray)}`)
   switch (action.type) {
     case 'edit':
-      router.push(`/filament/edit/${amsId}/${tray.id}`)
+      router.push({ name: ROUTE_NAME.FILAMENT_EDIT, params: { ams_id: amsId, tray_id: tray.id } })
       break
     case 'load':
       if (Number(tray.id) === 254) {
@@ -152,7 +153,7 @@ const handleSettingsSelect = (action: PopoverAction) => {
   console.log(`[FilamentPage] settings action: ${action.type}`)
   showSettingsPopover.value = false
   if (action.type === 'auto-refill') {
-    router.push('/filament/auto-refill')
+    router.push({ name: ROUTE_NAME.FILAMENT_AUTO_REFILL })
   }
 }
 </script>

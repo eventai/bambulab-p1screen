@@ -18,7 +18,7 @@
       </div>
     </div>
 
-    <div class="card list-item usb-card" @click="router.push('/home/files')">
+    <div class="card list-item usb-card" @click="router.push({ name: ROUTE_NAME.HOME_FILES })">
       <span class="item-label">SD 卡存储</span>
       <div v-if="device" class="item-value">
         {{ device?.sdcard ? '已挂载' : '未挂载' }}
@@ -26,7 +26,7 @@
       </div>
     </div>
 
-    <div class="card list-item firmware-card" @click="router.push('/setting/firmware')">
+    <div class="card list-item firmware-card" @click="router.push({ name: ROUTE_NAME.SETTING_FIRMWARE })">
       <span class="item-label">固件</span>
       <div class="item-value">
         {{ deviceModule?.sw_ver }}
@@ -34,17 +34,17 @@
       </div>
     </div>
 
-    <div class="card square-card calibration-card" @click="router.push('/setting/calibration')">
+    <div class="card square-card calibration-card" @click="router.push({ name: ROUTE_NAME.SETTING_CALIBRATION })">
       <i-material-symbols-home-storage-gear-rounded class="icon-large" />
       <div class="card-label">校准</div>
     </div>
 
-    <div class="card square-card toolbox-card" @click="router.push('/setting/toolbox')">
+    <div class="card square-card toolbox-card" @click="router.push({ name: ROUTE_NAME.SETTING_TOOLBOX })">
       <i-material-symbols-handyman class="icon-large" />
       <div class="card-label">工具箱</div>
     </div>
 
-    <div class="card square-card settings-card" @click="router.push('/setting/setting')">
+    <div class="card square-card settings-card" @click="router.push({ name: ROUTE_NAME.SETTING_SETTING })">
       <i-material-symbols-settings-rounded class="icon-large" />
       <div class="card-label">设置</div>
     </div>
@@ -53,6 +53,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { ROUTE_NAME } from '../../router/routes'
 import { getCurrentDevice } from '../../utils/device'
 import { PrinterClient, PrinterEvent } from '../../api/PrinterClient'
 
@@ -107,7 +108,7 @@ const onPushStatus = () => {
 
 const handleManageDevice = () => {
   if (!getCurrentDevice()) {
-    router.push('/setting/device/add')
+    router.push({ name: ROUTE_NAME.SETTING_DEVICE_ADD })
   } else {
     showDeviceListPopup.value = true
   }

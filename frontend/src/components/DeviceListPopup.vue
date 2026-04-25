@@ -33,7 +33,7 @@
       </van-cell-group>
 
       <van-cell-group inset>
-        <van-cell title="添加设备" class="add-device-cell device-cell" @click="router.push('/setting/device/add')" />
+        <van-cell title="添加设备" class="add-device-cell device-cell" @click="router.push({ name: ROUTE_NAME.SETTING_DEVICE_ADD })" />
       </van-cell-group>
     </div>
   </BasePopup>
@@ -45,6 +45,7 @@ import { useRouter } from 'vue-router'
 import { getCurrentDevice, setCurrentDevice, getDevices } from '../utils/device'
 import { PrinterClient } from '../api/PrinterClient'
 import { showToast } from 'vant'
+import { ROUTE_NAME } from '../router/routes'
 
 const client = PrinterClient.getInstance()
 
@@ -72,7 +73,7 @@ const toggleMode = () => {
 
 const handleCellClick = (serial: string) => {
   if (isEditMode.value) {
-    router.push(`/setting/device/edit/${serial}`)
+    router.push({ name: ROUTE_NAME.SETTING_DEVICE_EDIT, params: { serial } })
   } else {
     if (currentSerial.value === serial) return
     currentSerial.value = serial

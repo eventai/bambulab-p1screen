@@ -4,24 +4,7 @@ import { Button, Checkbox, Slider, Progress, Popup, Popover, Overlay, Dialog, Ce
 import Bowser from 'bowser'
 import App from './App.vue'
 import { PrinterClient } from './api/PrinterClient'
-import HomePage from './views/home/HomePage.vue'
-import FilesPage from './views/home/FilesPage.vue'
-import ControlPage from './views/control/ControlPage.vue'
-import MotionPage from './views/control/MotionPage.vue'
-import NozzlePage from './views/control/NozzlePage.vue'
-import FilamentPage from './views/filament/FilamentPage.vue'
-import FilamentAutoRefillPage from './views/filament/FilamentAutoRefillPage.vue'
-import FilamentEditPage from './views/filament/FilamentEditPage.vue'
-import SettingHomePage from './views/setting/HomePage.vue'
-import SettingDeviceEditPage from './views/setting/DeviceEditPage.vue'
-import SettingFirmwarePage from './views/setting/FirmwarePage.vue'
-import SettingCalibrationPage from './views/setting/CalibrationPage.vue'
-import SettingToolboxPage from './views/setting/ToolboxPage.vue'
-import SettingPage from './views/setting/SettingPage.vue'
-import SettingPrintOptionPage from './views/setting/PrintOptionPage.vue'
-import SettingAMSSettingPage from './views/setting/AMSSettingPage.vue'
-import SettingSerialPage from './views/setting/SerialPage.vue'
-import MessagePage from './views/message/MessagePage.vue'
+import { routes } from './router/routes'
 import { getCurrentDevice } from './utils/device'
 import 'vant/lib/index.css'
 import './styles/theme.css'
@@ -49,28 +32,7 @@ if (isValid === false) {
 
 const router = createRouter({
   history: createWebHashHistory(),
-  routes: [
-    { path: '/', redirect: '/home' },
-    { path: '/home', component: HomePage },
-    { path: '/home/files', component: FilesPage },
-    { path: '/control', component: ControlPage },
-    { path: '/control/motion', component: MotionPage },
-    { path: '/control/nozzle', component: NozzlePage },
-    { path: '/filament', component: FilamentPage },
-    { path: '/filament/auto-refill', component: FilamentAutoRefillPage },
-    { path: '/filament/edit/:ams_id/:tray_id', component: FilamentEditPage, props: true },
-    { path: '/setting', component: SettingHomePage },
-    { path: '/setting/device/add', component: SettingDeviceEditPage },
-    { path: '/setting/device/edit/:serial', component: SettingDeviceEditPage, props: true },
-    { path: '/setting/firmware', component: SettingFirmwarePage },
-    { path: '/setting/calibration', component: SettingCalibrationPage },
-    { path: '/setting/toolbox', component: SettingToolboxPage },
-    { path: '/setting/setting', component: SettingPage },
-    { path: '/setting/print-option', component: SettingPrintOptionPage },
-    { path: '/setting/ams-setting', component: SettingAMSSettingPage },
-    { path: '/setting/serial', component: SettingSerialPage },
-    { path: '/message', component: MessagePage },
-  ]
+  routes
 })
 
 createApp(App)

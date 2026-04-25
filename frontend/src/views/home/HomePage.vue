@@ -2,7 +2,7 @@
   <div class="homepage">
     <div class="task-card" ref="taskCardRef" :style="{ width : `${taskCardWidth}px` }">
       <span v-if="isRecording" class="recording"><i-material-symbols-circle />REC</span>
-      <span class="files" @click="router.push('/home/files')">{{ '文件 >' }}</span>
+      <span class="files" @click="router.push({ name: ROUTE_NAME.HOME_FILES })">{{ '文件 >' }}</span>
       <img v-if="getTaskThumbnail" class="task-thumbnail" :src="getTaskThumbnail"/>
       <img v-if="!getTaskThumbnail" class="task-thumbnail task-loading-thumbnail" :src="loadingThumbnail"/>
       <span class="task-name">{{ taskName }}</span>
@@ -50,6 +50,7 @@
 import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
 import { showToast } from 'vant'
 import { useRouter } from 'vue-router'
+import { ROUTE_NAME } from '../../router/routes'
 import humanizeDuration from 'humanize-duration'
 import { unzipSync } from 'fflate'
 import { PrinterClient, PrinterEvent } from '../../api/PrinterClient'

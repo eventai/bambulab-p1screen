@@ -21,7 +21,7 @@
         <i-material-symbols-chevron-right-rounded class="panel-arrow" />
       </div>
 
-      <div class="panel panel-main panel-motion" @click="router.push('/control/motion')">
+      <div class="panel panel-main panel-motion" @click="router.push({ name: ROUTE_NAME.CONTROL_MOTION })">
         <div class="panel-icon">
           <i-material-symbols-open-with-rounded />
         </div>
@@ -30,7 +30,7 @@
         <i-material-symbols-chevron-right-rounded class="panel-arrow" />
       </div>
 
-      <div class="panel panel-nozzle" @click="router.push('/control/nozzle')">
+      <div class="panel panel-nozzle" @click="router.push({ name: ROUTE_NAME.CONTROL_NOZZLE })">
         <div class="panel-head">
           <div class="panel-icon">
             <img :src="nozzleHeating ? nozzleOnIcon : nozzleOffIcon" />
@@ -89,6 +89,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { ROUTE_NAME } from '../../router/routes'
 import { showDialog } from 'vant'
 import { FanType, GcodeState, LightType, PrintSpeedLevel, TemperatureType } from '../../api/enums'
 import { PrinterClient, PrinterEvent } from '../../api/PrinterClient'

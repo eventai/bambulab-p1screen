@@ -35,6 +35,7 @@
 <script setup lang="tsx">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { ROUTE_NAME } from '../../router/routes'
 import { showConfirmDialog } from 'vant'
 import { PrinterClient } from '../../api/PrinterClient'
 
@@ -64,7 +65,7 @@ const handleConfirm = async () => {
   }
 
   await client.request('print.calibration', { option: option.value })
-  router.push('/home')
+  router.push({ name: ROUTE_NAME.HOME })
 
 }
 </script>
