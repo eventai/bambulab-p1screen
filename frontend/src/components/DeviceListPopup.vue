@@ -33,7 +33,7 @@
       </van-cell-group>
 
       <van-cell-group inset>
-        <van-cell title="添加设备" class="add-device-cell device-cell" @click="router.push('/home/device/add')" />
+        <van-cell title="添加设备" class="add-device-cell device-cell" @click="router.push('/setting/device/add')" />
       </van-cell-group>
     </div>
   </BasePopup>
