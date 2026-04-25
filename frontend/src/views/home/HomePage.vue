@@ -82,6 +82,21 @@ import nozzleCoolingThumbnail from '../../assets/images/indicator_nozzle_cooling
 // import nozzleOcclusionThumbnail from '../../assets/images/indicator_occlusion_filament_23.png'
 // import nozzlePurgeThumbnail from '../../assets/images/indicator_purge_filament_23.png'
 
+const shortEnglishHumanizer = humanizeDuration.humanizer({
+  language: 'shortEn',
+  languages: {
+    shortEn: {
+      y: () => 'y',
+      mo: () => 'mo',
+      w: () => 'w',
+      d: () => 'd',
+      h: () => 'h',
+      m: () => 'm',
+      s: () => 's',
+      ms: () => 'ms',
+    },
+  },
+})
 
 const router = useRouter()
 const client = PrinterClient.getInstance()
@@ -254,12 +269,12 @@ const nozzleThumbnail = ref(getNozzleThumbnail())
 const getPrintInfo = computed(() => {
   if ([GcodeState.Finish, GcodeState.Failed].includes(device.value?.gcode_state ?? GcodeState.Unknown)) return ''
 
-  const remainingTimeText = humanizeDuration((device.value?.mc_remaining_time || 0) * 60 * 1000, {
+  const remainingTimeText = shortEnglishHumanizer((device.value?.mc_remaining_time || 0) * 60 * 1000, {
     units: ['h', 'm'],
     round: true,
-    language: 'zh_CN'
+    spacer: '',
   })
-  return `${device.value?.layer_num || 0} / ${device.value?.total_layer_num || 0} | ${remainingTimeText}`
+  return `${device.value?.layer_num || 0}/${device.value?.total_layer_num || 0} | -${remainingTimeText}`
 })
 
 const isPaused = computed(() => device.value?.gcode_state === GcodeState.Pause)
