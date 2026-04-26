@@ -90,7 +90,7 @@ body {
   overflow: hidden;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1280px) {
   body {
     display: grid;
     place-items: center;
@@ -98,14 +98,13 @@ body {
   }
 
   #app {
-    width: min(720px, calc(100vw - 48px), calc((100vh - 48px) * 16 / 9));
-    aspect-ratio: 16 / 9;
-    height: auto;
+    width: 1024px;
+    height: 576px;
     border: 10px solid var(--van-background-5);
     border-radius: 28px;
     box-shadow:
       0 0 0 1px var(--van-background-4),
       0 18px 50px rgba(0, 0, 0, 0.45);
-    background: var(--van-background);
+    background-color: var(--van-background);
   }
 }
