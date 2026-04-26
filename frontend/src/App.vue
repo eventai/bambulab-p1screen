@@ -1,22 +1,24 @@
 <template>
-  <div class="app-shell">
-    <aside class="side-nav">
-      <RouterLink
-        v-for="item in navItems"
-        :key="item.key"
-        :class="{ 'nav-item': true, 'nav-item-active': item.key === activeNavKey }"
-        :to="item.to"
-        draggable="false"
-        @dragstart.prevent
-        @contextmenu.prevent
-      >
-        <component :is="item.icon" class="nav-icon" />
-      </RouterLink>
-    </aside>
+  <div class="app-root">
+    <div class="unsupported">你的浏览器内核版本过低，请升级。</div>
+    <div class="app-shell">
+      <aside class="side-nav">
+        <RouterLink
+          v-for="item in navItems"
+          :key="item.key"
+          :class="{ 'nav-item': true, 'nav-item-active': item.key === activeNavKey }"
+          :to="item.to"
+          draggable="false"
+          @dragstart.prevent
+        >
+          <component :is="item.icon" class="nav-icon" />
+        </RouterLink>
+      </aside>
 
-    <main class="main">
-      <RouterView />
-    </main>
+      <main class="main">
+        <RouterView />
+      </main>
+    </div>
   </div>
 </template>
 
@@ -53,11 +55,38 @@ const activeNavKey = computed(() => {
 </script>
 
 <style scoped>
+.app-root {
+  width: 100%;
+  height: 100%;
+}
+
 .app-shell {
   display: grid;
   grid-template-columns: auto 1fr;
   height: 100%;
   overflow: hidden;
+}
+
+.unsupported {
+  display: none;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+  color: var(--van-text-color);
+  font-size: 16px;
+}
+
+@supports not ((width: calc(1px + 1px)) and (color: var(--support-probe))) {
+  .app-shell {
+    display: none;
+  }
+
+  .unsupported {
+    display: flex;
+  }
 }
 
 .side-nav {
