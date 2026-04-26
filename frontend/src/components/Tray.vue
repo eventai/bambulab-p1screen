@@ -13,8 +13,10 @@
         <div class="filament" :style="{ '--tray-bg': bgColor }"></div>
         <span class="name" :style="{ color: textColor }">{{ name }}</span>
         <span class="material" :style="{ color: textColor }">{{ material }}</span>
-        <span v-if="!readonly" class="icon-edit" :style="{ backgroundColor: textColor}"></span>
-        <span v-if="readonly" class="icon-view" :style="{ backgroundColor: textColor}"></span>
+        <template v-if="exist || isExt">
+          <span v-if="!readonly" class="icon-edit" :style="{ backgroundColor: textColor}"></span>
+          <span v-if="readonly" class="icon-view" :style="{ backgroundColor: textColor}"></span>
+        </template>
         <div v-if="isCurrent" class="arrow">
           <div class="line" :style="{ borderColor: bgColor }" ></div>
           <i-material-symbols-arrow-drop-down :style="{ color: bgColor }" />
@@ -47,6 +49,8 @@ const props = withDefaults(
 const showPopover = ref(false)
 
 const actions = computed<PopoverAction[]>(() => {
+  if (!exist.value && !isExt.value) return []
+
   const menu: PopoverAction[] = [
     { type: 'edit', text: readonly.value ? '查看' : '编辑' },
   ]
@@ -71,6 +75,7 @@ const actions = computed<PopoverAction[]>(() => {
 
 const material = computed(() => props.tray.tray_type || '?')
 const color = computed(() => `#${props.tray.tray_color}`)
+const exist = computed(() => props.tray.tray_info_idx?.length > 0)
 const readonly = computed(() => props.tray.tag_uid !== '0000000000000000')
 const isLoading = computed(() => props.trayNow !== props.trayTar)
 const isCurrent = computed(() => trayEqual(props.trayNow))

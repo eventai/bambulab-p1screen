@@ -89,7 +89,7 @@ const tray = computed(() => {
   }
   return ams.value?.tray.find((item) => item.id === trayId)
 })
-const isReadonly = computed(() => tray.value && tray.value?.tag_uid.length > 0 && tray.value?.tag_uid !== '0000000000000000')
+const isReadonly = computed(() => tray.value && tray.value?.tag_uid?.length > 0 && tray.value?.tag_uid !== '0000000000000000')
 
 type FilamentVendor = { filament_id: string, filament_name: string, manufacturer: string, material: string, min_temperature: number, max_temperature: number }
 
@@ -142,7 +142,7 @@ watch(
   tray,
   (nextTray) => {
     if (!nextTray) return
-    trayColor.value = nextTray.tray_color
+    trayColor.value = nextTray.tray_color || ''
   },
   { immediate: true }
 )
