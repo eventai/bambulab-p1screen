@@ -134,4 +134,10 @@ watch(
 .add-device-cell {
   color: var(--van-blue);
 }
+
+@media (orientation: portrait) {
+  .device-cell {
+    width: auto;
+  }
+}
 </style>
