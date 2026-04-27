@@ -3,6 +3,9 @@
     :show="show"
     :class="{ popup: true, 'popup-bottom': isPortrait }"
     :position="isPortrait ? 'bottom' : 'right'"
+    teleport=".app-shell"
+    :overlay-style="{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }"
+    :style="{ position: 'absolute' }"
     @click-overlay="handleClose"
   >
     <NavHeader
@@ -61,6 +64,7 @@ const handleClose = () => {
 }
 
 .popup {
+  position: absolute !important;
   background: var(--van-background-3);
   padding: 4px 12px;
   display: grid;

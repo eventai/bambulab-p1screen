@@ -61,6 +61,7 @@ const activeNavKey = computed(() => {
 }
 
 .app-shell {
+  position: relative;
   display: grid;
   grid-template-columns: auto 1fr;
   height: 100%;
