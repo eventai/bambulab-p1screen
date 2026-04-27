@@ -178,10 +178,10 @@ const fanStatusText = computed(() => {
 })
 
 const nozzleHeating = computed(() => device.value && (device.value.nozzle_target_temper - 2 > device.value.nozzle_temper))
-const nozzleTempText = computed(() => device.value ? `${Math.floor(Number(device.value.nozzle_temper ?? '0'))}°C/${Math.floor(Number(device.value.nozzle_target_temper ?? '0'))}°C` : '')
+const nozzleTempText = computed(() => device.value ? `${Math.floor(device.value.nozzle_temper ?? 0)}°C/${Math.floor(device.value.nozzle_target_temper ?? 0)}°C` : '')
 
 const bedHeating = computed(() => device.value && (device.value.bed_target_temper - 2 > device.value.bed_temper))
-const bedTempText = computed(() => device.value ? `${Math.floor(Number(device.value.bed_temper ?? '0'))}°C/${Math.floor(Number(device.value.bed_target_temper ?? '0'))}°C` : '')
+const bedTempText = computed(() => device.value ? `${Math.floor(device.value.bed_temper ?? 0)}°C/${Math.floor(device.value.bed_target_temper ?? 0)}°C` : '')
 </script>
 
 <style scoped>
