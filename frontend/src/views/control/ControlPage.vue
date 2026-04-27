@@ -387,7 +387,7 @@ const bedTempText = computed(() => device.value ? `${Math.floor(Number(device.va
 }
 
 .panel-light-fixed {
-  position: fixed;
+  position: absolute;
   right: 10px;
   bottom: 10px;
   bottom: calc(10px + env(safe-area-inset-bottom));
@@ -404,7 +404,7 @@ const bedTempText = computed(() => device.value ? `${Math.floor(Number(device.va
   }
 
   .control-grid {
-    grid-template-columns: 60% 40%;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 4fr);
     grid-template-rows: 60px 60px 100px;
     grid-template-areas:
       'air speed'
@@ -412,10 +412,5 @@ const bedTempText = computed(() => device.value ? `${Math.floor(Number(device.va
       'nozzle .';
   }
 
-  .panel-light-fixed {
-    width: 156px;
-    bottom: calc(10px + 64px);
-    bottom: calc(10px + 64px + env(safe-area-inset-bottom));
-  }
 }
 </style>

@@ -254,7 +254,7 @@ const handleConfirm = async () => {
 .form-row {
   min-height: 44px;
   display: grid;
-  grid-template-columns: repeat(3, 150px);
+  grid-template-columns: repeat(3, minmax(150px, 1fr));
   justify-content: start;
   align-items: center;
 }
@@ -265,7 +265,7 @@ const handleConfirm = async () => {
 }
 
 .form-filament select {
-  width: 135px;
+  width: 90%;
   height: 36px;
   padding: 8px;
   border-radius: 8px;
@@ -382,7 +382,7 @@ const handleConfirm = async () => {
     grid-template-rows: repeat(5, auto) 1fr auto;
   }
   .form-row {
-    grid-template-columns: 120px 150px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .form-filament select:last-child, .temperature-field:last-child {
     grid-column: 2;

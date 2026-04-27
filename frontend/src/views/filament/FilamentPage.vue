@@ -42,24 +42,22 @@
       />
       <span class="ext-name" >外挂料盘</span>
     </div>
-  </div>
-
-  <div class="setting">
-    <van-popover
-      v-model:show="showSettingsPopover"
-      trigger="manual"
-      placement="top-end"
-      :actions="settingsActions"
-      style="--van-popover-action-width: 100px;"
-      @select="handleSettingsSelect"
-    >
-      <template #reference>
-        <button type="button" @click.stop="showSettingsPopover = !showSettingsPopover">
-          <i-material-symbols-handyman />
-        </button>
-      </template>
-    </van-popover>
-
+    <div class="setting">
+      <van-popover
+        v-model:show="showSettingsPopover"
+        trigger="manual"
+        placement="top-end"
+        :actions="settingsActions"
+        style="--van-popover-action-width: 100px;"
+        @select="handleSettingsSelect"
+      >
+        <template #reference>
+          <button type="button" @click.stop="showSettingsPopover = !showSettingsPopover">
+            <i-material-symbols-handyman />
+          </button>
+        </template>
+      </van-popover>
+    </div>
   </div>
 </template>
 
@@ -259,7 +257,7 @@ const handleSettingsSelect = (action: PopoverAction) => {
 }
 
 .setting {
-  position: fixed;
+  position: absolute;
   right: 16px;
   bottom: 16px;
   bottom: calc(16px + env(safe-area-inset-bottom));
@@ -285,10 +283,6 @@ const handleSettingsSelect = (action: PopoverAction) => {
   }
   .ams-card, .ext-card {
     grid-row: auto;
-  }
-  .setting {
-    bottom: calc(64px + 16px);
-    bottom: calc(64px + 16px + env(safe-area-inset-bottom));
   }
 }
 </style>
