@@ -130,7 +130,7 @@ const handleReconnect = () => {
 
   display: grid;
   grid-template-columns: minmax(0, 34fr) minmax(0, 33fr) minmax(0, 33fr);
-  grid-template-rows: 2fr 2fr 2fr 4fr;
+  grid-template-rows: repeat(3, minmax(0, 60px)) minmax(auto, 220px);
   gap: 16px;
 }
 
@@ -236,10 +236,9 @@ const handleReconnect = () => {
 @media (orientation: portrait) {
   .settings-container {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-rows: repeat(3, 44px) auto;
+    grid-template-rows: repeat(3, 50px) repeat(2, 150px);
     gap: 16px;
   }
-
 
   .wifi-card {
     grid-column: 1 / -1;
