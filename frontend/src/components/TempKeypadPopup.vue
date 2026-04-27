@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onUnmounted, ref, watch } from 'vue'
 import { TemperatureType } from '../api/enums'
 
 const props = withDefaults(
@@ -71,11 +71,28 @@ const emit = defineEmits<{
 const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
 const inputValue = ref('')
 
+const handleKeydown = (event: KeyboardEvent) => {
+  if (!props.show) return
+  if (event.key >= '0' && event.key <= '9') {
+    event.preventDefault()
+    handleKey(event.key)
+  } else if (event.key === 'Backspace') {
+    event.preventDefault()
+    handleKey('<')
+  } else if (event.key === 'Enter') {
+    event.preventDefault()
+    handleConfirm()
+  }
+}
+
 watch(
   () => props.show,
   (visible) => {
     if (visible) {
       inputValue.value = props.value !== undefined ? String(props.value) : ''
+      window.addEventListener('keydown', handleKeydown)
+    } else {
+      window.removeEventListener('keydown', handleKeydown)
     }
   }
 )
@@ -95,10 +112,15 @@ const handleKey = (key: string) => {
 }
 
 const handleConfirm = () => {
+  if (inputValue.value.length === 0) return
   const value = Number(inputValue.value)
   emit('confirm', props.type, Number.isFinite(value) ? value : 0)
   emit('update:show', false)
 }
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown)
+})
 </script>
 
 <style scoped>
