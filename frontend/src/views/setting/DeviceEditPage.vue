@@ -2,55 +2,43 @@
   <BaseSubPage :title="isEditMode ? '编辑设备' : '添加设备'">
   <div class="device-manage-page">
     <van-cell-group inset>
-      <van-cell title="设备名称">
-        <template #value>
-          <input
-            v-model.trim="name"
-            class="cell-input"
-            placeholder="设备名称"
-            enterkeyhint="next"
-            @keydown.enter.prevent="ipInputRef?.focus()"
-          />
-        </template>
-      </van-cell>
-      <van-cell title="IP 地址">
-        <template #value>
-          <input
-            ref="ipInputRef"
-            v-model.trim="ip"
-            class="cell-input"
-            placeholder="IP 地址"
-            enterkeyhint="next"
-            @keydown.enter.prevent="serialInputRef?.focus()"
-          />
-        </template>
-      </van-cell>
-      <van-cell title="序列号">
-        <template #value>
-          <input
-            ref="serialInputRef"
-            v-model.trim="serial"
-            class="cell-input"
-            :readonly="isEditMode"
-            :class="{ 'cell-input-readonly': isEditMode }"
-            placeholder="序列号"
-            enterkeyhint="next"
-            @keydown.enter.prevent="codeInputRef?.focus()"
-          />
-        </template>
-      </van-cell>
-      <van-cell title="配对码">
-        <template #value>
-          <input
-            ref="codeInputRef"
-            v-model.trim="code"
-            class="cell-input"
-            placeholder="配对码"
-            enterkeyhint="done"
-            @keydown.enter.prevent="(e) => (e.target as HTMLInputElement | null)?.blur()"
-          />
-        </template>
-      </van-cell>
+      <van-field
+        v-model.trim="name"
+        label="设备名称"
+        placeholder="设备名称"
+        input-align="right"
+        enterkeyhint="next"
+        @keydown.enter.prevent="ipInputRef?.focus()"
+      />
+      <van-field
+        ref="ipInputRef"
+        v-model.trim="ip"
+        label="IP 地址"
+        placeholder="IP 地址"
+        input-align="right"
+        enterkeyhint="next"
+        @keydown.enter.prevent="isEditMode ? codeInputRef?.focus() : serialInputRef?.focus()"
+      />
+      <van-field
+        ref="serialInputRef"
+        v-model.trim="serial"
+        :readonly="isEditMode"
+        label="序列号"
+        placeholder="序列号"
+        input-align="right"
+        enterkeyhint="next"
+        @keydown.enter.prevent="codeInputRef?.focus()"
+      />
+      <van-field
+        ref="codeInputRef"
+        v-model.trim="code"
+        label="配对码"
+        placeholder="配对码"
+        type="digit"
+        input-align="right"
+        enterkeyhint="done"
+        @keydown.enter.prevent="codeInputRef?.blur()"
+      />
     </van-cell-group>
 
     <van-cell-group inset>
@@ -83,9 +71,9 @@ const name = ref(stored?.name || '')
 const ip = ref(stored?.ip || '')
 const serial = ref(stored?.serial || '')
 const code = ref(stored?.code || '')
-const ipInputRef = ref<HTMLInputElement | null>(null)
-const serialInputRef = ref<HTMLInputElement | null>(null)
-const codeInputRef = ref<HTMLInputElement | null>(null)
+const ipInputRef = ref<HTMLElement | null>(null)
+const serialInputRef = ref<HTMLElement | null>(null)
+const codeInputRef = ref<HTMLElement | null>(null)
 const canSave = computed(() => Boolean(name.value && ip.value && serial.value && code.value))
 
 const handleSave = () => {
@@ -127,16 +115,11 @@ const handleDelete = () => {
   overflow: auto;
 }
 
-.cell-input {
-  width: 100%;
-  border: 0;
-  outline: none;
-  text-align: right;
-  background: transparent;
+:deep(.van-field__control) {
   color: var(--van-text-color-2);
 }
 
-.cell-input-readonly {
+:deep(.van-field__control:read-only) {
   color: var(--van-text-color-3);
 }
 

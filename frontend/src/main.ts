@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
-import { Button, Checkbox, Slider, Progress, Popup, Popover, Overlay, Dialog, Cell, CellGroup, Empty, Tab, Tabs, Switch, Stepper } from 'vant'
+import { Button, Checkbox, Slider, Progress, Popup, Popover, Overlay, Dialog, Cell, CellGroup, Empty, Tab, Tabs, Switch, Stepper, Field } from 'vant'
 import App from './App.vue'
 import { PrinterClient } from './api/PrinterClient'
 import { routes } from './router/routes'
@@ -50,6 +50,7 @@ createApp(App)
   .use(Stepper)
   .use(Overlay)
   .use(Checkbox)
+  .use(Field)
   .mount('#app')
 
 window.addEventListener('contextmenu', (event) => {
