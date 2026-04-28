@@ -159,6 +159,7 @@ const onStepperChange = (type: FanType, value: number) => {
 .fan-speed-name {
   font-size: 13px;
   font-weight: 500;
+  color: var(--van-text-color-2);
 }
 
 .fan-speed-card :deep(.van-switch) {

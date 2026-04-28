@@ -211,7 +211,7 @@ const bedTempText = computed(() => device.value ? `${Math.floor(device.value.bed
   width: 100%;
   height: 100%;
   display: grid;
-  gap: 8px;
+  gap: 10px;
   grid-template-columns: minmax(0, 4fr) minmax(0, 3fr) minmax(0, 3fr);
   grid-template-rows: 60px 100px 60px 1fr;
   grid-template-areas:

@@ -131,7 +131,7 @@ const handleReconnect = () => {
   display: grid;
   grid-template-columns: minmax(0, 34fr) minmax(0, 33fr) minmax(0, 33fr);
   grid-template-rows: repeat(3, minmax(0, 60px)) minmax(auto, 220px);
-  gap: 16px;
+  gap: 10px;
 }
 
 .card {
