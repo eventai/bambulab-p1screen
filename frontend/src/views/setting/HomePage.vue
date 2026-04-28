@@ -1,6 +1,6 @@
 <template>
   <div class="settings-container">
-    <div class="card square-card account-card" @click="handleManageDevice">
+    <div class="card square-card account-card" clickable @click="handleManageDevice">
       <i-material-symbols-devices-rounded class="icon-large" />
       <div class="card-label">{{ !deviceItem ? '添加设备' : '设备管理' }}</div>
       <div v-if="deviceItem" class="item-value">
@@ -18,7 +18,7 @@
       </div>
     </div>
 
-    <div class="card list-item usb-card" @click="router.push({ name: ROUTE_NAME.HOME_FILES })">
+    <div class="card list-item usb-card" clickable @click="router.push({ name: ROUTE_NAME.HOME_FILES })">
       <span class="item-label">SD 卡存储</span>
       <div v-if="device" class="item-value">
         {{ device?.sdcard ? '已挂载' : '未挂载' }}
@@ -26,7 +26,7 @@
       </div>
     </div>
 
-    <div class="card list-item firmware-card" @click="router.push({ name: ROUTE_NAME.SETTING_FIRMWARE })">
+    <div class="card list-item firmware-card" clickable @click="router.push({ name: ROUTE_NAME.SETTING_FIRMWARE })">
       <span class="item-label">固件</span>
       <div class="item-value">
         {{ deviceModule?.sw_ver }}
@@ -34,17 +34,17 @@
       </div>
     </div>
 
-    <div class="card square-card calibration-card" @click="router.push({ name: ROUTE_NAME.SETTING_CALIBRATION })">
+    <div class="card square-card calibration-card" clickable @click="router.push({ name: ROUTE_NAME.SETTING_CALIBRATION })">
       <i-material-symbols-home-storage-gear-rounded class="icon-large" />
       <div class="card-label">校准</div>
     </div>
 
-    <div class="card square-card toolbox-card" @click="router.push({ name: ROUTE_NAME.SETTING_TOOLBOX })">
+    <div class="card square-card toolbox-card" clickable @click="router.push({ name: ROUTE_NAME.SETTING_TOOLBOX })">
       <i-material-symbols-handyman class="icon-large" />
       <div class="card-label">工具箱</div>
     </div>
 
-    <div class="card square-card settings-card" @click="router.push({ name: ROUTE_NAME.SETTING_SETTING })">
+    <div class="card square-card settings-card" clickable @click="router.push({ name: ROUTE_NAME.SETTING_SETTING })">
       <i-material-symbols-settings-rounded class="icon-large" />
       <div class="card-label">设置</div>
     </div>
@@ -214,7 +214,7 @@ const handleReconnect = () => {
   justify-content: center;
 }
 
-.square-card:active {
+.card[clickable]:active {
   filter: brightness(0.8);
 }
 
