@@ -79,7 +79,7 @@ import bedOffIcon from '../../assets/images/monitor_bed_temp.svg'
 import nozzleNormalThumbnail from '../../assets/images/indicator_nozzle_23.png'
 import nozzleHeatingThumbnail from '../../assets/images/indicator_heat_nozzle_23.png'
 import nozzleCoolingThumbnail from '../../assets/images/indicator_nozzle_cooling_23.png'
-// import nozzleOcclusionThumbnail from '../../assets/images/indicator_occlusion_filament_23.png'
+import nozzleOcclusionThumbnail from '../../assets/images/indicator_occlusion_filament_23.png'
 // import nozzlePurgeThumbnail from '../../assets/images/indicator_purge_filament_23.png'
 
 const shortEnglishHumanizer = humanizeDuration.humanizer({
@@ -96,6 +96,8 @@ const shortEnglishHumanizer = humanizeDuration.humanizer({
       ms: () => 'ms',
     },
   },
+  spacer: '',
+  delimiter: '',
 })
 
 const router = useRouter()
@@ -207,10 +209,10 @@ const getTaskThumbnail = computed(() => project.value?.thumbnail_url)
 const taskName = computed(() => device.value?.subtask_name || '')
 
 const nozzleHeating = computed(() => device.value && (device.value.nozzle_target_temper - 2 > device.value.nozzle_temper))
-const nozzleTemp = computed(() => Math.floor(Number(device.value?.nozzle_temper ?? '0')))
+const nozzleTemp = computed(() => Math.floor(device.value?.nozzle_temper ?? 0))
 
 const bedHeating = computed(() => device.value && (device.value.bed_target_temper - 2 > device.value.bed_temper))
-const heatbedTemp = computed(() => Math.floor(Number(device.value?.bed_temper ?? '0')))
+const heatbedTemp = computed(() => Math.floor(device.value?.bed_temper ?? 0))
 
 const getPrintPercent = computed(() => {
   if (device.value?.gcode_state === GcodeState.Prepare) {
@@ -258,6 +260,7 @@ const getPrintSubStateLabel = () => {
 
 const getNozzleThumbnail = () => {
   if (!device.value) return nozzleNormalThumbnail
+  if (device.value.stg_cur === CurrentStage.PRINTING) return nozzleOcclusionThumbnail
   if (device.value.nozzle_temper > 50) {
     return (device.value.nozzle_target_temper === 0) ? nozzleCoolingThumbnail : nozzleHeatingThumbnail
   }
@@ -270,9 +273,8 @@ const getPrintInfo = computed(() => {
   if ([GcodeState.Finish, GcodeState.Failed].includes(device.value?.gcode_state ?? GcodeState.Unknown)) return ''
 
   const remainingTimeText = shortEnglishHumanizer((device.value?.mc_remaining_time || 0) * 60 * 1000, {
-    units: ['h', 'm'],
+    units: ['d', 'h', 'm'],
     round: true,
-    spacer: '',
   })
   return `${device.value?.layer_num || 0}/${device.value?.total_layer_num || 0} | -${remainingTimeText}`
 })
