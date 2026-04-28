@@ -34,7 +34,6 @@
         v-model.trim="code"
         label="配对码"
         placeholder="配对码"
-        type="digit"
         input-align="right"
         enterkeyhint="done"
         @keydown.enter.prevent="codeInputRef?.blur()"
