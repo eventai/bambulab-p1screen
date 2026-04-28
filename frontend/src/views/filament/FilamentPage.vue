@@ -169,7 +169,7 @@ const handleSettingsSelect = (action: PopoverAction) => {
   grid-template-columns: repeat(2, auto);
   align-content: center;
   align-items: center;
-  justify-content: center;
+  justify-content: space-around;
 }
 
 .ams-tab {
