@@ -1,6 +1,6 @@
 <template>
   <div class="msg-page">
-    <van-empty description="开发中" />
+    <van-empty description="Under Development" />
   </div>
 </template>
 

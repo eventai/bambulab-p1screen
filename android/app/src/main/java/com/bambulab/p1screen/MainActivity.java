@@ -109,7 +109,7 @@ public final class MainActivity extends Activity {
       return;
     }
     lastBackPressedAt = now;
-    Toast.makeText(this, "再按一次返回键退出应用", Toast.LENGTH_SHORT).show();
+    Toast.makeText(this, "Press back again to exit the app", Toast.LENGTH_SHORT).show();
   }
 
   private void applyFullscreen() {

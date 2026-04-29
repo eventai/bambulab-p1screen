@@ -1,6 +1,6 @@
 <template>
-  <BaseSubPage title="自动续料">
-    <van-empty description="开发中" />
+  <BaseSubPage title="Auto Refill">
+    <van-empty description="Under Development" />
   </BaseSubPage>
 </template>
 

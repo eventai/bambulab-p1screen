@@ -1,6 +1,6 @@
 <template>
-  <BaseSubPage title="工具箱">
-    <van-empty description="开发中" />
+  <BaseSubPage title="Toolbox">
+    <van-empty description="Under Development" />
   </BaseSubPage>
 </template>
 

@@ -1,6 +1,6 @@
 <template>
-  <BaseSubPage title="文件列表">
-    <van-empty description="开发中" />
+  <BaseSubPage title="File List">
+    <van-empty description="Under Development" />
   </BaseSubPage>
 </template>
 
