@@ -44,9 +44,19 @@ jobs:
           yes | sdkmanager --licenses
           sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
 
-      - name: Decode Keystore
+      - name: Generate temporary keystore
         run: |
-          echo "${{ secrets.SIGNING_KEY_STORE_BASE64 }}" | base64 --decode > android/keystore.jks
+          rm -f android/keystore.jks
+          keytool -genkeypair \
+            -v \
+            -keystore android/keystore.jks \
+            -alias key0 \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -storepass 123456 \
+            -keypass 123456 \
+            -dname "CN=Tony,O=Local,C=CZ"
 
       - name: Set Version
         id: version
@@ -62,6 +72,15 @@ jobs:
         env:
           TAG_NAME: ${{ github.ref_name }}
           APP_VERSION_NAME: ${{ steps.version.outputs.VERSION }}
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bambulab-p1screen-release-apk
+          path: |
+            android/app/build/outputs/apk/release/*.apk
+            dist/apk/release/*.apk
+            dist/apk/*.apk
 
       - name: Create Release and Upload Asset
         if: startsWith(github.ref, 'refs/tags/')
