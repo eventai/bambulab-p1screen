@@ -54,8 +54,8 @@ jobs:
             -keyalg RSA \
             -keysize 2048 \
             -validity 10000 \
-            -storepass 123456 \
-            -keypass 123456 \
+            -storepass bambulab \
+            -keypass bambulab \
             -dname "CN=Tony,O=Local,C=CZ"
 
       - name: Set Version
@@ -68,7 +68,9 @@ jobs:
         run: npm ci
 
       - name: Build APK
-        run: gradle -p android :app:assembleRelease --no-daemon
+        run: |
+          cd android
+          ./gradlew :app:assembleRelease --no-daemon
         env:
           TAG_NAME: ${{ github.ref_name }}
           APP_VERSION_NAME: ${{ steps.version.outputs.VERSION }}
