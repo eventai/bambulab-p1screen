@@ -54,6 +54,7 @@ export type DevicePrint = {
   subtask_name: string
 
   home_flag: number
+  hms: DeviceHMS[]
 }
 
 export type DeviceAMSInfo = {
@@ -89,6 +90,13 @@ export type DeviceTray = {
 export type DeviceLight = {
   node: LightType
   mode: LightMode
+}
+
+export type DeviceHMS = {
+  attr: number
+  code: number
+  action: number
+  timestamp: number
 }
 
 export type DeviceState = {
