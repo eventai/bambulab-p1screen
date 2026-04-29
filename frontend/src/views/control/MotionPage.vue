@@ -1,8 +1,8 @@
 <template>
-  <BaseSubPage title="运动：XYZ">
+  <BaseSubPage title="Motion: XYZ">
     <div class="motion-card">
       <div>
-        <span>工具头</span>
+        <span>Toolhead</span>
         <div class="motion-xy">
           <div class="axis-dial">
             <div class="axis-ring">
@@ -34,7 +34,7 @@
         </div>
       </div>
       <div>
-        <span>热床</span>
+        <span>Heatbed</span>
         <div class="motion-z">
           <van-button
             class="heatbed-btn"

@@ -52,23 +52,23 @@ const actions = computed<PopoverAction[]>(() => {
   if (!exist.value && !isExt.value) return []
 
   const menu: PopoverAction[] = [
-    { type: 'edit', text: readonly.value ? '查看' : '编辑' },
+    { type: 'edit', text: readonly.value ? 'View' : 'Edit' },
   ]
 
-  if (isLoading.value) { // 换料中
+  if (isLoading.value) { // Changing filament
     if (props.trayTar !== 255 && isTarget.value) {
-      menu.push({ type: 'load', text: '进料中', disabled: true })
+      menu.push({ type: 'load', text: 'Loading...', disabled: true })
     } else if (props.trayTar === 255 && isPrev.value) {
-      menu.push({ type: 'load', text: '退料中', disabled: true })
+      menu.push({ type: 'load', text: 'Unloading...', disabled: true })
     } else {
-      menu.push({ type: 'load', text: '进料', disabled: true })
+      menu.push({ type: 'load', text: 'Load', disabled: true })
     }
   } else {
-    menu.push(isCurrent.value ? { type: 'unload', text: '退料' } : { type: 'load', text: '进料' })
+    menu.push(isCurrent.value ? { type: 'unload', text: 'Unload' } : { type: 'load', text: 'Load' })
   }
 
   if (!isExt.value) {
-    menu.push({ type: 'reload', text: '重读' })
+    menu.push({ type: 'reload', text: 'Re-read' })
   }
   return menu
 })

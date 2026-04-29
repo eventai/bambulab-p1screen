@@ -1,17 +1,17 @@
 <template>
-  <BaseSubPage title="设置">
+  <BaseSubPage title="Settings">
     <div class="settings-page">
       <van-cell-group inset>
-        <van-cell title="打印选项" is-link to="/setting/print-option" />
-        <van-cell title="AMS 选项" is-link to="/setting/ams-setting" />
+        <van-cell title="Print Options" is-link to="/setting/print-option" />
+        <van-cell title="AMS Options" is-link to="/setting/ams-setting" />
       </van-cell-group>
 
       <van-cell-group inset>
-        <van-cell title="设备和序列号" :value="getCurrentDevice()?.name" is-link to="/setting/serial" />
+        <van-cell title="Device & Serial Number" :value="getCurrentDevice()?.name" is-link to="/setting/serial" />
       </van-cell-group>
 
-      <van-cell-group inset title="关于 bambulab-p1screen">
-        <van-cell title="当前版本" :value="currentVersion" />
+      <van-cell-group inset title="About bambulab-p1screen">
+        <van-cell title="Current Version" :value="currentVersion" />
       </van-cell-group>
     </div>
   </BaseSubPage>

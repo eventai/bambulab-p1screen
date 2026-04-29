@@ -1,7 +1,7 @@
 <template>
   <BasePopup
     :show="show"
-    title="打印速度"
+    title="Print Speed"
     @update:show="emit('update:show', $event)"
   >
     <div class="print-speed-buttons">
@@ -29,16 +29,16 @@ type SpeedButton = {
 }
 
 const buttons: SpeedButton[] = [{
-  label: '狂暴模式（166%）',
+  label: 'Ludicrous Mode (166%)',
   value: PrintSpeedLevel.Ludicrous,
 }, {
-  label: '运动模式（124%）',
+  label: 'Sport Mode (124%)',
   value: PrintSpeedLevel.Sport,
 }, {
-  label: '标准模式（100%）',
+  label: 'Standard Mode (100%)',
   value: PrintSpeedLevel.Standard,
 }, {
-  label: '静音模式（50%）',
+  label: 'Silent Mode (50%)',
   value: PrintSpeedLevel.Silent,
 }]
 

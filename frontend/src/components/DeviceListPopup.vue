@@ -1,7 +1,7 @@
 <template>
   <BasePopup
     :show="show"
-    title="设备列表"
+    title="Device List"
     @update:show="emit('update:show', $event)"
   >
     <template #header-right>
@@ -12,7 +12,7 @@
         :disabled="devices.length === 0"
         @click="toggleMode"
       >
-        {{ isEditMode ? '取消' : '编辑' }}
+        {{ isEditMode ? 'Cancel' : 'Edit' }}
       </van-button>
     </template>
 
@@ -33,7 +33,7 @@
       </van-cell-group>
 
       <van-cell-group inset>
-        <van-cell title="添加设备" class="add-device-cell device-cell" @click="router.push({ name: ROUTE_NAME.SETTING_DEVICE_ADD })" />
+        <van-cell title="Add Device" class="add-device-cell device-cell" @click="router.push({ name: ROUTE_NAME.SETTING_DEVICE_ADD })" />
       </van-cell-group>
     </div>
   </BasePopup>
@@ -83,7 +83,7 @@ const handleCellClick = (serial: string) => {
       client.connect(current.ip, current.serial, current.code)
     }
     showToast({
-      message: '切换成功',
+      message: 'Switched successfully',
       position: 'bottom',
     })
   }

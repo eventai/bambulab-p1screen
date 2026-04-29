@@ -12,7 +12,7 @@
         :disabled="inputValue.length === 0"
         @click="handleConfirm"
       >
-        确定
+        Confirm
       </van-button>
     </template>
 
@@ -53,13 +53,13 @@ const props = withDefaults(
 const title = computed(() => {
   switch (props.type) {
     case TemperatureType.Nozzle:
-      return '喷嘴温度'
+      return 'Nozzle Temp'
     case TemperatureType.Heatbed:
-      return '热床温度'
+      return 'Heatbed Temp'
     case TemperatureType.Chamber:
-      return '机箱温度'
+      return 'Chamber Temp'
     default:
-      return '温度'
+      return 'Temperature'
   }
 })
 

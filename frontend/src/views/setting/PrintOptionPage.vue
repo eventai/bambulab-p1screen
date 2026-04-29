@@ -1,9 +1,9 @@
 <template>
-  <BaseSubPage title="打印选项">
+  <BaseSubPage title="Print Options">
     <SettingCell
       v-if="device"
-      title="丢步自动恢复"
-      label="检测到电机运行异常导致跳过步骤时，尝试自动恢复。"
+      title="Auto Recovery on Step Loss"
+      label="When the motor skips steps due to an anomaly, attempt automatic recovery."
       :selected="auto_recovery"
       @click="onChange"
     />

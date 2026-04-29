@@ -1,27 +1,27 @@
 <template>
-  <BaseSubPage title="AMS 设置">
+  <BaseSubPage title="AMS Settings">
     <div v-if="device">
       <SettingCell
-        title="插入耗材时读取"
-        label="插入耗材后，AMS 会自动读取耗材信息。需要花费大约20秒。"
+        title="Read on Filament Insert"
+        label="When filament is inserted, AMS will automatically read the filament info. Takes approximately 20 seconds."
         :selected="tray_read_option"
         @click="onChangeUserSetting('tray_read_option', $event)"
       />
       <SettingCell
-        title="开机时读取"
-        label="每次开机时，AMS 将会自动读取其所插入的耗材信息。需要花费大约1分钟。"
+        title="Read on Startup"
+        label="On every startup, AMS will automatically read the filament info of inserted spools. Takes approximately 1 minute."
         :selected="startup_read_option"
         @click="onChangeUserSetting('startup_read_option', $event)"
       />
       <SettingCell
-        title="剩余容量估计"
-        label="AMS 将会尝试估算Bambulab官方耗材的剩余容量。"
+        title="Remaining Capacity Estimate"
+        label="AMS will attempt to estimate the remaining capacity of Bambu Lab official filaments."
         :selected="calibrate_remain_flag"
         @click="onChangeUserSetting('calibrate_remain_flag', $event)"
       />
       <SettingCell
-        title="AMS自动续料"
-        label="AMS 将在当前耗材用尽后，自动使用与该耗材品牌、类型和颜色完全相同的其他耗材继续打印。"
+        title="AMS Auto Refill"
+        label="AMS will automatically continue printing with a filament of the same brand, type, and color when the current spool runs out."
         :selected="auto_switch_filament"
         @click="onChangePrintOption('auto_switch_filament', $event)"
       />
@@ -69,7 +69,7 @@ const onChangeUserSetting = async (key: string, selected: boolean) => {
     }
     params[key] = selected
     await client.request('print.ams_user_setting', params)
-    showToast({ message: '成功', position: 'bottom'})
+    showToast({ message: 'Success', position: 'bottom'})
     switch(key) {
       case 'tray_read_option':
         device.value.ams.insert_flag = selected
@@ -86,16 +86,16 @@ const onChangeUserSetting = async (key: string, selected: boolean) => {
         break
     }
   } catch (error: any) {
-    showToast({ message: `失败：${error.message}`, position: 'bottom'})
+    showToast({ message: `Failed: ${error.message}`, position: 'bottom'})
   }
 }
 
 const onChangePrintOption = async (key: string, selected: boolean) => {
   try {
     await client.request('print.print_option', { [key]: selected })
-    showToast({ message: '成功', position: 'bottom'})
+    showToast({ message: 'Success', position: 'bottom'})
   } catch (error: any) {
-    showToast({ message: `失败：${error.message}`, position: 'bottom'})
+    showToast({ message: `Failed: ${error.message}`, position: 'bottom'})
   }
 }
 

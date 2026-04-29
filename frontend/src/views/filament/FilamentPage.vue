@@ -40,7 +40,7 @@
         :trayPrev="Number(device?.ams.tray_pre) ?? -1"
         :popoverAction="handleTrayAction"
       />
-      <span class="ext-name" >外挂料盘</span>
+      <span class="ext-name" >External Spool</span>
     </div>
     <div class="setting">
       <van-popover
@@ -81,7 +81,7 @@ const device = ref(client.device.print)
 const currentAmsId = ref<string | undefined>(device.value?.ams.ams[0].id)
 const currentAms = computed(() => device.value?.ams.ams.filter(ams => ams.id === currentAmsId.value)[0])
 const showSettingsPopover = ref(false)
-const settingsActions: PopoverAction[] = [{ type: 'auto-refill', text: '自动续料' }]
+const settingsActions: PopoverAction[] = [{ type: 'auto-refill', text: 'Auto Refill' }]
 
 const amsPrefix = (amsId: string) => String.fromCharCode('A'.charCodeAt(0) + Number(amsId ?? '0'))
 const humIcon = (humidity: string) => [humLevel1Icon, humLevel1Icon, humLevel2Icon, humLevel3Icon, humLevel4Icon, humLevel5Icon][Number(humidity)]

@@ -1,9 +1,9 @@
 <template>
-  <BaseSubPage title="喷嘴和挤出机">
+  <BaseSubPage title="Nozzle & Extruder">
     <div v-if="device" class="nozzle-container">
       <img src="../../assets/images/extruder_normal_23.png" />
       <div>
-        <label class="extruder-label">挤出机</label>
+        <label class="extruder-label">Extruder</label>
         <button class="extruder-btn" type="button" @click="handleMove('e', -10)">
           <img src="../../assets/images/monitor_extruder_up.svg" />
         </button>
@@ -12,12 +12,12 @@
         </button>
       </div>
       <div>
-        <label class="nozzle-label">喷嘴</label>
+        <label class="nozzle-label">Nozzle</label>
         <label class="nozzle-temp" v-on:click="openTempPopup">
           <span>{{ Math.floor(Number(device?.nozzle_temper ?? '0')) }}</span> / {{ Math.floor(Number(device?.nozzle_target_temper ?? '0')) }} °C
         </label>
         <div class="nozzle-types">
-          <label class="nozzle-type">标准</label>
+          <label class="nozzle-type">Standard</label>
           <label class="nozzle-type">{{ nozzleTypeName() }}</label>
           <label class="nozzle-type">{{ device?.nozzle_diameter }}mm</label>
           <span class="nozzle-edit" v-on:click="editNozzle" hidden></span>
@@ -44,7 +44,7 @@ const client = PrinterClient.getInstance()
 const device = ref(client.device.print)
 const showTempPopup = ref(false)
 const nozzleTypeName = () => {
-  return { stainless_steel: '不锈钢', hardened_steel: '硬化钢', '': '未知'}[device.value?.nozzle_type || '']
+  return { stainless_steel: 'Stainless Steel', hardened_steel: 'Hardened Steel', '': 'Unknown'}[device.value?.nozzle_type || '']
 }
 
 onMounted(() => {
@@ -62,7 +62,7 @@ const onPushStatus = () => {
 const handleMove = (axis: 'e', step: -10 | -1 | 0| 1 | 10) => {
   console.log(`[NozzlePage] move axis=e, step=${step}`)
   if (Number(device.value?.nozzle_temper ?? '0') < 170) {
-    showDialog({ message: '请将热端加热到170°C以上。' })
+    showDialog({ message: 'Please heat the hotend above 170°C.' })
     return
   }
 
@@ -90,7 +90,7 @@ const handleTempConfirm = (type: TemperatureType | undefined, value: number) => 
 
 const editNozzle = () => {
   showToast({
-    message: '不支持此操作',
+    message: 'Operation not supported',
     position: 'bottom',
   })
 }

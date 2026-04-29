@@ -21,7 +21,7 @@ import './styles/theme.css'
 // })
 // if (browser.satisfies(requirements) === false) {
 //   showDialog({
-//     message: '你的WebView内核版本过低，会导致功能和界面异常。Android用户请升级浏览器内核组件（Android System WebView），iOS用户请升级操作系统。',
+//     message: 'Your WebView version is too old, which may cause functional and UI issues. Android users: upgrade Android System WebView. iOS users: upgrade your OS.',
 //     messageAlign: 'left',
 //   })
 // }

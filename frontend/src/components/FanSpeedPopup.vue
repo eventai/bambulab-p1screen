@@ -1,12 +1,12 @@
 <template>
   <BasePopup
     :show="show"
-    title="风扇"
+    title="Fans"
     @update:show="emit('update:show', $event)"
   >
     <div class="fan-speed-card">
       <div class="fan-title-group">
-        <span class="fan-speed-name">部件</span>
+        <span class="fan-speed-name">Part</span>
         <img class="fan-speed-icon" :src="fanPartSpeed > 0 ? fanOnIcon : fanOffIcon" />
       </div>
       <van-switch
@@ -29,7 +29,7 @@
 
     <div class="fan-speed-card">
       <div class="fan-title-group">
-        <span class="fan-speed-name">辅助</span>
+        <span class="fan-speed-name">Aux</span>
         <img class="fan-speed-icon" :src="fanAuxSpeed > 0 ? fanOnIcon : fanOffIcon" />
       </div>
       <van-switch
@@ -52,7 +52,7 @@
 
     <div class="fan-speed-card">
       <div class="fan-title-group">
-        <span class="fan-speed-name">机箱</span>
+        <span class="fan-speed-name">Chamber</span>
         <img class="fan-speed-icon" :src="fanChamberSpeed > 0 ? fanOnIcon : fanOffIcon" />
       </div>
       <van-switch

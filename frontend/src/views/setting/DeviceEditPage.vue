@@ -1,11 +1,11 @@
 <template>
-  <BaseSubPage :title="isEditMode ? '编辑设备' : '添加设备'">
+  <BaseSubPage :title="isEditMode ? 'Edit Device' : 'Add Device'">
   <div class="device-manage-page">
     <van-cell-group inset>
       <van-field
         v-model.trim="name"
-        label="设备名称"
-        placeholder="设备名称"
+        label="Device Name"
+        placeholder="Device Name"
         input-align="right"
         enterkeyhint="next"
         @keydown.enter.prevent="ipInputRef?.focus()"
@@ -13,8 +13,8 @@
       <van-field
         ref="ipInputRef"
         v-model.trim="ip"
-        label="IP 地址"
-        placeholder="IP 地址"
+        label="IP Address"
+        placeholder="IP Address"
         input-align="right"
         enterkeyhint="next"
         @keydown.enter.prevent="isEditMode ? codeInputRef?.focus() : serialInputRef?.focus()"
@@ -23,8 +23,8 @@
         ref="serialInputRef"
         v-model.trim="serial"
         :readonly="isEditMode"
-        label="序列号"
-        placeholder="序列号"
+        label="Serial Number"
+        placeholder="Serial Number"
         input-align="right"
         enterkeyhint="next"
         @keydown.enter.prevent="codeInputRef?.focus()"
@@ -32,8 +32,8 @@
       <van-field
         ref="codeInputRef"
         v-model.trim="code"
-        label="配对码"
-        placeholder="配对码"
+        label="Pairing Code"
+        placeholder="Pairing Code"
         input-align="right"
         enterkeyhint="done"
         @keydown.enter.prevent="codeInputRef?.blur()"
@@ -42,12 +42,12 @@
 
     <van-cell-group inset>
       <van-cell
-        title="保存"
+        title="Save"
         class="save-btn"
         :clickable="canSave"
         @click="handleSave"
       />
-      <van-cell v-if="isEditMode" title="删除" class="delete-btn" @click="handleDelete" />
+      <van-cell v-if="isEditMode" title="Delete" class="delete-btn" @click="handleDelete" />
     </van-cell-group>
   </div>
   </BaseSubPage>
@@ -82,7 +82,7 @@ const handleSave = () => {
   client.connect(ip.value, serial.value, code.value)
   router.back()
   showToast({
-    message: '保存成功',
+    message: 'Saved successfully',
     position: 'bottom',
   })
 }
@@ -98,7 +98,7 @@ const handleDelete = () => {
   }
   router.back()
   showToast({
-    message: '删除成功',
+    message: 'Deleted successfully',
     position: 'bottom',
   })
 }

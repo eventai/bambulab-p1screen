@@ -6,7 +6,7 @@
         <div class="panel-icon">
           <img :src="activeFanCount() > 0 ? fanOnIcon : fanOffIcon" />
         </div>
-        <div class="panel-title">风扇</div>
+        <div class="panel-title">Fans</div>
         <div class="panel-value">{{ fanStatusText }}</div>
         <i-material-symbols-chevron-right-rounded class="panel-arrow" />
       </div>
@@ -16,7 +16,7 @@
           <i-material-symbols-swap-driving-apps-wheel />
           <!-- <img src="../../assets/images/monitor_speed.svg" /> -->
         </div>
-        <div class="panel-title">速度</div>
+        <div class="panel-title">Speed</div>
         <div class="panel-value">{{ speedText }}</div>
         <i-material-symbols-chevron-right-rounded class="panel-arrow" />
       </div>
@@ -25,7 +25,7 @@
         <div class="panel-icon">
           <i-material-symbols-open-with-rounded />
         </div>
-        <div class="panel-title">运动</div>
+        <div class="panel-title">Motion</div>
         <div class="panel-value">XYZ</div>
         <i-material-symbols-chevron-right-rounded class="panel-arrow" />
       </div>
@@ -35,7 +35,7 @@
           <div class="panel-icon">
             <img :src="nozzleHeating ? nozzleOnIcon : nozzleOffIcon" />
           </div>
-          <div class="panel-title">喷嘴和挤出机</div>
+          <div class="panel-title">Nozzle & Extruder</div>
           <i-material-symbols-chevron-right-rounded class="panel-arrow" />
         </div>
         <div class="nozzle-temp-row">
@@ -48,7 +48,7 @@
         <div class="panel-icon">
           <img :src="bedHeating ? bedOnIcon : bedOffIcon" />
         </div>
-        <div class="panel-title">热床</div>
+        <div class="panel-title">Heatbed</div>
         <div class="panel-value">{{ bedTempText }}</div>
         <i-material-symbols-chevron-right-rounded class="panel-arrow" />
       </div>
@@ -58,7 +58,7 @@
       <div class="light-content">
         <div class="light-left">
           <img class="lightbulb" :src="lightSwitchValue ? lightOnIcon : lightOffIcon" />
-          <span>照明</span>
+          <span>Light</span>
         </div>
         <van-switch
           :model-value="lightSwitchValue"
@@ -142,7 +142,7 @@ const printSpeedLevel = computed(() => device.value?.spd_lvl)
 
 const handlePrintSpeedConfirm = (speedLevel: number) => {
   if ([GcodeState.Idle, GcodeState.Finish].includes(device.value?.gcode_state ?? GcodeState.Unknown)) {
-    showDialog({ message: '空闲状态下调整打印速度不生效。' })
+    showDialog({ message: 'Speed changes have no effect when idle.' })
     return
   }
   client.setPrintSpeedLevel(speedLevel)
@@ -155,16 +155,16 @@ const handleLightSwitch = (value: boolean) => {
 
 const speedText = computed(() => {
   const speed = [{
-    label: '狂暴',
+    label: 'Ludicrous',
     value: PrintSpeedLevel.Ludicrous,
   }, {
-    label: '运动',
+    label: 'Sport',
     value: PrintSpeedLevel.Sport,
   }, {
-    label: '标准',
+    label: 'Standard',
     value: PrintSpeedLevel.Standard,
   }, {
-    label: '静音',
+    label: 'Silent',
     value: PrintSpeedLevel.Silent,
   }].filter(item => item.value === device.value?.spd_lvl)
   return (speed.length > 0) ? speed[0].label : ''
@@ -174,7 +174,7 @@ const activeFanCount = () => [FanType.Part, FanType.Aux, FanType.Chamber].filter
 const fanStatusText = computed(() => {
   if (!device.value) return ''
   const count = activeFanCount()
-  return count === 0 ? '无风扇开启' : `${count}风扇开启`
+  return count === 0 ? 'No fans active' : `${count} fan(s) active`
 })
 
 const nozzleHeating = computed(() => device.value && (device.value.nozzle_target_temper - 2 > device.value.nozzle_temper))

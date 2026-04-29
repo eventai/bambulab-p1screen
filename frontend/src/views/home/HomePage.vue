@@ -2,7 +2,7 @@
   <div class="homepage">
     <div class="task-card" ref="taskCardRef" :style="{ width : `${taskCardWidth}px` }">
       <span v-if="isRecording" class="recording"><i-material-symbols-circle />REC</span>
-      <span class="files" @click="router.push({ name: ROUTE_NAME.HOME_FILES })">{{ '文件 >' }}</span>
+      <span class="files" @click="router.push({ name: ROUTE_NAME.HOME_FILES })">{{ 'Files >' }}</span>
       <img v-if="getTaskThumbnail" class="task-thumbnail" :src="getTaskThumbnail"/>
       <img v-if="!getTaskThumbnail" class="task-thumbnail task-loading-thumbnail" :src="loadingThumbnail"/>
       <span class="task-name">{{ taskName }}</span>
@@ -37,13 +37,13 @@
         <span class="progress-status">{{ getPrintStateLabel }}</span>
       </div>
       <div class="progress-card-buttons">
-        <ControlButton :icon="skipIcon" label="跳过" font-size="10px" @click="handleSkip" :disabled="!showPrintActions" />
-        <ControlButton v-if="!isPaused" :icon="pauseIcon" label="暂停" font-size="10px" @click="handlePause" :disabled="!showPrintActions" />
-        <ControlButton v-if="isPaused" :icon="resumeIcon" label="继续" font-size="10px" @click="handleResume" :disabled="!showPrintActions" />
-        <ControlButton :icon="stopIcon" label="停止" font-size="10px" @click="handleStop" :disabled="!showPrintActions" />
+        <ControlButton :icon="skipIcon" label="Skip" font-size="10px" @click="handleSkip" :disabled="!showPrintActions" />
+        <ControlButton v-if="!isPaused" :icon="pauseIcon" label="Pause" font-size="10px" @click="handlePause" :disabled="!showPrintActions" />
+        <ControlButton v-if="isPaused" :icon="resumeIcon" label="Resume" font-size="10px" @click="handleResume" :disabled="!showPrintActions" />
+        <ControlButton :icon="stopIcon" label="Stop" font-size="10px" @click="handleStop" :disabled="!showPrintActions" />
       </div>
     </div>
-    <ControlButton class="light-button" :icon="lightSwitchValue ? lightOnIcon : lightOffIcon" label="照明" font-size="10px" @click="toggleLight" />
+    <ControlButton class="light-button" :icon="lightSwitchValue ? lightOnIcon : lightOffIcon" label="Light" font-size="10px" @click="toggleLight" />
   </div>
 </template>
 <script setup lang="ts">
@@ -224,18 +224,18 @@ const getPrintPercent = computed(() => {
 const getPrintStateLabel = computed(() => {
   switch (device.value?.gcode_state) {
     case GcodeState.Idle:
-      return '空闲'
+      return 'Idle'
     case GcodeState.Prepare:
-      return `下载中(${device.value?.gcode_file_prepare_percent}%)`
+      return `Downloading (${device.value?.gcode_file_prepare_percent}%)`
     case GcodeState.Running:
       return getPrintSubStateLabel()
-      // return '打印中'
+      // return 'Printing'
     case GcodeState.Pause:
-      return '已暂停'
+      return 'Paused'
     case GcodeState.Finish:
-      return '完成'
+      return 'Finished'
     case GcodeState.Failed:
-      return '失败'
+      return 'Failed'
     default:
       return ''
   }
@@ -244,15 +244,15 @@ const getPrintStateLabel = computed(() => {
 const getPrintSubStateLabel = () => {
   switch (device.value?.stg_cur) {
     case CurrentStage.PRINTING:
-      return '打印中'
+      return 'Printing'
     case CurrentStage.HEATBED_PREHEATING:
-      return '预加热热床'
+      return 'Preheating Bed'
     case CurrentStage.CHANGING_FILAMENT:
-      return '换料中'
+      return 'Changing Filament'
     case CurrentStage.HOMING_TOOLHEAD:
-      return '工具头回中'
+      return 'Homing Toolhead'
     case CurrentStage.CLEANING_NOZZLE_TIP:
-      return '清理喷嘴头'
+      return 'Cleaning Nozzle'
     default:
       return ''
   }
@@ -285,7 +285,7 @@ const showPrintActions = computed(() => [GcodeState.Pause, GcodeState.Running].i
 const handleSkip = () => {
   console.log('[Controls] skip')
   showToast({
-    message: '功能开发中～',
+    message: 'Feature coming soon~',
     position: 'bottom',
   })
 }

@@ -1,11 +1,11 @@
 <template>
-  <BaseSubPage title="编辑耗材">
+  <BaseSubPage title="Edit Filament">
     <div class="filament-edit-card">
       <div class="form-row form-filament">
-        <label class="form-label">耗材</label>
+        <label class="form-label">Filament</label>
         <select class="manufacturer" v-model="manufacturer" :disabled="isReadonly || isCustomFilament" @change="onManufacturerChange">
           <option v-for="item in manufacturerList" :key="item" :value="item">{{ item }}</option>
-          <option v-if="isCustomFilament" value="Custom">自定义</option>
+          <option v-if="isCustomFilament" value="Custom">Custom</option>
         </select>
         <select class="filament" v-model="filamentId" :disabled="isReadonly || isCustomFilament">
           <option v-for="item in getFilamentListOf(manufacturer)" :key="item.filament_id" :value="item.filament_id">{{ item.filament_name }}</option>
@@ -14,7 +14,7 @@
       </div>
 
       <div class="form-row form-color">
-        <label class="form-label">颜色</label>
+        <label class="form-label">Color</label>
         <div class="color-field" @click="showColorPicker = true">
           <div class="color-swatch" :style="{ backgroundColor: hextoRGB(trayColor) }"></div>
           <span v-if="!isReadonly" class="icon-edit" ></span>
@@ -22,29 +22,29 @@
       </div>
 
       <div class="form-row form-temperature">
-        <label class="form-label">喷嘴温度</label>
+        <label class="form-label">Nozzle Temp</label>
         <div class="temperature-field">
-          最低
+          Min
           <span>{{ isCustomFilament ? tray?.nozzle_temp_min : getSelectedFilament()?.min_temperature || 0 }}</span>
           °C
         </div>
         <div class="temperature-field">
-          最高
+          Max
           <span>{{ isCustomFilament ? tray?.nozzle_temp_max : getSelectedFilament()?.max_temperature || 0 }}</span>
           °C
         </div>
       </div>
 
       <div class="form-actions">
-        <van-button class="action-btn" plain type="default" @click="handleReset" :disabled="!tray">重置</van-button>
-        <van-button class="action-btn" type="primary" @click="handleConfirm" :disabled="!(tray && filamentId && filamentId.length > 0)">确认</van-button>
+        <van-button class="action-btn" plain type="default" @click="handleReset" :disabled="!tray">Reset</van-button>
+        <van-button class="action-btn" type="primary" @click="handleConfirm" :disabled="!(tray && filamentId && filamentId.length > 0)">Confirm</van-button>
       </div>
     </div>
 
     <van-overlay :show="showColorPicker" @click="showColorPicker = false">
       <div class="color-picker-wrapper">
         <div @click.stop >
-          <span>其他颜色</span>
+          <span>Other Colors</span>
           <i-material-symbols-close-rounded @click="showColorPicker = false" />
           <div class="color-grids">
             <div
@@ -168,7 +168,7 @@ const handleReset = async () => {
   if (!tray.value) return
 
   try {
-    await showConfirmDialog({ message: '您确定要清除耗材丝信息吗？' })
+    await showConfirmDialog({ message: 'Are you sure you want to clear the filament info?' })
   } catch {
     return
   }
@@ -195,7 +195,7 @@ const handleReset = async () => {
   } catch (error: any) {
     console.error(`[FilamentEditPage] reset failed: ${error.message}`)
     showToast({
-      message: `重置失败：${error.message}`,
+      message: `Reset failed: ${error.message}`,
       position: 'bottom',
     })
   }
@@ -232,7 +232,7 @@ const handleConfirm = async () => {
   } catch (error: any) {
     console.error(`[FilamentEditPage] save failed: ${error.message}`)
     showToast({
-      message: `保存失败：${error.message}`,
+      message: `Save failed: ${error.message}`,
       position: 'bottom',
     })
   }

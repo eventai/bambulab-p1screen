@@ -1,5 +1,5 @@
 <template>
-  <BaseSubPage title="打印校准">
+  <BaseSubPage title="Print Calibration">
     <template #right>
       <van-button
         class="header-action-btn"
@@ -8,24 +8,24 @@
         :disabled="option === 0"
         @click="handleConfirm"
       >
-        确定
+        Confirm
       </van-button>
     </template>
     <SettingCell
-      title="自动热床调平（6分钟）"
-      label="通过喷嘴接触打印板来检测热床的平整度。调平可以试挤出的高度更均匀。"
+      title="Auto Bed Leveling (6 min)"
+      label="Detects the flatness of the build plate by touching it with the nozzle. Ensures consistent first-layer height."
       :selected="bedLevelling"
       @click="bedLevelling = $event"
     />
     <SettingCell
-      title="振动补偿（4分钟）"
-      label="测量打印机的机械共振模型以补偿震动。可以减少加速造成的纹路并大幅提高打印速度。"
+      title="Vibration Compensation (4 min)"
+      label="Measures the printer's mechanical resonance to compensate for vibration. Reduces artefacts from acceleration and significantly increases print speed."
       :selected="vibrationCompensation"
       @click="vibrationCompensation = $event"
     />
     <SettingCell
-      title="电机降噪（15分钟）"
-      label="测量每个电机的细微差异以优化主动降噪算法。"
+      title="Motor Noise Cancellation (15 min)"
+      label="Measures subtle differences in each motor to optimize the active noise-cancellation algorithm."
       :selected="motorCancellation"
       @click="motorCancellation = $event"
     />
@@ -56,8 +56,8 @@ const option = computed(() => {
 const handleConfirm = async () => {
   try {
     await showConfirmDialog({
-      message: '机器校准过程需要一段时间，且机器会产生轻微震动，在此过程中，不可操作机器，确定要开始校准吗？',
-      confirmButtonText: '开始校准',
+      message: 'Calibration takes some time and the printer may vibrate slightly. Do not operate the printer during this process. Start calibration?',
+      confirmButtonText: 'Start Calibration',
       messageAlign: 'left',
     })
   } catch {

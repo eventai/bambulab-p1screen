@@ -2,16 +2,16 @@
   <div class="settings-container">
     <div class="card square-card account-card" clickable @click="handleManageDevice">
       <i-material-symbols-devices-rounded class="icon-large" />
-      <div class="card-label">{{ !deviceItem ? '添加设备' : '设备管理' }}</div>
+      <div class="card-label">{{ !deviceItem ? 'Add Device' : 'Device Management' }}</div>
       <div v-if="deviceItem" class="item-value">
-        打印机: {{ deviceItem?.name }}
+        Printer: {{ deviceItem?.name }}
         <i-material-symbols-chevron-right-rounded />
       </div>
     </div>
     <DeviceListPopup v-model:show="showDeviceListPopup" />
 
     <div class="card list-item wifi-card">
-      <span class="item-label">网络</span>
+      <span class="item-label">Network</span>
       <div class="item-value">
         {{ getStatusLabel() }}
         <i-material-symbols-refresh-rounded class="refresh-btn" v-if="!isConnected" @click="handleReconnect"/>
@@ -19,15 +19,15 @@
     </div>
 
     <div class="card list-item usb-card" clickable @click="router.push({ name: ROUTE_NAME.HOME_FILES })">
-      <span class="item-label">SD 卡存储</span>
+      <span class="item-label">SD Card Storage</span>
       <div v-if="device" class="item-value">
-        {{ device?.sdcard ? '已挂载' : '未挂载' }}
+        {{ device?.sdcard ? 'Mounted' : 'Not Mounted' }}
         <i-material-symbols-chevron-right-rounded />
       </div>
     </div>
 
     <div class="card list-item firmware-card" clickable @click="router.push({ name: ROUTE_NAME.SETTING_FIRMWARE })">
-      <span class="item-label">固件</span>
+      <span class="item-label">Firmware</span>
       <div class="item-value">
         {{ deviceModule?.sw_ver }}
         <i-material-symbols-chevron-right-rounded />
@@ -36,17 +36,17 @@
 
     <div class="card square-card calibration-card" clickable @click="router.push({ name: ROUTE_NAME.SETTING_CALIBRATION })">
       <i-material-symbols-home-storage-gear-rounded class="icon-large" />
-      <div class="card-label">校准</div>
+      <div class="card-label">Calibration</div>
     </div>
 
     <div class="card square-card toolbox-card" clickable @click="router.push({ name: ROUTE_NAME.SETTING_TOOLBOX })">
       <i-material-symbols-handyman class="icon-large" />
-      <div class="card-label">工具箱</div>
+      <div class="card-label">Toolbox</div>
     </div>
 
     <div class="card square-card settings-card" clickable @click="router.push({ name: ROUTE_NAME.SETTING_SETTING })">
       <i-material-symbols-settings-rounded class="icon-large" />
-      <div class="card-label">设置</div>
+      <div class="card-label">Settings</div>
     </div>
   </div>
 </template>
@@ -64,14 +64,14 @@ const device = ref(client.device.print)
 const modules = ref(client.device.module)
 
 const getStatusLabel = () => {
-  if (client.lastError?.message === 'Connection refused: Not authorized') return '认证失败'
+  if (client.lastError?.message === 'Connection refused: Not authorized') return 'Auth Failed'
   const c = client.mqttClient
-  if (!c) return '未连接'
-  if (c.connected) return '已连接'
-  if (c.disconnecting) return '断开中'
-  if (c.reconnecting) return '重连中'
-  if (c.disconnected) return '已断开'
-  return '未知'
+  if (!c) return 'Not Connected'
+  if (c.connected) return 'Connected'
+  if (c.disconnecting) return 'Disconnecting'
+  if (c.reconnecting) return 'Reconnecting'
+  if (c.disconnected) return 'Disconnected'
+  return 'Unknown'
 }
 
 const isConnected = ref(client.mqttClient?.connected || false)

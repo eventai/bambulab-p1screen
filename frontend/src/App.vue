@@ -1,6 +1,6 @@
 <template>
   <div class="app-root">
-    <div class="unsupported">你的浏览器内核版本过低，请升级。</div>
+    <div class="unsupported">Your browser version is too old. Please upgrade.</div>
     <div class="app-shell">
       <aside class="side-nav">
         <RouterLink
