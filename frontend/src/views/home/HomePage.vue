@@ -43,7 +43,24 @@
         <ControlButton :icon="stopIcon" label="Stop" font-size="10px" @click="handleStop" :disabled="!showPrintActions" />
       </div>
     </div>
-    <ControlButton class="light-button" :icon="lightSwitchValue ? lightOnIcon : lightOffIcon" label="Light" font-size="10px" @click="toggleLight" />
+    <div class="side-buttons">
+      <ControlButton class="camera-button" :icon="cameraIcon" label="Camera" font-size="10px" @click="openCamera" />
+      <ControlButton class="light-button" :icon="lightSwitchValue ? lightOnIcon : lightOffIcon" label="Light" font-size="10px" @click="toggleLight" />
+    </div>
+
+    <!-- Camera overlay -->
+    <Teleport to="body">
+      <div v-if="cameraVisible" class="camera-overlay">
+        <button class="camera-overlay-close" @click="closeCamera">×</button>
+        <div class="camera-status" v-if="cameraStatus !== 'streaming'">{{ cameraStatusLabel }}</div>
+        <img
+          v-show="cameraStatus === 'streaming'"
+          ref="cameraImgRef"
+          class="camera-stream-img"
+          alt="Camera stream"
+        />
+      </div>
+    </Teleport>
   </div>
 </template>
 <script setup lang="ts">
@@ -61,6 +78,7 @@ import { getCurrentDevice } from '../../utils/device'
 
 import lightOnIcon from '../../assets/images/monitor_lamp_on.svg'
 import lightOffIcon from '../../assets/images/monitor_lamp_off.svg'
+import cameraIcon from '../../assets/images/monitor_camera.svg'
 import skipIcon from '../../assets/images/print_control_partskip.svg'
 import pauseIcon from '../../assets/images/print_control_pause.svg'
 import resumeIcon from '../../assets/images/print_control_resume.svg'
@@ -143,6 +161,7 @@ onUnmounted(() => {
   client.off(PrinterEvent.MQTT_STATE_CHANGE, onPushStatus)
   client.off(PrinterEvent.PRINT_PUSH_STATUS, onPushStatus)
   client.off(PrinterEvent.PRINT_PROJECT_FILE, onProjectFile)
+  stopCameraStream()
 })
 
 watch(
@@ -170,6 +189,11 @@ const onPushStatus = (params: any) => {
   if (!project.value) {
     project.value = getCurrentProject()
     loadProjectThumbnail()
+  }
+  // Try FTP thumbnail whenever subtask_name is available
+  const name = device.value?.subtask_name
+  if (name) {
+    loadThumbnailFromFtp(name)
   }
 }
 
@@ -205,8 +229,31 @@ const loadProjectThumbnail = async () => {
 }
 
 const isRecording = computed(() => project.value?.timelapse)
-const getTaskThumbnail = computed(() => project.value?.thumbnail_url)
+const ftpThumbnailUrl = ref<string | undefined>(undefined)
+let ftpThumbnailName = ''
+const getTaskThumbnail = computed(() => project.value?.thumbnail_url ?? ftpThumbnailUrl.value)
 const taskName = computed(() => device.value?.subtask_name || '')
+
+const loadThumbnailFromFtp = async (subtaskName: string) => {
+  if (!subtaskName || subtaskName === ftpThumbnailName) return
+  const dev = getCurrentDevice()
+  if (!dev?.ip || !dev?.code) return
+
+  ftpThumbnailName = subtaskName
+  ftpThumbnailUrl.value = undefined
+  console.log(`[HomePage] fetching FTP thumbnail for: ${subtaskName}`)
+
+  try {
+    const url = `/api/thumbnail?ip=${encodeURIComponent(dev.ip)}&code=${encodeURIComponent(dev.code)}&name=${encodeURIComponent(subtaskName)}`
+    const response = await fetch(url)
+    if (!response.ok) throw new Error(`HTTP ${response.status}`)
+    const blob = await response.blob()
+    ftpThumbnailUrl.value = URL.createObjectURL(blob)
+    console.log(`[HomePage] FTP thumbnail loaded for: ${subtaskName}`)
+  } catch (err) {
+    console.warn(`[HomePage] FTP thumbnail failed for ${subtaskName}:`, err)
+  }
+}
 
 const nozzleHeating = computed(() => device.value && (device.value.nozzle_target_temper - 2 > device.value.nozzle_temper))
 const nozzleTemp = computed(() => Math.floor(device.value?.nozzle_temper ?? 0))
@@ -313,6 +360,70 @@ const toggleLight = () => {
   client.setLight(LightType.Chamber, value)
 }
 
+// ---- Camera overlay ----
+const cameraVisible = ref(false)
+const cameraImgRef = ref<HTMLImageElement | null>(null)
+const cameraStatus = ref<'idle' | 'connecting' | 'streaming' | 'error'>('idle')
+let cameraSSE: EventSource | null = null
+
+const cameraStatusLabel = computed(() => {
+  switch (cameraStatus.value) {
+    case 'connecting': return 'Connecting to camera…'
+    case 'error': return 'Camera unavailable. Check printer IP and access code.'
+    default: return ''
+  }
+})
+
+const openCamera = () => {
+  const device = getCurrentDevice()
+  if (!device?.ip || !device?.code) {
+    showToast({ message: 'Printer IP or access code not configured.', position: 'bottom' })
+    return
+  }
+  cameraVisible.value = true
+  startCameraStream(device.ip, device.code)
+}
+
+const closeCamera = () => {
+  cameraVisible.value = false
+  stopCameraStream()
+}
+
+const startCameraStream = (ip: string, code: string) => {
+  stopCameraStream()
+  cameraStatus.value = 'connecting'
+  const url = `/api/camera?ip=${encodeURIComponent(ip)}&code=${encodeURIComponent(code)}`
+  const sse = new EventSource(url)
+  cameraSSE = sse
+
+  sse.onmessage = (event) => {
+    if (cameraStatus.value !== 'streaming') {
+      cameraStatus.value = 'streaming'
+    }
+    if (cameraImgRef.value) {
+      cameraImgRef.value.src = `data:image/jpeg;base64,${event.data}`
+    }
+  }
+
+  sse.onerror = () => {
+    if (cameraStatus.value !== 'streaming') {
+      cameraStatus.value = 'error'
+    }
+    // EventSource auto-reconnects; only show error if never received a frame
+  }
+}
+
+const stopCameraStream = () => {
+  if (cameraSSE) {
+    cameraSSE.close()
+    cameraSSE = null
+  }
+  cameraStatus.value = 'idle'
+  if (cameraImgRef.value) {
+    cameraImgRef.value.src = ''
+  }
+}
+
 </script>
 
 <style scoped>
@@ -328,6 +439,7 @@ const toggleLight = () => {
 .task-card,
 .printer-card,
 .progress-card,
+.camera-button,
 .light-button {
   background: var(--van-background-2);
   border-radius: 8px;
@@ -552,18 +664,31 @@ const toggleLight = () => {
   margin-bottom: 2px;
 }
 
-.light-button {
+.side-buttons {
   grid-column: 2;
   grid-row: 2;
   justify-self: end;
-  width: 56px;
-  /* height: 72px; */
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
+.camera-button,
+.light-button {
+  width: 56px;
+}
+
+:deep(.camera-button > img),
 :deep(.light-button > img) {
   width: 20px;
   height: 20px;
 }
+
+:deep(.camera-button > img) {
+  filter: invert(1);
+}
+
+/* Camera overlay – rendered via Teleport into <body>, not scoped */
 
 @media (orientation: portrait) {
   .homepage {
@@ -598,7 +723,7 @@ const toggleLight = () => {
     justify-content: flex-start;
   }
 
-  .light-button {
+  .side-buttons {
     display: none;
   }
 }

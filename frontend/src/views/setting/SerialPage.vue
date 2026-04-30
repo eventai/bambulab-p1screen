@@ -2,10 +2,8 @@
   <BaseSubPage title="Device & Serial Number">
     <van-cell-group inset title="Device Info">
       <van-cell title="Device Name" :value="getCurrentDevice()?.name" />
-      <!-- <van-cell title="打印机使用时间" value="x 小时" /> -->
-    </van-cell-group>
-    <van-cell-group v-if="modules" inset title="Serial Numbers">
-      <van-cell v-for="module in modules" :key="module.sn" :title="module.product_name" :value="module.sn" v-show="module.visible" />
+      <van-cell title="Serial Number" :value="getCurrentDevice()?.serial" />
+      <van-cell title="IP Address" :value="getCurrentDevice()?.ip" />
     </van-cell-group>
   </BaseSubPage>
 </template>

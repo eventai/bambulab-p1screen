@@ -25,7 +25,7 @@
       <span class="ams-name" >AMS-{{ amsPrefix(currentAms.id) }}</span>
       <div class="ams-info">
         <img :src="humIcon(currentAms.humidity)"/>
-        <span>{{ currentAms.humidity_raw }}%</span>
+        <span>{{ humidityDisplay(currentAms) }}</span>
         <span>{{ Math.round(Number(currentAms.temp)).toFixed(0) }}°C</span>
       </div>
       
@@ -84,7 +84,37 @@ const showSettingsPopover = ref(false)
 const settingsActions: PopoverAction[] = [{ type: 'auto-refill', text: 'Auto Refill' }]
 
 const amsPrefix = (amsId: string) => String.fromCharCode('A'.charCodeAt(0) + Number(amsId ?? '0'))
-const humIcon = (humidity: string) => [humLevel1Icon, humLevel1Icon, humLevel2Icon, humLevel3Icon, humLevel4Icon, humLevel5Icon][Number(humidity)]
+
+// humidity from MQTT is the actual RH percentage (e.g. 5 = 5%), NOT a discrete 1-5 level.
+// Derive the icon level from the percentage.
+const humLevelIcons = [humLevel1Icon, humLevel1Icon, humLevel2Icon, humLevel3Icon, humLevel4Icon, humLevel5Icon]
+
+const humPercentToLevel = (pct: number): number => {
+  if (pct <= 10) return 1
+  if (pct <= 35) return 2
+  if (pct <= 60) return 3
+  if (pct <= 75) return 4
+  return 5
+}
+
+const humIcon = (humidity: string) => {
+  const pct = Number(humidity)
+  // If value is 1-5 and could be the old level format, use it directly as level.
+  // Otherwise treat as percentage and derive level.
+  const level = pct <= 5 && pct >= 1 && Number.isInteger(pct)
+    ? pct  // could be either: small percentage or level - treat as level for icon
+    : humPercentToLevel(pct)
+  return humLevelIcons[level] ?? humLevel1Icon
+}
+
+// Show raw humidity percentage directly from MQTT.
+const humidityDisplay = (ams: { humidity: string; humidity_raw?: string }) => {
+  const raw = ams.humidity_raw
+  if (raw && raw !== '' && raw !== '0') return `${raw}%`
+  const pct = Number(ams.humidity)
+  if (!isNaN(pct)) return `${pct}%`
+  return '-'
+}
 
 onMounted(() => {
   client.on(PrinterEvent.PRINT_PUSH_STATUS, onPushStatus)

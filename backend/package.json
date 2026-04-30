@@ -3,7 +3,12 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "adm-zip": "^0.5.17",
+    "basic-ftp": "^6.0.0",
     "express": "^4.19.2",
     "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/adm-zip": "^0.5.8"
   }
 }

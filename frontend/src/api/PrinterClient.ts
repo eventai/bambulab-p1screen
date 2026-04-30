@@ -447,4 +447,30 @@ export class PrinterClient {
     this.request('print.stop', { 'param': '' })
   }
 
+  /**
+   * Starts printing a .3mf file stored on the printer's SD card.
+   * @param taskName  The base task name (e.g. "xyzcalibrationcube20mm") for display
+   * @param ftpPath   The exact FTP path from the backend (e.g. "/cache/xyz.gcode.3mf")
+   * @param plate     Plate index to print (default 1)
+   * @param useAms    Whether to use AMS (default false – auto-detect)
+   */
+  printFile(taskName: string, ftpPath: string, plate = 1, useAms = false) {
+    // Map the FTP path (where '/' is the SD card root) to the internal file:// URL required by firmware
+    const url = `file:///sdcard${ftpPath}`
+    this.request('print.project_file', {
+      url,
+      param: `Metadata/plate_${plate}.gcode`,
+      subtask_name: taskName,
+      subtask_id: '0',
+      use_ams: useAms,
+      timelapse: false,
+      bed_leveling: true,
+      flow_cali: false,
+      vibration_cali: true,
+      layer_inspect: false,
+      bed_type: 'auto',
+      ams_mapping: [],
+    })
+  }
+
 }

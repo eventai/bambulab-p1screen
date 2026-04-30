@@ -32,8 +32,8 @@
       <van-field
         ref="codeInputRef"
         v-model.trim="code"
-        label="Pairing Code"
-        placeholder="Pairing Code"
+        label="Access Code"
+        placeholder="Access Code"
         input-align="right"
         enterkeyhint="done"
         @keydown.enter.prevent="codeInputRef?.blur()"
