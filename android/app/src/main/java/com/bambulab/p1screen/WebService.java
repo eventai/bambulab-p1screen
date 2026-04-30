@@ -17,11 +17,15 @@ public final class WebService extends NanoWSD {
 
   private final Context appContext;
   private final FetchHandler fetchHandler;
+  private final CameraHandler cameraHandler;
+  private final FilesHandler filesHandler;
 
   public WebService(int port, Context context) {
     super(port);
     appContext = context;
     fetchHandler = new FetchHandler();
+    cameraHandler = new CameraHandler();
+    filesHandler = new FilesHandler();
   }
 
   @Override
@@ -46,6 +50,12 @@ public final class WebService extends NanoWSD {
     String uri = session.getUri();
     if ("/api/fetch".equals(uri)) {
       return fetchHandler.handle(session);
+    } else if ("/api/camera".equals(uri)) {
+      return cameraHandler.handle(session);
+    } else if ("/api/files".equals(uri)) {
+      return filesHandler.handleFiles(session);
+    } else if ("/api/thumbnail".equals(uri)) {
+      return filesHandler.handleThumbnail(session);
     }
     return serveStatic(session);
   }

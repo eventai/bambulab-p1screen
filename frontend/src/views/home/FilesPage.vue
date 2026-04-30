@@ -8,12 +8,12 @@
 
     <!-- Error state -->
     <div v-else-if="error" class="state-center">
-      <van-empty :description="error">
+      <van-empty :description="error" image-size="48">
         <template #image>
           <i-material-symbols-error-outline style="font-size:48px;color:var(--van-red)" />
         </template>
+        <van-button size="small" @click="loadFiles">Retry</van-button>
       </van-empty>
-      <van-button size="small" @click="loadFiles">Retry</van-button>
     </div>
 
     <!-- Empty state -->

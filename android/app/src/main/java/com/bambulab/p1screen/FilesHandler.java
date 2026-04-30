@@ -1,0 +1,201 @@
+package com.bambulab.p1screen;
+
+import android.util.Log;
+
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPFile;
+import org.apache.commons.net.ftp.FTPSClient;
+
+import fi.iki.elonen.NanoHTTPD;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+public final class FilesHandler {
+  private static final String TAG = "FilesHandler";
+  private static final int FTP_PORT = 990;
+
+  public NanoHTTPD.Response handleFiles(NanoHTTPD.IHTTPSession session) {
+    String ip = session.getParms().get("ip");
+    String code = session.getParms().get("code");
+
+    if (ip == null || code == null) {
+      return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.BAD_REQUEST, "text/plain", "Missing parameters");
+    }
+
+    FTPSClient client = createFtpsClient();
+    try {
+      client.connect(ip, FTP_PORT);
+      if (!client.login("bblp", code)) {
+        throw new Exception("FTP Login failed");
+      }
+      client.enterLocalPassiveMode();
+
+      JSONArray results = new JSONArray();
+      String[] dirs = {"/", "/cache", "/sdcard", "/model"};
+
+      for (String dir : dirs) {
+        FTPFile[] files = client.listFiles(dir);
+        if (files != null) {
+          for (FTPFile f : files) {
+            String name = f.getName();
+            if (name != null && (name.endsWith(".3mf") || name.endsWith(".gcode.3mf"))) {
+              JSONObject obj = new JSONObject();
+              String taskName = name.replace(".gcode.3mf", "").replace(".3mf", "");
+              
+              obj.put("name", taskName);
+              obj.put("fullName", name);
+              obj.put("size", f.getSize());
+              obj.put("path", dir.equals("/") ? "/" + name : dir + "/" + name);
+              
+              if (f.getTimestamp() != null) {
+                // Approximate ISO string
+                obj.put("modified", String.format("%tFT%<tTZ", f.getTimestamp().getTime()));
+              } else {
+                obj.put("modified", null);
+              }
+              results.put(obj);
+            }
+          }
+        }
+      }
+
+      client.logout();
+      client.disconnect();
+
+      return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, "application/json", results.toString());
+
+    } catch (Exception e) {
+      Log.e(TAG, "FTP files error", e);
+      return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.INTERNAL_ERROR, "text/plain", e.getMessage());
+    } finally {
+      if (client.isConnected()) {
+        try { client.disconnect(); } catch (IOException ignored) {}
+      }
+    }
+  }
+
+  public NanoHTTPD.Response handleThumbnail(NanoHTTPD.IHTTPSession session) {
+    String ip = session.getParms().get("ip");
+    String code = session.getParms().get("code");
+    String name = session.getParms().get("name");
+    String path = session.getParms().get("path");
+
+    if (ip == null || code == null || name == null) {
+      return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.BAD_REQUEST, "text/plain", "Missing parameters");
+    }
+
+    List<String> ftpPaths = new ArrayList<>();
+    if (path != null && !path.isEmpty()) {
+      ftpPaths.add(path);
+    }
+    ftpPaths.add("/cache/" + name + ".gcode.3mf");
+    ftpPaths.add("/cache/" + name + ".3mf");
+    ftpPaths.add("/" + name + ".gcode.3mf");
+    ftpPaths.add("/" + name + ".3mf");
+
+    List<String> thumbnailEntries = Arrays.asList(
+      "Metadata/plate_1.png",
+      "Metadata/thumbnail.png",
+      "Metadata/cover.png",
+      "Metadata/plate_2.png"
+    );
+
+    FTPSClient client = createFtpsClient();
+    try {
+      client.connect(ip, FTP_PORT);
+      if (!client.login("bblp", code)) {
+        throw new Exception("FTP Login failed");
+      }
+      client.enterLocalPassiveMode();
+      client.setFileType(FTP.BINARY_FILE_TYPE);
+
+      byte[] imgData = null;
+
+      for (String ftpPath : ftpPaths) {
+        Log.i(TAG, "Trying to download: " + ftpPath);
+        InputStream is = client.retrieveFileStream(ftpPath);
+        if (is != null) {
+          try {
+            ZipInputStream zis = new ZipInputStream(is);
+            ZipEntry entry;
+            while ((entry = zis.getNextEntry()) != null) {
+              if (thumbnailEntries.contains(entry.getName())) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                byte[] buffer = new byte[4096];
+                int len;
+                while ((len = zis.read(buffer)) > 0) {
+                  baos.write(buffer, 0, len);
+                }
+                imgData = baos.toByteArray();
+                break;
+              }
+            }
+            zis.close();
+          } catch (Exception e) {
+            Log.w(TAG, "Zip parse error", e);
+          }
+          // Exhaust and complete the stream
+          client.completePendingCommand();
+          
+          if (imgData != null) {
+            break;
+          }
+        }
+      }
+
+      client.logout();
+      client.disconnect();
+
+      if (imgData == null) {
+        return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.NOT_FOUND, "text/plain", "Thumbnail not found");
+      }
+
+      NanoHTTPD.Response response = NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, "image/png", new ByteArrayInputStream(imgData), imgData.length);
+      response.addHeader("Cache-Control", "public, max-age=3600");
+      return response;
+
+    } catch (Exception e) {
+      Log.e(TAG, "FTP thumbnail error", e);
+      return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.INTERNAL_ERROR, "text/plain", e.getMessage());
+    } finally {
+      if (client.isConnected()) {
+        try { client.disconnect(); } catch (IOException ignored) {}
+      }
+    }
+  }
+
+  private FTPSClient createFtpsClient() {
+    FTPSClient client = new FTPSClient(true); // true = implicit
+    try {
+      TrustManager[] trustManagers = new TrustManager[]{new X509TrustManager() {
+        @Override public void checkClientTrusted(X509Certificate[] chain, String authType) {}
+        @Override public void checkServerTrusted(X509Certificate[] chain, String authType) {}
+        @Override public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
+      }};
+      SSLContext context = SSLContext.getInstance("TLS");
+      context.init(null, trustManagers, new SecureRandom());
+      client.setSocketFactory(context.getSocketFactory());
+    } catch (Exception e) {
+      Log.e(TAG, "Failed to create insecure SSL context", e);
+    }
+    return client;
+  }
+}
