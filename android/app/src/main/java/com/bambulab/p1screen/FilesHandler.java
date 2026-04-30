@@ -5,6 +5,7 @@ import android.util.Log;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPSClient;
+import org.apache.commons.net.util.TrustManagerUtils;
 
 import fi.iki.elonen.NanoHTTPD;
 
@@ -184,18 +185,7 @@ public final class FilesHandler {
 
   private FTPSClient createFtpsClient() {
     FTPSClient client = new FTPSClient(true); // true = implicit
-    try {
-      TrustManager[] trustManagers = new TrustManager[]{new X509TrustManager() {
-        @Override public void checkClientTrusted(X509Certificate[] chain, String authType) {}
-        @Override public void checkServerTrusted(X509Certificate[] chain, String authType) {}
-        @Override public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
-      }};
-      SSLContext context = SSLContext.getInstance("TLS");
-      context.init(null, trustManagers, new SecureRandom());
-      client.setSocketFactory(context.getSocketFactory());
-    } catch (Exception e) {
-      Log.e(TAG, "Failed to create insecure SSL context", e);
-    }
+    client.setTrustManager(TrustManagerUtils.getAcceptAllTrustManager());
     return client;
   }
 }
