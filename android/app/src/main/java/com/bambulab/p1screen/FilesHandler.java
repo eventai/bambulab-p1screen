@@ -186,6 +186,7 @@ public final class FilesHandler {
   private FTPSClient createFtpsClient() {
     FTPSClient client = new FTPSClient(true); // true = implicit
     client.setTrustManager(TrustManagerUtils.getAcceptAllTrustManager());
+    client.setStrictReplyParsing(false);
     return client;
   }
 }

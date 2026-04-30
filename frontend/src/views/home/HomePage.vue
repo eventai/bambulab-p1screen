@@ -9,22 +9,26 @@
     </div>
     <div class="printer-card">
       <div class="printer-content">
-        <img :src="p1sThumbnail" />
-        <span class="heatbed-temp">
-          <img class="temp-icon" :src="bedHeating ? bedOnIcon : bedOffIcon" />
-          {{ heatbedTemp }}
-          <span class="temp-unit">°C</span>
-        </span>
-        <span class="wifi-signal"><img :src="wifiSignalIcon"/></span>
+        <div class="printer-wrapper">
+          <img :src="p1sThumbnail" />
+          <span class="heatbed-temp">
+            <img class="temp-icon" :src="bedHeating ? bedOnIcon : bedOffIcon" />
+            {{ heatbedTemp }}
+            <span class="temp-unit">°C</span>
+          </span>
+          <span class="wifi-signal"><img :src="wifiSignalIcon"/></span>
+        </div>
         <DeviceListPopup v-model:show="showDeviceListPopup" />
       </div>
       <div class="nozzle-content">
-        <img :src="nozzleThumbnail" />
-        <span class="nozzle-temp">
-          <img class="temp-icon" :src="nozzleHeating ? nozzleOnIcon : nozzleOffIcon" />
-          {{ nozzleTemp }}
-          <span class="temp-unit">°C</span>
-        </span>
+        <div class="nozzle-wrapper">
+          <img :src="nozzleThumbnail" />
+          <span class="nozzle-temp">
+            <img class="temp-icon" :src="nozzleHeating ? nozzleOnIcon : nozzleOffIcon" />
+            {{ nozzleTemp }}
+            <span class="temp-unit">°C</span>
+          </span>
+        </div>
       </div>
     </div>
     <div class="progress-card">
@@ -526,6 +530,32 @@ const stopCameraStream = () => {
   height: 100%;
 }
 
+.printer-content,
+.nozzle-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.printer-wrapper,
+.nozzle-wrapper {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 100%;
+  max-width: 100%;
+}
+
+.printer-wrapper {
+  top: 50%;
+  aspect-ratio: 1 / 1;
+}
+
+.nozzle-wrapper {
+  top: 45%;
+  aspect-ratio: 1 / 1.5;
+}
+
 .printer-card .temp-unit {
   font-size: 10px;
   padding-left: 4px;
@@ -539,16 +569,18 @@ const stopCameraStream = () => {
   height: 16px;
 }
 
-.printer-content > img {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%); 
-  width: 90%;
-  padding: 4px;
+.printer-wrapper > img,
+.nozzle-wrapper > img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  padding: 12px;
+  box-sizing: border-box;
 }
 
-.printer-card > div > span {
+.printer-wrapper > span,
+.nozzle-wrapper > span {
   display: block;
   position: absolute;
   transform: translate(-50%, -50%); 
@@ -591,16 +623,8 @@ const stopCameraStream = () => {
   background: var(--van-background-5);
 }
 
-.nozzle-content > img {
-  position: absolute;
-  top: 45%;
-  left: 50%;
-  transform: translate(-50%, -50%); 
-  width: 90%;
-}
-
 .nozzle-temp {
-  top: 75%;
+  top: 82%;
   left: 50%;
 }
 
