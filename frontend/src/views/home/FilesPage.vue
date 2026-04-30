@@ -8,9 +8,12 @@
 
     <!-- Error state -->
     <div v-else-if="error" class="state-center">
-      <van-empty :description="error" image-size="48">
+      <van-empty image-size="48">
         <template #image>
           <i-material-symbols-error-outline style="font-size:48px;color:var(--van-red)" />
+        </template>
+        <template #description>
+          <div style="text-align: center; padding: 0 16px;">{{ error }}</div>
         </template>
         <van-button size="small" @click="loadFiles">Retry</van-button>
       </van-empty>
@@ -18,7 +21,11 @@
 
     <!-- Empty state -->
     <div v-else-if="files.length === 0" class="state-center">
-      <van-empty description="No files found on printer storage" />
+      <van-empty>
+        <template #description>
+          <div style="text-align: center; padding: 0 16px;">No files found on printer storage</div>
+        </template>
+      </van-empty>
     </div>
 
     <!-- File list -->

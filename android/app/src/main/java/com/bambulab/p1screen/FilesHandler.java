@@ -47,6 +47,8 @@ public final class FilesHandler {
       if (!client.login("bblp", code)) {
         throw new Exception("FTP Login failed");
       }
+      client.execPBSZ(0);
+      client.execPROT("P");
       client.enterLocalPassiveMode();
 
       JSONArray results = new JSONArray();
@@ -125,6 +127,8 @@ public final class FilesHandler {
       if (!client.login("bblp", code)) {
         throw new Exception("FTP Login failed");
       }
+      client.execPBSZ(0);
+      client.execPROT("P");
       client.enterLocalPassiveMode();
       client.setFileType(FTP.BINARY_FILE_TYPE);
 
