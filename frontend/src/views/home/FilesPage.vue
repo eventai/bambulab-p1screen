@@ -49,7 +49,13 @@
       @confirm="startPrint"
     >
       <div class="dialog-content">
-        <img v-if="selectedFile?.thumbnailUrl" :src="selectedFile.thumbnailUrl" class="dialog-thumb" />
+        <div v-if="selectedFile?.thumbnailLoading" class="thumb-loading">
+          <van-loading type="spinner" size="24px" />
+        </div>
+        <img v-else-if="selectedFile?.thumbnailUrl" :src="selectedFile.thumbnailUrl" class="dialog-thumb" />
+        <div v-else-if="selectedFile?.thumbnailError" class="thumb-error">
+          No preview available
+        </div>
         <span class="dialog-name">{{ selectedFile?.name }}</span>
         <span class="dialog-hint">Bed leveling will be performed before printing.</span>
       </div>
@@ -71,6 +77,8 @@ interface PrinterFile {
   modified: string | null
   path: string
   thumbnailUrl?: string
+  thumbnailLoading?: boolean
+  thumbnailError?: boolean
 }
 
 const client = PrinterClient.getInstance()
@@ -113,6 +121,8 @@ const loadFiles = async () => {
 
 const loadThumbnail = async (file: PrinterFile, ip: string, code: string) => {
   try {
+    file.thumbnailLoading = true
+    file.thumbnailError = false
     const params = new URLSearchParams({
       ip,
       code,
@@ -120,11 +130,16 @@ const loadThumbnail = async (file: PrinterFile, ip: string, code: string) => {
       path: file.path,  // exact FTP path from file listing
     })
     const res = await fetch(`/api/thumbnail?${params}`)
-    if (!res.ok) return
+    if (!res.ok) {
+      file.thumbnailError = true
+      return
+    }
     const blob = await res.blob()
     file.thumbnailUrl = URL.createObjectURL(blob)
   } catch {
-    // thumbnail is optional – ignore errors
+    file.thumbnailError = true
+  } finally {
+    file.thumbnailLoading = false
   }
 }
 
@@ -286,11 +301,27 @@ const formatSize = (bytes: number): string => {
 }
 
 .dialog-thumb {
-  width: 100px;
-  height: 100px;
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  aspect-ratio: 1 / 1;
   object-fit: contain;
   border-radius: 8px;
   background: var(--van-background-3);
+}
+
+.thumb-loading,
+.thumb-error {
+  width: 100%;
+  max-width: 200px;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: var(--van-background-3);
+  color: var(--van-text-color-2);
+  font-size: 12px;
 }
 
 .dialog-name {

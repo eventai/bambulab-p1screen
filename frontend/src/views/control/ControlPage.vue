@@ -399,8 +399,12 @@ const bedTempText = computed(() => device.value ? `${Math.floor(device.value.bed
 
 @media (orientation: portrait) {
   .background-image {
-    width: calc(100% - 40px);
+    width: 90%;
     height: auto;
+    left: 50%;
+    top: 68%;
+    bottom: auto;
+    transform: translate(-50%, -50%);
   }
 
   .control-grid {

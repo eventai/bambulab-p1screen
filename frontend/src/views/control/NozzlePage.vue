@@ -100,11 +100,13 @@ const editNozzle = () => {
 <style scoped>
 .nozzle-container {
   display: grid;
-  grid-template-columns: 180px 80px 170px;
+  grid-template-columns: auto auto auto;
+  gap: 40px;
   align-items: center;
-  justify-items: center;
   justify-content: center;
   height: 100%;
+  padding-bottom: 80px;
+  box-sizing: border-box;
 }
 
 .nozzle-container > img {
@@ -178,14 +180,17 @@ label {
 
 @media (orientation: portrait) {
   .nozzle-container {
-    grid-template-rows: 200px 200px;
-    grid-template-columns: 80px 170px;
+    grid-template-rows: auto auto;
+    grid-template-columns: auto auto;
+    gap: 40px;
+    align-content: center;
   }
   .nozzle-container > img {
     grid-row: 1;
     grid-column: 1 / span 2;
     width: auto;
-    height: 100px;
+    height: 120px;
+    justify-self: center;
   }
   .nozzle-container > div {
     grid-row: 2;
