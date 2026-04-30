@@ -161,11 +161,7 @@ const formatSize = (bytes: number): string => {
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`
 }
 
-const formatDate = (iso: string | null): string => {
-  if (!iso) return ''
-  const d = new Date(iso)
-  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
-}
+
 </script>
 
 <style scoped>
