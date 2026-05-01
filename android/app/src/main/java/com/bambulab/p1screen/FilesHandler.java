@@ -139,35 +139,41 @@ public final class FilesHandler {
         Log.i(TAG, "Trying to download: " + ftpPath);
         InputStream is = client.retrieveFileStream(ftpPath);
         if (is != null) {
+          java.io.File tempFile = null;
           try {
-            ZipInputStream zis = new ZipInputStream(is);
-            ZipEntry entry;
-            while ((entry = zis.getNextEntry()) != null) {
+            tempFile = java.io.File.createTempFile("bambu_", ".3mf");
+            java.io.FileOutputStream fos = new java.io.FileOutputStream(tempFile);
+            byte[] buffer = new byte[8192];
+            int len;
+            while ((len = is.read(buffer)) != -1) {
+              fos.write(buffer, 0, len);
+            }
+            fos.close();
+            
+            // Now parse robustly using ZipFile
+            java.util.zip.ZipFile zipFile = new java.util.zip.ZipFile(tempFile);
+            java.util.Enumeration<? extends java.util.zip.ZipEntry> entries = zipFile.entries();
+            while (entries.hasMoreElements()) {
+              java.util.zip.ZipEntry entry = entries.nextElement();
               if (thumbnailEntries.contains(entry.getName())) {
+                InputStream zis = zipFile.getInputStream(entry);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                byte[] buffer = new byte[4096];
-                int len;
                 while ((len = zis.read(buffer)) > 0) {
                   baos.write(buffer, 0, len);
                 }
+                zis.close();
                 imgData = baos.toByteArray();
                 break;
               }
             }
-            
-            // CRITICAL FIX: The Bambu Lab FTP server crashes if a data transfer is aborted prematurely.
-            // We MUST exhaust the remaining bytes from the underlying InputStream before closing it.
-            if (imgData != null) {
-                byte[] exhaustBuffer = new byte[8192];
-                while (is.read(exhaustBuffer) != -1) {
-                    // discard remaining data to prevent printer crash
-                }
-            }
-            
-            zis.close();
+            zipFile.close();
           } catch (Exception e) {
             Log.w(TAG, "Zip parse error", e);
             errorMessages.append("ZipError: ").append(e.getMessage()).append(" ");
+          } finally {
+            if (tempFile != null && tempFile.exists()) {
+              tempFile.delete();
+            }
           }
           
           try {
@@ -187,12 +193,15 @@ public final class FilesHandler {
       client.logout();
       client.disconnect();
 
-      if (imgData != null) {
+      if (imgData != null && imgData.length > 0) {
         NanoHTTPD.Response response = NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, "image/png", new ByteArrayInputStream(imgData), imgData.length);
         response.addHeader("Cache-Control", "public, max-age=3600");
         return response;
       } else {
         String err = errorMessages.toString();
+        if (imgData != null && imgData.length == 0) {
+            err = "Extracted 0 bytes for thumbnail. " + err;
+        }
         if (err.isEmpty()) err = "Thumbnail not found";
         return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.INTERNAL_ERROR, "text/plain", err);
       }
