@@ -11,7 +11,10 @@
           draggable="false"
           @dragstart.prevent
         >
-          <component :is="item.icon" class="nav-icon" />
+          <van-badge v-if="item.key === 'message'" :content="hmsCount" :show-zero="false">
+            <component :is="item.icon" class="nav-icon" />
+          </van-badge>
+          <component v-else :is="item.icon" class="nav-icon" />
         </RouterLink>
       </aside>
 
@@ -23,9 +26,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import type { Component } from 'vue'
+import { PrinterClient, PrinterEvent } from './api/PrinterClient'
 import IconHome from '~icons/material-symbols/home-rounded'
 import IconTune from '~icons/material-symbols/tune-rounded'
 import IconDatabase from '~icons/material-symbols/database'
@@ -51,6 +55,23 @@ const navItems: NavItem[] = [
 const activeNavKey = computed(() => {
   const firstSegment = route.path.split('/')[1]
   return firstSegment ?? ''
+})
+
+const client = PrinterClient.getInstance()
+const hmsCount = ref(0)
+
+const onPushStatus = () => {
+  hmsCount.value = client.device.print?.hms?.length || 0
+}
+
+onMounted(() => {
+  client.on(PrinterEvent.MQTT_STATE_CHANGE, onPushStatus)
+  client.on(PrinterEvent.PRINT_PUSH_STATUS, onPushStatus)
+})
+
+onUnmounted(() => {
+  client.off(PrinterEvent.MQTT_STATE_CHANGE, onPushStatus)
+  client.off(PrinterEvent.PRINT_PUSH_STATUS, onPushStatus)
 })
 </script>
 
