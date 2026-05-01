@@ -138,7 +138,9 @@ public final class MainActivity extends Activity {
     decorView.setOnApplyWindowInsetsListener((v, insets) -> {
       int orientation = getResources().getConfiguration().orientation;
       if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-        v.setPadding(insets.getSystemWindowInsetLeft(), insets.getSystemWindowInsetTop(), insets.getSystemWindowInsetRight(), 0);
+        // V režimu na šířku (full-screen) nenastavujeme horní padding,
+        // aby aplikace vyplnila i prostor po skrytém status baru.
+        v.setPadding(insets.getSystemWindowInsetLeft(), 0, insets.getSystemWindowInsetRight(), 0);
       } else {
         v.setPadding(insets.getSystemWindowInsetLeft(), insets.getSystemWindowInsetTop(), insets.getSystemWindowInsetRight(), insets.getSystemWindowInsetBottom());
       }
