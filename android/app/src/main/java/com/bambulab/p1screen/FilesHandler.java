@@ -133,6 +133,7 @@ public final class FilesHandler {
       client.setFileType(FTP.BINARY_FILE_TYPE);
 
       byte[] imgData = null;
+      StringBuilder errorMessages = new StringBuilder();
 
       for (String ftpPath : ftpPaths) {
         Log.i(TAG, "Trying to download: " + ftpPath);
@@ -153,29 +154,48 @@ public final class FilesHandler {
                 break;
               }
             }
+            
+            // CRITICAL FIX: The Bambu Lab FTP server crashes if a data transfer is aborted prematurely.
+            // We MUST exhaust the remaining bytes from the underlying InputStream before closing it.
+            if (imgData != null) {
+                byte[] exhaustBuffer = new byte[8192];
+                while (is.read(exhaustBuffer) != -1) {
+                    // discard remaining data to prevent printer crash
+                }
+            }
+            
             zis.close();
           } catch (Exception e) {
             Log.w(TAG, "Zip parse error", e);
+            errorMessages.append("ZipError: ").append(e.getMessage()).append(" ");
           }
-          // Exhaust and complete the stream
-          client.completePendingCommand();
+          
+          try {
+            client.completePendingCommand();
+          } catch (Exception e) {
+            errorMessages.append("CmdError: ").append(e.getMessage()).append(" ");
+          }
           
           if (imgData != null) {
             break;
           }
+        } else {
+          errorMessages.append("No stream for ").append(ftpPath).append(" ");
         }
       }
 
       client.logout();
       client.disconnect();
 
-      if (imgData == null) {
-        return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.NOT_FOUND, "text/plain", "Thumbnail not found");
+      if (imgData != null) {
+        NanoHTTPD.Response response = NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, "image/png", new ByteArrayInputStream(imgData), imgData.length);
+        response.addHeader("Cache-Control", "public, max-age=3600");
+        return response;
+      } else {
+        String err = errorMessages.toString();
+        if (err.isEmpty()) err = "Thumbnail not found";
+        return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.INTERNAL_ERROR, "text/plain", err);
       }
-
-      NanoHTTPD.Response response = NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, "image/png", new ByteArrayInputStream(imgData), imgData.length);
-      response.addHeader("Cache-Control", "public, max-age=3600");
-      return response;
 
     } catch (Exception e) {
       Log.e(TAG, "FTP thumbnail error", e);

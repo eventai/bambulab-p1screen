@@ -54,7 +54,7 @@
         </div>
         <img v-else-if="selectedFile?.thumbnailUrl" :src="selectedFile.thumbnailUrl" class="dialog-thumb" />
         <div v-else-if="selectedFile?.thumbnailError" class="thumb-error">
-          No preview available
+          {{ selectedFile?.thumbnailErrorText || 'No preview available' }}
         </div>
         <span class="dialog-name">{{ selectedFile?.name }}</span>
         <span class="dialog-hint">Bed leveling will be performed before printing.</span>
@@ -79,6 +79,7 @@ interface PrinterFile {
   thumbnailUrl?: string
   thumbnailLoading?: boolean
   thumbnailError?: boolean
+  thumbnailErrorText?: string
 }
 
 const client = PrinterClient.getInstance()
@@ -131,7 +132,9 @@ const loadThumbnail = async (file: PrinterFile, ip: string, code: string) => {
     })
     const res = await fetch(`/api/thumbnail?${params}`)
     if (!res.ok) {
+      const errText = await res.text()
       file.thumbnailError = true
+      file.thumbnailErrorText = errText || 'No preview available'
       return
     }
     const blob = await res.blob()
@@ -321,7 +324,10 @@ const formatSize = (bytes: number): string => {
   border-radius: 8px;
   background: var(--van-background-3);
   color: var(--van-text-color-2);
-  font-size: 12px;
+  font-size: 11px;
+  text-align: center;
+  padding: 8px;
+  word-break: break-word;
 }
 
 .dialog-name {
