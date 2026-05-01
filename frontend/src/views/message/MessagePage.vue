@@ -27,7 +27,7 @@
       </div>
     </div>
     
-    <van-empty v-else description="No messages" />
+    <van-empty v-else description="No messages" class="empty-state" />
   </div>
 </template>
 
@@ -102,6 +102,7 @@ const displayUrl = computed(() => {
 <style scoped>
 .msg-page {
   display: flex;
+  flex-direction: column;
   height: 100%;
   width: 100%;
   box-sizing: border-box;
@@ -110,11 +111,19 @@ const displayUrl = computed(() => {
 }
 
 .hms-layout {
+  flex: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
   width: 100%;
   height: 100%;
+}
+
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .hms-detail {
