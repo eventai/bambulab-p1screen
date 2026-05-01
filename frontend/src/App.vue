@@ -64,6 +64,9 @@ const onPushStatus = () => {
   hmsCount.value = client.device.print?.hms?.length || 0
 }
 
+// Initialize immediately in case data is already present
+onPushStatus()
+
 onMounted(() => {
   client.on(PrinterEvent.MQTT_STATE_CHANGE, onPushStatus)
   client.on(PrinterEvent.PRINT_PUSH_STATUS, onPushStatus)
